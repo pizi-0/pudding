@@ -28,6 +28,22 @@ class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
 
     return null;
   }
+
+  Future<void> signInWithCredential(String user, String password) async {
+    final client = services<JellyfinClient>();
+    try {
+      final auth = await client.user.authenticateByName(
+        username: user,
+        password: password,
+      );
+
+      client.setSession(token: auth.accessToken, userId: auth.user.id);
+
+      state = AsyncData(auth.user);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
 
 final authProvider = AsyncNotifierProvider<AuthNotifier, JellyfinUser?>(

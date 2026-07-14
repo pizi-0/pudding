@@ -10,7 +10,7 @@ class Pudding extends StatelessWidget {
     return MaterialApp(
       title: 'Pudding',
       home: Material(
-        child: FTheme(data: FThemes.violet.dark.touch, child: AuthScreen()),
+        child: FTheme(data: FThemes.violet.dark.desktop, child: AuthScreen()),
       ),
     );
   }

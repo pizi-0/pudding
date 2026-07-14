@@ -43,6 +43,7 @@ dependencies:
   shared_preferences: ^2.5.5
   get_it: ^9.2.1
   device_info_plus: ^13.2.0
+  awesome_extensions: ^2.1.0
 
 dev_dependencies:
   flutter_test:

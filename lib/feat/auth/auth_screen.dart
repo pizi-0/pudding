@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pudding/const/const.dart';
 import 'package:pudding/feat/auth/auth_provider.dart';
+import 'package:pudding/feat/auth/widgets/auth_widget.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -27,13 +29,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       return FScaffold(
         child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 400, maxHeight: 400),
-            child: FCard(
-              child: FTabs(
-                children: [
-                  FTabEntry(label: Text('Login'), child: _buildLoginForm()),
-                  FTabEntry(label: Text('QuickConnect'), child: Text('login')),
-                ],
+            constraints: BoxConstraints(maxWidth: 400),
+            child: AnimatedSize(
+              alignment: .topCenter,
+              duration: kDefaultAnimationDuration,
+              child: FCard(
+                child: FTabs(
+                  children: [
+                    FTabEntry(label: Text('Login'), child: AuthWidget()),
+                    FTabEntry(
+                      label: Text('QuickConnect'),
+                      child: Text('login'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -42,34 +51,5 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     }
 
     return FScaffold(child: Text('Welcome'));
-  }
-
-  Widget _buildLoginForm() {
-    return Column(
-      spacing: 4,
-      children: [
-        FTextFormField(
-          label: Text('Server addresss'),
-          onSubmit: (value) async {},
-        ),
-        FTextFormField(
-          label: Text('Username'),
-        ),
-        FTextFormField.password(),
-
-        Row(
-          spacing: 4,
-          children: [
-            Expanded(
-              flex: 2,
-              child: FButton(
-                child: Text('Login'),
-                onPress: () {},
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
   }
 }
