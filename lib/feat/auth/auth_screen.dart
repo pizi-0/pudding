@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/feat/auth/auth_provider.dart';
 import 'package:pudding/feat/auth/widgets/auth_widget.dart';
+import 'package:pudding/theme/styles/card_style.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -16,6 +17,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
+    final theme = FTheme.of(context);
 
     if (auth.isLoading) {
       return FScaffold(
@@ -34,14 +36,26 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               alignment: .topCenter,
               duration: kDefaultAnimationDuration,
               child: FCard(
-                child: FTabs(
-                  children: [
-                    FTabEntry(label: Text('Login'), child: AuthWidget()),
-                    FTabEntry(
-                      label: Text('QuickConnect'),
-                      child: Text('login'),
-                    ),
-                  ],
+                style: cardStyle(
+                  colors: theme.colors,
+                  typography: theme.typography,
+                  style: theme.style,
+                  touch: false,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: FTabs(
+                    children: [
+                      FTabEntry(
+                        label: Text('Login'),
+                        child: AuthWidget(),
+                      ),
+                      FTabEntry(
+                        label: Text('QuickConnect'),
+                        child: Text('login'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -34,8 +34,8 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  forui: ^0.23.0
-  forui_assets: ^0.23.0
+  forui: ^0.24.0
+  forui_assets: ^0.24.0
   flutter_riverpod: ^3.3.2
   dart_jellyfin: ^0.1.0
   flutter_secure_storage: ^10.3.1
@@ -55,6 +55,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  forui_cli: ^0.24.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -65,6 +66,20 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
+  fonts:
+    - family: Roboto Slab
+      fonts:
+        - asset: assets/fonts/Roboto_Slab/RobotoSlab.ttf
+    - family: Noto Sans
+      fonts:
+        - asset: assets/fonts/Noto_Sans/NotoSans.ttf
+        - asset: assets/fonts/Noto_Sans/NotoSans-Italic.ttf
+          style: italic
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto/Roboto.ttf
+        - asset: assets/fonts/Roboto/Roboto-Italic.ttf
+          style: italic
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:

@@ -14,7 +14,8 @@ class AuthWidget extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _AuthWidgetState();
 }
 
-class _AuthWidgetState extends ConsumerState<AuthWidget> {
+class _AuthWidgetState extends ConsumerState<AuthWidget>
+    with AutomaticKeepAliveClientMixin {
   final formKey = GlobalKey<FormState>();
 
   Widget? serverErrorWidget;
@@ -39,6 +40,7 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final theme = FTheme.of(context);
     final showCredentialFields = info != null;
 
@@ -49,7 +51,7 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
           control: .managed(controller: serverField),
           label: Text('Server address'),
           hint: 'http://localhost:8096',
-          onSubmit: _getServerInfo,
+          onSubmit: (v) => _getServerInfo(),
           error: serverErrorWidget,
           clearable: (p0) => p0.text.isNotEmpty,
           clearIconBuilder: (p0, style, clear) => Padding(
@@ -116,6 +118,7 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
                           }
                           return null;
                         },
+                        onSubmit: (v) => _signInWithCredentials(),
                       ),
                     ],
                   ),
@@ -143,13 +146,11 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
           duration: kDefaultAnimationDuration,
           child: showCredentialFields
               ? FButton(
-                  onPress: loading ? () {} : _signInWithCredentials,
+                  onPress: _signInWithCredentials,
                   child: loading ? FCircularProgress() : Text('Sign in'),
                 )
               : FButton(
-                  onPress: loading
-                      ? () {}
-                      : () => _getServerInfo(serverField.text),
+                  onPress: _getServerInfo,
                   child: loading ? FCircularProgress() : Text('Test'),
                 ),
         ),
@@ -157,13 +158,15 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
     );
   }
 
-  Future<void> _getServerInfo(String serverAddress) async {
-    String defAddress = 'http://localhost:8096';
-    String add = serverAddress;
+  Future<void> _getServerInfo() async {
+    if (loading) return;
 
-    if (serverAddress.isEmpty) {
-      serverField.text = defAddress;
-      add = defAddress;
+    String address = 'http://localhost:8096';
+
+    if (serverField.text.isEmpty) {
+      serverField.text = address;
+    } else {
+      address = serverField.text;
     }
 
     loading = true;
@@ -171,14 +174,14 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
     serverErrorWidget = null;
     setState(() {});
     try {
-      jelly.connect(add.trim());
+      jelly.connect(address);
       info = await jelly.system.publicInfo();
       setState(() {});
     } on JellyfinException catch (e) {
       debugPrint(e.type.toString());
-      serverErrorWidget = Text('Unable to connect to $add. ${e.type}');
+      serverErrorWidget = Text('Unable to connect to $address. ${e.type}');
     } on Exception catch (e) {
-      serverErrorWidget = Text('Unable to connect to $add. $e');
+      serverErrorWidget = Text('Unable to connect to $address. $e');
     } finally {
       loading = false;
       setState(() {});
@@ -186,6 +189,8 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
   }
 
   Future<void> _signInWithCredentials() async {
+    if (loading) return;
+
     loading = true;
     loginErrorMessage = null;
     setState(() {});
@@ -205,4 +210,7 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
       setState(() {});
     }
   }
+
+  @override
+  bool get wantKeepAlive => serverField.text.isNotEmpty;
 }
