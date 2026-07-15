@@ -22,6 +22,7 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
   JellyfinSystemInfo? info;
 
   bool loading = false;
+  bool quickConnectEnabled = false;
 
   FAutocompleteController serverField = FAutocompleteController();
   TextEditingController userField = TextEditingController();
@@ -43,119 +44,169 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
     final showCredentialFields = info != null;
 
     return Column(
-      mainAxisAlignment: .start,
+      mainAxisAlignment: .center,
+      mainAxisSize: .min,
       children: [
-        FAutocomplete.text(
-          items: ['http://localhost:8096', 'http://192.168.0.69:8096'],
-          control: .managed(controller: serverField),
-          label: Text('Server address'),
-          hint: 'http://localhost:8096',
-          onSubmit: (v) => _getServerInfo(),
-          readOnly: info != null,
-          forceErrorText: serverErrorMessage,
-          errorBuilder: (context, message) => Text(message),
-          suffixBuilder: (context, style, variants) {
-            if (serverField.text.isNotEmpty) {
-              return Padding(
-                padding: const .only(right: 2),
-                child: FButton.icon(
-                  size: .sm,
-                  variant: .ghost,
-                  onPress: () {
-                    serverField.clear();
-                    serverErrorMessage = null;
-                    info = null;
-                    setState(() {});
-                  },
-                  child: Icon(FLucideIcons.x),
-                ),
-              );
-            }
-            return SizedBox.shrink();
-          },
-        ),
-
-        SizedBox(height: 8),
-        SizedBox(
-          height: showCredentialFields ? null : 0,
-          child: Column(
-            crossAxisAlignment: .start,
-            spacing: 8,
-            children: [
-              Row(
-                spacing: 8,
-                children: [
-                  Expanded(child: FDivider()),
-                  Text(
-                    '${info?.serverName ?? '{serverName}'} (${info?.version})',
-                    style: theme.typography.body.sm.copyWith(
-                      fontWeight: .w600,
-                    ),
-                  ),
-                  Expanded(child: FDivider()),
-                ],
-              ),
-              Form(
-                key: formKey,
-                child: Column(
-                  spacing: 8,
-                  children: [
-                    FTextFormField(
-                      control: .managed(controller: userField),
-                      label: Text('Username'),
-                      validator: (value) {
-                        if (value?.isEmpty ?? false) {
-                          return 'Username cannot be empty';
-                        }
-                        return null;
-                      },
-                    ),
-                    FTextFormField.password(
-                      control: .managed(controller: passField),
-                      label: Text('Password'),
-                      validator: (value) {
-                        if (value?.isEmpty ?? false) {
-                          return 'Password cannot be empty';
-                        }
-                        return null;
-                      },
-                      onSubmit: (v) => _signInWithCredentials(),
-                    ),
-                  ],
-                ),
-              ),
-              AnimatedSize(
-                duration: kDefaultAnimationDuration,
-                alignment: AlignmentGeometry.topLeft,
-                child: SizedBox(
-                  height: loginErrorMessage == null ? 0 : null,
-                  child: Text(
-                    loginErrorMessage ??
-                        'There should be an error message here',
-                    style: theme.typography.body.sm.copyWith(
-                      color: theme.colors.error,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            'Pudding',
+            style: theme.typography.display.xl5.copyWith(
+              fontWeight: .bold,
+              color: theme.colors.primary,
+            ),
           ),
         ),
-        SizedBox(height: 8),
-        AnimatedSwitcher(
-          duration: kDefaultAnimationDuration,
-          child: showCredentialFields
-              ? FButton(
-                  onPress: _signInWithCredentials,
-                  child: loading ? FCircularProgress() : Text('Sign in'),
-                )
-              : FButton(
-                  onPress: _getServerInfo,
-                  child: loading ? FCircularProgress() : Text('Test'),
+        FCard(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: .min,
+              mainAxisAlignment: .start,
+              children: [
+                FAutocomplete.text(
+                  items: ['http://localhost:8096', 'http://192.168.0.69:8096'],
+                  control: .managed(controller: serverField),
+                  onItemPress: (value) => _resetForm(),
+                  label: Text('Server address'),
+                  hint: 'http://localhost:8096',
+                  onSubmit: (v) => _getServerInfo(),
+                  readOnly: info != null,
+                  forceErrorText: serverErrorMessage,
+                  errorBuilder: (context, message) => Text(message),
+                  suffixBuilder: (context, style, variants) {
+                    if (serverField.text.isNotEmpty) {
+                      return Padding(
+                        padding: const .only(right: 2),
+                        child: FButton.icon(
+                          size: .sm,
+                          variant: .ghost,
+                          onPress: () {
+                            serverField.clear();
+                            _resetForm();
+                          },
+                          child: Icon(FLucideIcons.x),
+                        ),
+                      );
+                    }
+                    return SizedBox.shrink();
+                  },
                 ),
+
+                SizedBox(height: 8),
+                SizedBox(
+                  height: showCredentialFields ? null : 0,
+                  child: Column(
+                    crossAxisAlignment: .start,
+                    spacing: 8,
+                    children: [
+                      Row(
+                        spacing: 8,
+                        children: [
+                          Expanded(child: FDivider()),
+                          Text(
+                            '${info?.serverName ?? '{serverName}'} (${info?.version})',
+                            style: theme.typography.body.sm.copyWith(
+                              fontWeight: .w600,
+                            ),
+                          ),
+                          Expanded(child: FDivider()),
+                        ],
+                      ),
+                      Form(
+                        key: formKey,
+                        child: Column(
+                          spacing: 8,
+                          children: [
+                            FTextFormField(
+                              control: .managed(controller: userField),
+                              label: Text('Username'),
+                              validator: (value) {
+                                if (value?.isEmpty ?? false) {
+                                  return 'Username cannot be empty';
+                                }
+                                return null;
+                              },
+                            ),
+                            FTextFormField.password(
+                              control: .managed(controller: passField),
+                              label: Text('Password'),
+                              validator: (value) {
+                                if (value?.isEmpty ?? false) {
+                                  return 'Password cannot be empty';
+                                }
+                                return null;
+                              },
+                              onSubmit: (v) => _signInWithCredentials(),
+                            ),
+                          ],
+                        ),
+                      ),
+                      AnimatedSize(
+                        duration: kDefaultAnimationDuration,
+                        alignment: AlignmentGeometry.topLeft,
+                        child: SizedBox(
+                          height: loginErrorMessage == null ? 0 : null,
+                          child: Text(
+                            loginErrorMessage ??
+                                'There should be an error message here',
+                            style: theme.typography.body.sm.copyWith(
+                              color: theme.colors.error,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 8),
+                AnimatedSwitcher(
+                  duration: kDefaultAnimationDuration,
+                  child: _buildButton(showCredentialFields),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );
+  }
+
+  Widget _buildButton(bool show) {
+    if (show) {
+      return Row(
+        spacing: 8,
+        children: [
+          Expanded(
+            child: FButton(
+              onPress: _signInWithCredentials,
+              child: loading ? FCircularProgress() : Text('Sign in'),
+            ),
+          ),
+          if (quickConnectEnabled)
+            Expanded(
+              child: FButton(
+                variant: .secondary,
+                onPress: _signInWithCredentials,
+                child: loading ? FCircularProgress() : Text('Quick Connect'),
+              ),
+            ),
+        ],
+      );
+    } else {
+      return FButton(
+        onPress: _getServerInfo,
+        child: loading ? FCircularProgress() : Text('Test'),
+      );
+    }
+  }
+
+  void _resetForm() {
+    serverErrorMessage = null;
+    loginErrorMessage = null;
+    info = null;
+    formKey.currentState?.reset();
+    setState(() {});
   }
 
   Future<void> _getServerInfo() async {
@@ -169,12 +220,13 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
     }
 
     loading = true;
-    info = null;
-    serverErrorMessage = null;
+    _resetForm();
     setState(() {});
     try {
       jelly.connect(address);
       info = await jelly.system.publicInfo();
+      quickConnectEnabled = await jelly.quickConnect.enabled();
+
       setState(() {});
     } on JellyfinException catch (e) {
       debugPrint(e.type.toString());

@@ -21,23 +21,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           child: AnimatedSize(
             alignment: .topCenter,
             duration: kDefaultAnimationDuration,
-            child: FCard(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: FTabs(
-                  children: [
-                    FTabEntry(
-                      label: Text('Login'),
-                      child: AuthWidget(),
-                    ),
-                    FTabEntry(
-                      label: Text('QuickConnect'),
-                      child: Text('login'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            child: AuthWidget(),
           ),
         ),
       ),
