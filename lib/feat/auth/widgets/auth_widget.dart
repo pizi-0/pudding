@@ -14,17 +14,16 @@ class AuthWidget extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _AuthWidgetState();
 }
 
-class _AuthWidgetState extends ConsumerState<AuthWidget>
-    with AutomaticKeepAliveClientMixin {
+class _AuthWidgetState extends ConsumerState<AuthWidget> {
   final formKey = GlobalKey<FormState>();
 
-  Widget? serverErrorWidget;
+  String? serverErrorMessage;
   String? loginErrorMessage;
   JellyfinSystemInfo? info;
 
   bool loading = false;
 
-  TextEditingController serverField = TextEditingController();
+  FAutocompleteController serverField = FAutocompleteController();
   TextEditingController userField = TextEditingController();
   TextEditingController passField = TextEditingController();
 
@@ -40,105 +39,106 @@ class _AuthWidgetState extends ConsumerState<AuthWidget>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     final theme = FTheme.of(context);
     final showCredentialFields = info != null;
 
     return Column(
       mainAxisAlignment: .start,
       children: [
-        FTextField(
+        FAutocomplete.text(
+          items: ['http://localhost:8096', 'http://192.168.0.69:8096'],
           control: .managed(controller: serverField),
           label: Text('Server address'),
           hint: 'http://localhost:8096',
           onSubmit: (v) => _getServerInfo(),
-          error: serverErrorWidget,
-          clearable: (p0) => p0.text.isNotEmpty,
-          clearIconBuilder: (p0, style, clear) => Padding(
-            padding: const EdgeInsetsGeometry.only(right: 1),
-            child: FButton.icon(
-              size: .sm,
-              variant: .ghost,
-              onPress: () {
-                serverErrorWidget = null;
-                info = null;
-                setState(() {});
-
-                clear();
-              },
-              child: Icon(FLucideIcons.x),
-            ),
-          ),
+          readOnly: info != null,
+          forceErrorText: serverErrorMessage,
+          errorBuilder: (context, message) => Text(message),
+          suffixBuilder: (context, style, variants) {
+            if (serverField.text.isNotEmpty) {
+              return Padding(
+                padding: const .only(right: 2),
+                child: FButton.icon(
+                  size: .sm,
+                  variant: .ghost,
+                  onPress: () {
+                    serverField.clear();
+                    serverErrorMessage = null;
+                    info = null;
+                    setState(() {});
+                  },
+                  child: Icon(FLucideIcons.x),
+                ),
+              );
+            }
+            return SizedBox.shrink();
+          },
         ),
-        // FDivider(),
+
         SizedBox(height: 8),
-        AnimatedSize(
-          duration: kDefaultAnimationDuration,
-          alignment: .topCenter,
-          child: SizedBox(
-            height: showCredentialFields ? null : 0,
-            child: Column(
-              crossAxisAlignment: .start,
-              spacing: 8,
-              children: [
-                Row(
+        SizedBox(
+          height: showCredentialFields ? null : 0,
+          child: Column(
+            crossAxisAlignment: .start,
+            spacing: 8,
+            children: [
+              Row(
+                spacing: 8,
+                children: [
+                  Expanded(child: FDivider()),
+                  Text(
+                    '${info?.serverName ?? '{serverName}'} (${info?.version})',
+                    style: theme.typography.body.sm.copyWith(
+                      fontWeight: .w600,
+                    ),
+                  ),
+                  Expanded(child: FDivider()),
+                ],
+              ),
+              Form(
+                key: formKey,
+                child: Column(
                   spacing: 8,
                   children: [
-                    Expanded(child: FDivider()),
-                    Text(
-                      '${info?.serverName ?? '{serverName}'} (${info?.version})',
-                      style: theme.typography.body.sm.copyWith(
-                        fontWeight: .w600,
-                      ),
+                    FTextFormField(
+                      control: .managed(controller: userField),
+                      label: Text('Username'),
+                      validator: (value) {
+                        if (value?.isEmpty ?? false) {
+                          return 'Username cannot be empty';
+                        }
+                        return null;
+                      },
                     ),
-                    Expanded(child: FDivider()),
+                    FTextFormField.password(
+                      control: .managed(controller: passField),
+                      label: Text('Password'),
+                      validator: (value) {
+                        if (value?.isEmpty ?? false) {
+                          return 'Password cannot be empty';
+                        }
+                        return null;
+                      },
+                      onSubmit: (v) => _signInWithCredentials(),
+                    ),
                   ],
                 ),
-                Form(
-                  key: formKey,
-                  child: Column(
-                    spacing: 8,
-                    children: [
-                      FTextFormField(
-                        control: .managed(controller: userField),
-                        label: Text('Username'),
-                        validator: (value) {
-                          if (value?.isEmpty ?? false) {
-                            return 'Username cannot be empty';
-                          }
-                          return null;
-                        },
-                      ),
-                      FTextFormField.password(
-                        control: .managed(controller: passField),
-                        label: Text('Password'),
-                        validator: (value) {
-                          if (value?.isEmpty ?? false) {
-                            return 'Password cannot be empty';
-                          }
-                          return null;
-                        },
-                        onSubmit: (v) => _signInWithCredentials(),
-                      ),
-                    ],
-                  ),
-                ),
-                AnimatedSize(
-                  duration: kDefaultAnimationDuration,
-                  alignment: AlignmentGeometry.topLeft,
-                  child: SizedBox(
-                    height: loginErrorMessage == null ? 0 : null,
-                    child: Text(
-                      loginErrorMessage ??
-                          'There should be an error message here',
-                      style: theme.typography.body.sm.copyWith(
-                        color: theme.colors.error,
-                      ),
+              ),
+              AnimatedSize(
+                duration: kDefaultAnimationDuration,
+                alignment: AlignmentGeometry.topLeft,
+                child: SizedBox(
+                  height: loginErrorMessage == null ? 0 : null,
+                  child: Text(
+                    loginErrorMessage ??
+                        'There should be an error message here',
+                    style: theme.typography.body.sm.copyWith(
+                      color: theme.colors.error,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         SizedBox(height: 8),
@@ -160,7 +160,6 @@ class _AuthWidgetState extends ConsumerState<AuthWidget>
 
   Future<void> _getServerInfo() async {
     if (loading) return;
-
     String address = 'http://localhost:8096';
 
     if (serverField.text.isEmpty) {
@@ -171,7 +170,7 @@ class _AuthWidgetState extends ConsumerState<AuthWidget>
 
     loading = true;
     info = null;
-    serverErrorWidget = null;
+    serverErrorMessage = null;
     setState(() {});
     try {
       jelly.connect(address);
@@ -179,9 +178,9 @@ class _AuthWidgetState extends ConsumerState<AuthWidget>
       setState(() {});
     } on JellyfinException catch (e) {
       debugPrint(e.type.toString());
-      serverErrorWidget = Text('Unable to connect to $address. ${e.type}');
+      serverErrorMessage = 'Unable to connect to $address. ${e.type}';
     } on Exception catch (e) {
-      serverErrorWidget = Text('Unable to connect to $address. $e');
+      serverErrorMessage = 'Unable to connect to $address. $e';
     } finally {
       loading = false;
       setState(() {});
@@ -210,7 +209,4 @@ class _AuthWidgetState extends ConsumerState<AuthWidget>
       setState(() {});
     }
   }
-
-  @override
-  bool get wantKeepAlive => serverField.text.isNotEmpty;
 }
