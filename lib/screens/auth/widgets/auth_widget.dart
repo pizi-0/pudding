@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/const/const.dart';
-import 'package:pudding/feat/auth/auth_provider.dart';
+import 'package:pudding/screens/auth/auth_provider.dart';
 import 'package:pudding/services/di.dart';
 
 class AuthWidget extends ConsumerStatefulWidget {

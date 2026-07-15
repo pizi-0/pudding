@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pudding/const/const.dart';
-import 'package:pudding/feat/auth/auth_provider.dart';
-import 'package:pudding/feat/auth/widgets/auth_widget.dart';
+import 'package:pudding/screens/auth/auth_provider.dart';
+import 'package:pudding/screens/auth/widgets/auth_widget.dart';
 import 'package:pudding/theme/styles/card_style.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {

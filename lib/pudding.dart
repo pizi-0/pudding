@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:pudding/feat/auth/auth_screen.dart';
+import 'package:pudding/screens/auth/auth_screen.dart';
 import 'package:pudding/theme/theme.dart';
 
 class Pudding extends StatelessWidget {
