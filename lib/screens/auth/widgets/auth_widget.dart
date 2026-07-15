@@ -265,7 +265,7 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
       loginErrorMessage = e.toString();
     } finally {
       loading = false;
-      setState(() {});
+      if (mounted) setState(() {});
     }
   }
 
