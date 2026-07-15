@@ -3,6 +3,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/widgets/horizontal_dialog.dart';
@@ -51,11 +52,15 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(
-            'Pudding',
-            style: theme.typography.display.xl5.copyWith(
-              fontWeight: .bold,
-              color: theme.colors.primary,
+          child: Flexible(
+            child: Text(
+              'Pudding',
+              style: GoogleFonts.flavors(
+                textStyle: theme.typography.display.xl6.copyWith(
+                  fontWeight: .bold,
+                  color: theme.colors.primary,
+                ),
+              ),
             ),
           ),
         ),

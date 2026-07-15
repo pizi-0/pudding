@@ -16,7 +16,7 @@ class Pudding extends ConsumerWidget {
       routerConfig: router,
       builder: (context, child) => FTheme(
         data: FThemeData(
-          colors: darkCustom(primary: Colors.blue),
+          colors: darkCustom(primary: Colors.pink),
           touch: false,
         ),
         child: child!,

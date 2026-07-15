@@ -46,16 +46,19 @@ final FColors darkColors = FColors(
 );
 
 FColors darkCustom({Color primary = const Color(0xFFF0B100)}) {
-  final primaryForeground =
-      ThemeData.estimateBrightnessForColor(primary) == Brightness.dark
+  final primaryIsDark = ThemeData.estimateBrightnessForColor(primary) == .dark;
+
+  final primaryForeground = primaryIsDark
       ? Colors.white.withAlpha(230)
       : Colors.black.withAlpha(230);
+
+  final background = primary.darken(98);
 
   return FColors(
     brightness: .dark,
     systemOverlayStyle: .light,
     barrier: Color(0x7A000000),
-    background: Color(0xFF0A0A0A),
+    background: background,
     foreground: Color(0xFFFAFAFA),
     primary: primary,
     primaryForeground: primaryForeground,
@@ -74,16 +77,19 @@ FColors darkCustom({Color primary = const Color(0xFFF0B100)}) {
 }
 
 FColors lightCustom({Color primary = const Color(0xFFF0B100)}) {
-  final primaryForeground =
-      ThemeData.estimateBrightnessForColor(primary) == Brightness.dark
+  final primaryIsDark = ThemeData.estimateBrightnessForColor(primary) == .dark;
+
+  final primaryForeground = primaryIsDark
       ? Colors.white.withAlpha(230)
       : Colors.black.withAlpha(230);
+
+  final background = primary.lighten(98);
 
   return FColors(
     brightness: .light,
     systemOverlayStyle: .dark,
     barrier: Color(0x33000000),
-    background: Color(0xFFFFFFFF),
+    background: background,
     foreground: Color(0xFF0A0A0A),
     primary: primary,
     primaryForeground: primaryForeground,
