@@ -6,6 +6,7 @@ import 'package:pudding/data/local/secure_storage/secure_storage.dart';
 import 'package:pudding/services/di.dart';
 
 class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
+  final client = services<JellyfinClient>();
   @override
   Future<JellyfinUser?> build() async {
     return await getUser();
@@ -13,7 +14,6 @@ class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
 
   Future<JellyfinUser?> getUser() async {
     final savedSession = await SecureStorage.getSession();
-    final client = services<JellyfinClient>();
 
     if (savedSession != null) {
       client.setSession(
@@ -30,11 +30,24 @@ class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
   }
 
   Future<void> signInWithCredential(String user, String password) async {
-    final client = services<JellyfinClient>();
     try {
       final auth = await client.user.authenticateByName(
         username: user,
         password: password,
+      );
+
+      client.setSession(token: auth.accessToken, userId: auth.user.id);
+
+      state = AsyncData(auth.user);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> signInWithQuickConnect(String secret) async {
+    try {
+      final auth = await client.user.authenticateWithQuickConnect(
+        secret: secret,
       );
 
       client.setSession(token: auth.accessToken, userId: auth.user.id);
