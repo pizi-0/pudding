@@ -40,9 +40,13 @@ final routeProvider = Provider<GoRouter>(
         path: '/login',
         builder: (context, state) => AuthScreen(),
       ),
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) =>
-            MainNavigationShell(navigationShell: navigationShell),
+      StatefulShellRoute(
+        builder: (context, state, navigationShell) => navigationShell,
+        navigatorContainerBuilder: (context, navigationShell, children) =>
+            MainNavigationShell(
+              navigationShell: navigationShell,
+              children: children,
+            ),
         branches: [
           StatefulShellBranch(
             routes: [
