@@ -52,11 +52,11 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Flexible(
+          child: FittedBox(
             child: Text(
               'Pudding',
               style: GoogleFonts.flavors(
-                textStyle: theme.typography.display.xl6.copyWith(
+                textStyle: theme.typography.display.xl8.copyWith(
                   fontWeight: .bold,
                   color: theme.colors.primary,
                 ),
