@@ -49,3 +49,17 @@ class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
 final authProvider = AsyncNotifierProvider<AuthNotifier, JellyfinUser?>(
   () => AuthNotifier(),
 );
+
+final authStateProvider = Provider<AuthState>((ref) {
+  final user = ref.watch(authProvider);
+
+  if (user.value == null) {
+    return .unauthd;
+  } else if (user.value != null) {
+    return .authd;
+  } else {
+    return .init;
+  }
+});
+
+enum AuthState { init, authd, unauthd }
