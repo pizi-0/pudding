@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pudding/data/local/secure_storage/secure_storage.dart';
+import 'package:pudding/models/jf_saved_session.dart';
 import 'package:pudding/services/di.dart';
 
 class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
@@ -39,6 +40,14 @@ class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
       client.setSession(token: auth.accessToken, userId: auth.user.id);
 
       state = AsyncData(auth.user);
+
+      await SecureStorage.storeSession(
+        JfSavedSession(
+          token: auth.accessToken,
+          userId: auth.user.id,
+          serverAddresss: client.baseUrl!,
+        ),
+      );
     } catch (e) {
       rethrow;
     }
@@ -53,6 +62,14 @@ class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
       client.setSession(token: auth.accessToken, userId: auth.user.id);
 
       state = AsyncData(auth.user);
+
+      await SecureStorage.storeSession(
+        JfSavedSession(
+          token: auth.accessToken,
+          userId: auth.user.id,
+          serverAddresss: client.baseUrl!,
+        ),
+      );
     } catch (e) {
       rethrow;
     }
@@ -67,6 +84,8 @@ final authStateProvider = Provider<AuthState>((ref) {
   final user = ref.watch(authProvider);
 
   if (user.value == null) {
+    if (user.isLoading) return .init;
+
     return .unauthd;
   } else if (user.value != null) {
     return .authd;
