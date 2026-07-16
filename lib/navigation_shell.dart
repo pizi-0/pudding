@@ -21,6 +21,7 @@ class MainNavigationShell extends ConsumerWidget {
     final bottomBar = size.width <= theme.breakpoints.md;
 
     return FScaffold(
+      childPad: false,
       child: Column(
         children: [
           Expanded(
