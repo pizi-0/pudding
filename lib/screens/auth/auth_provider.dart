@@ -4,6 +4,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pudding/data/local/secure_storage/secure_storage.dart';
 import 'package:pudding/models/jf_saved_session.dart';
+import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/services/di.dart';
 
 class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
@@ -23,6 +24,8 @@ class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
       );
 
       client.connect(savedSession.serverAddresss);
+
+      ref.read(homeProvider);
 
       return await client.user.currentUser();
     }
