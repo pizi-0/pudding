@@ -18,11 +18,13 @@ class _HomeState extends ConsumerState<Home> {
 
     return FScaffold(
       childPad: false,
-      child: Column(
-        spacing: 8,
-        mainAxisAlignment: .center,
-        children: [
-          Showcase(items: data.showcaseItem),
+      child: CustomScrollView(
+        slivers: [
+          SliverFillViewport(
+            delegate: SliverChildListDelegate([
+              Showcase(items: data.showcaseItem),
+            ]),
+          ),
         ],
       ),
     );
