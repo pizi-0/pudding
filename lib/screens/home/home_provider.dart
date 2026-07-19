@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:pudding/services/di.dart';
+import 'package:pudding/utils/list_extensions.dart';
 
 class HomeNotifier extends AsyncNotifier<HomeData> {
   final client = services<JellyfinClient>();
@@ -22,9 +23,7 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
   Future<List<JellyfinItem>> _getShowcaseItems() async {
     List<JellyfinItem> res = [...await _getNextUp(), ...await _getLatest()];
 
-    print(res.length);
-
-    return res;
+    return res.uniqueBy((e) => e.id).toList();
   }
 
   Future<List<JellyfinItem>> _getNextUp({int limit = 5}) async {
