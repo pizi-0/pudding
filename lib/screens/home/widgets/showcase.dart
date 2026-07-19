@@ -156,7 +156,6 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
                   mainAxisSize: .min,
                   children: [
                     FButton(
-                      onFocusChange: (value) => print(value),
                       onPress: () {},
                       prefix: Icon(FLucideIcons.play),
                       child: Row(
