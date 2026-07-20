@@ -198,19 +198,49 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
   }
 }
 
-class ShowcaseItemBackdrop extends ConsumerWidget {
+class ShowcaseItemBackdrop extends StatefulWidget {
   final JellyfinItem item;
   const ShowcaseItemBackdrop({super.key, required this.item});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Image.network(
-      _getImage(),
-      errorBuilder: (context, error, stackTrace) =>
-          Center(child: Text(error.toString())),
-      fit: .cover,
-      color: Colors.black45,
-      colorBlendMode: .darken,
+  State<ShowcaseItemBackdrop> createState() => _ShowcaseItemBackdropState();
+}
+
+class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
+    with TickerProviderStateMixin {
+  late AnimationController anim;
+  late Animation<double> scale;
+  @override
+  void initState() {
+    super.initState();
+    anim = AnimationController(vsync: this, duration: 15.seconds);
+    scale = Tween<double>(begin: 1, end: 1.05).animate(anim);
+    anim.forward();
+  }
+
+  @override
+  void dispose() {
+    anim.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: anim,
+      builder: (context, child) => Transform.scale(
+        alignment: .bottomCenter,
+        scale: scale.value,
+        child: child,
+      ),
+      child: Image.network(
+        _getImage(),
+        errorBuilder: (context, error, stackTrace) =>
+            Center(child: Text(error.toString())),
+        fit: .cover,
+        color: Colors.black45,
+        colorBlendMode: .darken,
+      ),
     ).fadeIn(duration: 1.5.seconds);
   }
 
@@ -218,7 +248,7 @@ class ShowcaseItemBackdrop extends ConsumerWidget {
     final client = services<JellyfinClient>();
 
     return client.images.url(
-      itemId: item.seriesId ?? item.id,
+      itemId: widget.item.seriesId ?? widget.item.id,
       type: JellyfinImagesApi.typeBackdrop,
     );
   }
