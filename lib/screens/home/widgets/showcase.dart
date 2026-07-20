@@ -196,6 +196,7 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
   late final item = widget.item;
   final client = services<JellyfinClient>();
   late final resumable = widget.item.userData?.playbackPositionTicks != 0;
+  late final isEpisode = widget.item.type == JellyfinItemKind.episode;
 
   @override
   Widget build(BuildContext context) {
@@ -232,51 +233,63 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
                 value: _progress(),
               ).setOpacity(opacity: resumable ? 1 : 0),
             ),
-            FCard(
-              style: .delta(
-                decoration: .boxDelta(),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IntrinsicWidth(
-                  child: Column(
-                    crossAxisAlignment: .stretch,
-                    spacing: 8,
-                    children: [
-                      Row(
-                        spacing: 8,
-                        mainAxisSize: .min,
-                        children: [
-                          FButton.icon(
-                            onPress: () {},
-                            child: Icon(FLucideIcons.info),
-                          ),
-                          FButton(
-                            onPress: () {},
-                            prefix: Icon(FLucideIcons.play),
-                            child: Text(resumable ? 'Resume' : 'Play'),
-                          ).expanded(),
-                          if (resumable)
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxwidth),
+              child: FCard(
+                style: .delta(
+                  decoration: .boxDelta(),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IntrinsicWidth(
+                    child: Column(
+                      crossAxisAlignment: .center,
+                      spacing: 8,
+                      children: [
+                        Row(
+                          spacing: 8,
+                          mainAxisSize: .min,
+                          children: [
                             FButton.icon(
                               onPress: () {},
-                              child: Icon(FLucideIcons.rotateCcw),
+                              child: Icon(FLucideIcons.info),
                             ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: .min,
-                        children: [
-                          Text(
-                            _playtime(),
-                            style: theme.typography.display.sm,
-                          ),
-                          Text(
-                            _endTime(),
-                            style: theme.typography.display.sm,
-                          ),
-                        ].separatedby(Icon(FLucideIcons.dot)),
-                      ).setOpacity(opacity: 0.6),
-                    ],
+                            FButton(
+                              onPress: () {},
+                              prefix: Icon(FLucideIcons.play),
+                              child: Row(
+                                children: [
+                                  Text(resumable ? 'Resume' : 'Play'),
+                                  if (isEpisode)
+                                    Text(
+                                      _episodeTitle(),
+                                      overflow: .ellipsis,
+                                    ),
+                                ].separatedby(Icon(FLucideIcons.dot)),
+                              ),
+                            ).expanded(),
+                            if (resumable)
+                              FButton.icon(
+                                onPress: () {},
+                                child: Icon(FLucideIcons.rotateCcw),
+                              ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisSize: .min,
+                          children: [
+                            Text(
+                              _playtime(),
+                              style: theme.typography.display.sm,
+                            ),
+                            Text(
+                              _endTime(),
+                              style: theme.typography.display.sm,
+                            ),
+                          ].separatedby(Icon(FLucideIcons.dot)),
+                        ).setOpacity(opacity: 0.6),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -285,6 +298,13 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
         ),
       ),
     );
+  }
+
+  String _episodeTitle() {
+    final season = widget.item.parentIndexNumber;
+    final episode = widget.item.indexNumber;
+
+    return 'S$season:E$episode';
   }
 
   double _progress() {
