@@ -10,6 +10,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/const/const.dart';
+import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/num_extensions.dart';
 
@@ -87,39 +88,49 @@ class _ShowcaseState extends ConsumerState<Showcase> {
             padding: const EdgeInsets.all(15.0),
             child: Row(
               mainAxisSize: .min,
-              spacing: 8,
               children: [
-                AnimatedSwitcher(
-                  duration: kDefaultAnimationDuration,
-                  child: currentPage != 0
-                      ? FButton.icon(
-                          variant: .ghost,
-                          size: .lg,
-                          onPress: _previousPage,
-                          child: Icon(FLucideIcons.chevronLeft),
-                        )
-                      : SizedBox.square(dimension: 40),
+                FButton.icon(
+                  variant: .ghost,
+                  onPress: () => ref.refresh(homeProvider),
+                  child: ref.read(homeProvider).isLoading
+                      ? FCircularProgress()
+                      : Icon(FLucideIcons.rotateCcw),
                 ),
-                SizedBox(
-                  width: 35,
-                  child: AnimatedSwitcher(
-                    duration: kDefaultAnimationDuration,
-                    child: Text(
-                      '${currentPage + 1}/${widget.items.length}',
-                      textAlign: .center,
+                Row(
+                  mainAxisSize: .min,
+                  spacing: 8,
+                  children: [
+                    AnimatedSwitcher(
+                      duration: kDefaultAnimationDuration,
+                      child: FButton.icon(
+                        variant: .ghost,
+                        size: .lg,
+                        onPress: currentPage == 0 ? null : _previousPage,
+                        child: Icon(FLucideIcons.chevronLeft),
+                      ),
                     ),
-                  ),
+                    SizedBox(
+                      width: 35,
+                      child: AnimatedSwitcher(
+                        duration: kDefaultAnimationDuration,
+                        child: Text(
+                          '${currentPage + 1}/${widget.items.length}',
+                          textAlign: .center,
+                        ),
+                      ),
+                    ),
+                    AnimatedSwitcher(
+                      duration: kDefaultAnimationDuration,
+                      child: FButton.icon(
+                        variant: .ghost,
+                        size: .lg,
+                        onPress: _nextPage,
+                        child: Icon(FLucideIcons.chevronRight),
+                      ),
+                    ),
+                  ],
                 ),
-                AnimatedSwitcher(
-                  duration: kDefaultAnimationDuration,
-                  child: FButton.icon(
-                    variant: .ghost,
-                    size: .lg,
-                    onPress: _nextPage,
-                    child: Icon(FLucideIcons.chevronRight),
-                  ),
-                ),
-              ],
+              ].separatedby(Icon(FLucideIcons.dot)),
             ),
           ),
         ),
@@ -215,6 +226,12 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
                 ),
               ),
             ),
+            SizedBox(
+              width: maxwidth,
+              child: FDeterminateProgress(
+                value: _progress(),
+              ).setOpacity(opacity: resumable ? 1 : 0),
+            ),
             FCard(
               style: .delta(
                 decoration: .boxDelta(),
@@ -268,6 +285,13 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
         ),
       ),
     );
+  }
+
+  double _progress() {
+    final played = (widget.item.userData?.playbackPositionTicks ?? 0) / 10000;
+    final duration = widget.item.durationMs ?? 0;
+
+    return played / duration;
   }
 
   String _getLogo() {
