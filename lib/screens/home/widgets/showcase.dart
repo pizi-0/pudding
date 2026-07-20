@@ -114,12 +114,12 @@ class ShowcaseItem extends ConsumerStatefulWidget {
 class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
   late final item = widget.item;
   final client = services<JellyfinClient>();
+  late final resumable = widget.item.userData?.playbackPositionTicks != 0;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final theme = FTheme.of(context);
-    final resumable = widget.item.userData?.playbackPositionTicks != 0;
 
     final maxwidth = size.width > theme.breakpoints.sm
         ? size.width * 0.4
@@ -151,27 +151,46 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  spacing: 8,
-                  mainAxisSize: .min,
-                  children: [
-                    FButton(
-                      onPress: () {},
-                      prefix: Icon(FLucideIcons.play),
-                      child: Row(
+                child: IntrinsicWidth(
+                  child: Column(
+                    crossAxisAlignment: .stretch,
+                    spacing: 8,
+                    children: [
+                      Row(
+                        spacing: 8,
+                        mainAxisSize: .min,
                         children: [
-                          Text(resumable ? 'Resume' : 'Play'),
-                          Text(_playtime()),
-                          Text(_endTime()),
+                          FButton.icon(
+                            onPress: () {},
+                            child: Icon(FLucideIcons.info),
+                          ),
+                          FButton(
+                            onPress: () {},
+                            prefix: Icon(FLucideIcons.play),
+                            child: Text(resumable ? 'Resume' : 'Play'),
+                          ).expanded(),
+                          if (resumable)
+                            FButton.icon(
+                              onPress: () {},
+                              child: Icon(FLucideIcons.rotateCcw),
+                            ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: .min,
+                        children: [
+                          Text(
+                            _playtime(),
+                            style: theme.typography.display.sm,
+                          ),
+                          Text(
+                            _endTime(),
+                            style: theme.typography.display.sm,
+                          ),
                         ].separatedby(Icon(FLucideIcons.dot)),
-                      ),
-                    ),
-                    if (resumable)
-                      FButton.icon(
-                        onPress: () {},
-                        child: Icon(FLucideIcons.rotateCcw),
-                      ),
-                  ],
+                      ).setOpacity(opacity: 0.6),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -194,7 +213,11 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
   }
 
   String _endTime() {
-    return item.durationMs?.endsAt(context) ?? '';
+    final played = (item.userData?.playbackPositionTicks ?? 0) / 10000;
+    final total = item.durationMs ?? 0;
+    final left = (total - played).toInt();
+
+    return 'Ends at ${left.endsAt(context)}';
   }
 }
 
