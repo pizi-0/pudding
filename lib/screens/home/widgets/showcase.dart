@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:pudding/const/const.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/num_extensions.dart';
 
@@ -73,14 +74,81 @@ class _ShowcaseState extends ConsumerState<Showcase> {
               itemBuilder: (context, index) => ShowcaseItem(
                 item: widget.items[index],
               ),
-              onPageChanged: (v) => setState(() {
-                currentPage = v;
+              onPageChanged: (value) => setState(() {
+                currentPage = value;
               }),
+            ),
+          ),
+        ),
+        Align(
+          alignment: .topRight,
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Row(
+              mainAxisSize: .min,
+              spacing: 8,
+              children: [
+                AnimatedSwitcher(
+                  duration: kDefaultAnimationDuration,
+                  child: currentPage != 0
+                      ? FButton.icon(
+                          variant: .ghost,
+                          size: .lg,
+                          onPress: _previousPage,
+                          child: Icon(FLucideIcons.chevronLeft),
+                        )
+                      : SizedBox.square(dimension: 40),
+                ),
+                SizedBox(
+                  width: 35,
+                  child: AnimatedSwitcher(
+                    duration: kDefaultAnimationDuration,
+                    child: Text(
+                      '${currentPage + 1}/${widget.items.length}',
+                      textAlign: .center,
+                    ),
+                  ),
+                ),
+                AnimatedSwitcher(
+                  duration: kDefaultAnimationDuration,
+                  child: FButton.icon(
+                    variant: .ghost,
+                    size: .lg,
+                    onPress: _nextPage,
+                    child: Icon(FLucideIcons.chevronRight),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _previousPage() async {
+    _pageTimer?.cancel();
+    await pageController.previousPage(
+      duration: 500.milliseconds,
+      curve: Curves.easeInOut,
+    );
+
+    _startSlideshow();
+  }
+
+  Future<void> _nextPage() async {
+    _pageTimer?.cancel();
+
+    if (pageController.page == widget.items.length - 1) {
+      pageController.jumpTo(0);
+      return;
+    }
+    await pageController.nextPage(
+      duration: 500.milliseconds,
+      curve: Curves.easeInOut,
+    );
+
+    _startSlideshow();
   }
 
   void _startSlideshow() async {
@@ -95,7 +163,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
           return;
         }
         await pageController.nextPage(
-          duration: 1000.milliseconds,
+          duration: 500.milliseconds,
           curve: Curves.easeInOut,
         );
       },
@@ -252,7 +320,6 @@ class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
     return AnimatedBuilder(
       animation: anim,
       builder: (context, child) => Transform.scale(
-        alignment: .bottomCenter,
         scale: scale.value,
         child: child,
       ),
@@ -261,10 +328,10 @@ class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
         errorBuilder: (context, error, stackTrace) =>
             Center(child: Text(error.toString())),
         fit: .cover,
-        color: Colors.black45,
+        color: Colors.black38,
         colorBlendMode: .darken,
       ),
-    ).fadeIn(duration: 1.5.seconds);
+    ).fadeIn(duration: 1000.milliseconds, curve: Curves.easeInOut);
   }
 
   String _getImage() {
