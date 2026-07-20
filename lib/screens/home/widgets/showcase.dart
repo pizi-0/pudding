@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:animate_do/animate_do.dart';
 import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,7 +54,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
               ScrollConfiguration.of(
                 context,
               ).copyWith(
-                dragDevices: {.mouse, .trackpad},
+                dragDevices: {...PointerDeviceKind.values},
               ),
           child: NotificationListener<UserScrollNotification>(
             onNotification: (notification) {
@@ -69,7 +70,6 @@ class _ShowcaseState extends ConsumerState<Showcase> {
             },
             child: PageView.builder(
               controller: pageController,
-              allowImplicitScrolling: true,
               itemCount: widget.items.length,
               itemBuilder: (context, index) => ShowcaseItem(
                 item: widget.items[index],
