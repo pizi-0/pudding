@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:awesome_extensions/awesome_extensions.dart';
+import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -141,6 +142,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
 
     if (pageController.page == widget.items.length - 1) {
       pageController.jumpTo(0);
+      _startSlideshow();
       return;
     }
     await pageController.nextPage(
@@ -323,8 +325,8 @@ class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
         scale: scale.value,
         child: child,
       ),
-      child: Image.network(
-        _getImage(),
+      child: CachedNetworkImage(
+        imageUrl: _getImage(),
         errorBuilder: (context, error, stackTrace) =>
             Center(child: Text(error.toString())),
         fit: .cover,
