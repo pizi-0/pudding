@@ -234,7 +234,7 @@ class ItemLg extends ConsumerWidget {
     final theme = FTheme.of(context);
 
     return SizedBox(
-      height: 200,
+      height: 220,
       child: Row(
         spacing: 20,
         crossAxisAlignment: .stretch,
@@ -262,31 +262,111 @@ class ItemLg extends ConsumerWidget {
             style: .delta(color: theme.colors.primary, padding: .value(.zero)),
           ),
           Expanded(
-            flex: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: .start,
-                children: [
-                  Row(
+            flex: 7,
+            child: Column(
+              spacing: 8,
+              crossAxisAlignment: .stretch,
+              mainAxisAlignment: .center,
+              children: [
+                Expanded(
+                  child: Column(
+                    spacing: 8,
                     children: [
-                      Expanded(
-                        child: Text(
-                          item.getTitle(),
-                          style: theme.typography.body.xl.copyWith(
-                            fontWeight: .bold,
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  item.getTitle(),
+                                  style: theme.typography.body.xl3.copyWith(
+                                    fontWeight: .bold,
+                                    height: 1.2,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: .ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
+                          Row(
+                            children: [
+                              Text(item.productionYear?.toString() ?? ''),
+                              if (item.getOfficialRating() != null)
+                                Container(
+                                  height: theme.typography.body.lg.fontSize,
+                                  decoration: BoxDecoration(
+                                    border: .all(
+                                      color: theme.colors.foreground,
+                                    ),
+                                    borderRadius: .circular(4),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 1.5,
+                                      horizontal: 3,
+                                    ),
+                                    child: FittedBox(
+                                      child: Text(
+                                        item.getOfficialRating()!,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              if (item.showRuntime)
+                                Text(item.getRuntime() ?? ''),
+
+                              if (item.isSeries)
+                                Text('${item.getSeasons()} season'),
+                            ].separatedby(Icon(FLucideIcons.dot)),
+                          ),
+                        ],
+                      ),
+                      FDeterminateProgress(value: item.getPlayProgress()),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              item.getOverview() ?? '',
+                              maxLines: 3,
+                              overflow: .ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Text(item.getOverview() ?? ''),
+                ),
+                Row(
+                  spacing: 8,
+                  children: [
+                    FButton.icon(
+                      onPress: () {},
+                      child: Icon(FLucideIcons.info),
                     ),
-                  ),
-                ],
-              ),
+                    FButton.icon(
+                      onPress: () {},
+                      child: Icon(FLucideIcons.heart),
+                    ),
+                    FButton.icon(
+                      onPress: () {},
+                      child: Icon(FLucideIcons.check),
+                    ),
+                    Icon(FLucideIcons.dot),
+                    FButton(
+                      onPress: () {},
+                      prefix: Icon(FLucideIcons.play),
+                      child: Row(
+                        children: [
+                          Text('Play'),
+                          if (item.showRuntime)
+                            Text('Ends at ${item.getEndsAt(context)}'),
+                        ].separatedby(Icon(FLucideIcons.dot)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -335,34 +415,41 @@ class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
 
   @override
   Widget build(BuildContext context) {
-    return ShaderMask(
-      shaderCallback: (bounds) => LinearGradient(
-        begin: .topCenter,
-        end: .bottomCenter,
-        stops: [0.6, 1],
-        colors: [Colors.black12, Colors.black],
-      ).createShader(bounds),
-      blendMode: .dstOut,
-      child: CachedNetworkImage(
-        imageUrl: item.getBackdrop(),
-        errorBuilder: (context, error, stackTrace) =>
-            Center(child: Text(error.toString())),
-        imageBuilder: (context, imageProvider) => AnimatedBuilder(
-          animation: anim,
-          builder: (context, _) {
-            return Transform.scale(
-              scale: scale.value,
-              child: Image(
-                image: imageProvider,
-                fit: .cover,
-              ),
-            );
-          },
-        ),
-        fit: .cover,
-        color: Colors.black38,
-        colorBlendMode: .darken,
-      ).fadeIn(duration: 1000.milliseconds, curve: Curves.easeInOut),
+    final size = MediaQuery.sizeOf(context);
+    return Container(
+      clipBehavior: .hardEdge,
+      decoration: BoxDecoration(color: Colors.transparent),
+      height: size.height,
+      width: size.width,
+      child: ShaderMask(
+        shaderCallback: (bounds) => LinearGradient(
+          begin: .topCenter,
+          end: .bottomCenter,
+          stops: [0.6, 1],
+          colors: [Colors.black12, Colors.black],
+        ).createShader(bounds),
+        blendMode: .dstOut,
+        child: CachedNetworkImage(
+          imageUrl: item.getBackdrop(),
+          errorBuilder: (context, error, stackTrace) =>
+              Center(child: Text(error.toString())),
+          imageBuilder: (context, imageProvider) => AnimatedBuilder(
+            animation: anim,
+            builder: (context, _) {
+              return Transform.scale(
+                scale: scale.value,
+                child: Image(
+                  image: imageProvider,
+                  fit: .cover,
+                ),
+              );
+            },
+          ),
+          fit: .cover,
+          color: Colors.black38,
+          colorBlendMode: .darken,
+        ).fadeIn(duration: 1000.milliseconds, curve: Curves.easeInOut),
+      ),
     );
   }
 }
