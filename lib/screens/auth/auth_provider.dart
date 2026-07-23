@@ -25,7 +25,7 @@ class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
 
       client.connect(savedSession.serverAddresss);
 
-      ref.read(homeProvider);
+      await ref.read(homeProvider.notifier).build();
 
       return await client.user.currentUser();
     }
