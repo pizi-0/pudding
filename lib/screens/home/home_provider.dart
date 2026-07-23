@@ -33,11 +33,40 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
   Future<List<JellyfinItem>> _getNextUp({int limit = 5}) async {
     final res = await client.tvShows.nextUp(limit: limit);
 
-    return res.items;
+    final items = List<JellyfinItem>.from(res.items);
+
+    for (int i = 0; i < items.length; i++) {
+      if (items[i].overview == null) {
+        final newItem = await client.items.byId(items[i].id);
+
+        if (newItem == null) continue;
+        if (newItem.overview == null) continue;
+
+        items.removeAt(i);
+        items.insert(i, newItem);
+      }
+    }
+
+    return items;
   }
 
   Future<List<JellyfinItem>> _getLatest({int limit = 5}) async {
-    return await client.items.latest(limit: limit);
+    final res = await client.items.latest(limit: limit);
+
+    final items = List<JellyfinItem>.from(res);
+
+    for (int i = 0; i < items.length; i++) {
+      if (items[i].overview == null) {
+        final newItem = await client.items.byId(items[i].id);
+
+        if (newItem == null) continue;
+        if (newItem.overview == null) continue;
+
+        items.removeAt(i);
+        items.insert(i, newItem);
+      }
+    }
+    return items;
   }
 
   Future<List<JellyfinItem>> _getSuggestions({int limit = 10}) async {
