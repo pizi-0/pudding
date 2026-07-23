@@ -311,7 +311,7 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
     final played = (widget.item.userData?.playbackPositionTicks ?? 0) / 10000;
     final duration = widget.item.durationMs ?? 0;
 
-    return played / duration;
+    return (played / duration).clamp(0, 1);
   }
 
   String _getLogo() {
