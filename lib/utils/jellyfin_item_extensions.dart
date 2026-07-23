@@ -40,6 +40,8 @@ extension JellyInfo on JellyfinItem {
   }
 
   double getPlayProgress() {
+    if (isSeason || isSeries) return 0;
+
     final playedDurationMs = ((userData?.playbackPositionTicks ?? 0) / 10000);
     final totalDurationMs = durationMs ?? 0;
 
@@ -66,4 +68,19 @@ extension JellyInfo on JellyfinItem {
       type: JellyfinImagesApi.typePrimary,
     );
   }
+
+  String? getOfficialRating() {
+    return raw['OfficialRating'];
+  }
+
+  int? getSeasons() {
+    return childCount;
+  }
+
+  bool get isSeries => type == JellyfinItemKind.series;
+  bool get isMovie => type == JellyfinItemKind.movie;
+  bool get isEpisode => type == JellyfinItemKind.episode;
+  bool get isSeason => type == JellyfinItemKind.season;
+  bool get showRuntime =>
+      (durationMs != null || durationMs != 0) && (isMovie || isEpisode);
 }
