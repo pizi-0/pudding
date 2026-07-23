@@ -219,12 +219,14 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
           children: [
             SizedBox(
               width: maxwidth,
-              child: Opacity(
-                opacity: 0.8,
-                child: Image.network(
-                  _getLogo(),
-                  fit: .contain,
-                ),
+              child: CachedNetworkImage(
+                imageUrl: _getLogo(),
+                errorBuilder: (context, error, stackTrace) =>
+                    CachedNetworkImage(
+                      imageUrl: _getPrimary(),
+                      errorBuilder: (context, error, stackTrace) =>
+                          Text(error.toString()),
+                    ),
               ),
             ),
             SizedBox(
@@ -322,6 +324,14 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
     );
   }
 
+  String _getPrimary() {
+    final item = widget.item;
+    return client.images.url(
+      itemId: item.seriesId ?? item.id,
+      type: JellyfinImagesApi.typePrimary,
+    );
+  }
+
   String _playtime() {
     return item.durationMs?.toFormattedDuration() ?? '';
   }
@@ -363,20 +373,25 @@ class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: anim,
-      builder: (context, child) => Transform.scale(
-        scale: scale.value,
-        child: child,
+    return CachedNetworkImage(
+      imageUrl: _getImage(),
+      errorBuilder: (context, error, stackTrace) =>
+          Center(child: Text(error.toString())),
+      imageBuilder: (context, imageProvider) => AnimatedBuilder(
+        animation: anim,
+        builder: (context, _) {
+          return Transform.scale(
+            scale: scale.value,
+            child: Image(
+              image: imageProvider,
+              fit: .cover,
+            ),
+          );
+        },
       ),
-      child: CachedNetworkImage(
-        imageUrl: _getImage(),
-        errorBuilder: (context, error, stackTrace) =>
-            Center(child: Text(error.toString())),
-        fit: .cover,
-        color: Colors.black38,
-        colorBlendMode: .darken,
-      ),
+      fit: .cover,
+      color: Colors.black38,
+      colorBlendMode: .darken,
     ).fadeIn(duration: 1000.milliseconds, curve: Curves.easeInOut);
   }
 
