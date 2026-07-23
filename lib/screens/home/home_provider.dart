@@ -21,7 +21,11 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
   }
 
   Future<List<JellyfinItem>> _getShowcaseItems() async {
-    List<JellyfinItem> res = [...await _getNextUp(), ...await _getLatest()];
+    List<JellyfinItem> res = [
+      ...await _getNextUp(),
+      ...await _getLatest(),
+      ...await _getSuggestions(),
+    ];
 
     return res.uniqueBy((e) => e.id).toList();
   }
@@ -34,6 +38,15 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
 
   Future<List<JellyfinItem>> _getLatest({int limit = 5}) async {
     return await client.items.latest(limit: limit);
+  }
+
+  Future<List<JellyfinItem>> _getSuggestions({int limit = 10}) async {
+    final res = await client.suggestions.list(
+      limit: limit,
+      type: [JellyfinItemKind.movie, JellyfinItemKind.series],
+    );
+
+    return res.items;
   }
 }
 
