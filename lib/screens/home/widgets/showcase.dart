@@ -12,7 +12,7 @@ import 'package:forui/forui.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/services/di.dart';
-import 'package:pudding/utils/num_extensions.dart';
+import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
 class Showcase extends ConsumerStatefulWidget {
   final List<JellyfinItem> items;
@@ -75,6 +75,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
               itemCount: widget.items.length,
               itemBuilder: (context, index) => ShowcaseItem(
                 item: widget.items[index],
+                key: ValueKey(widget.items[index].id),
               ),
               onPageChanged: (value) => setState(() {
                 currentPage = value;
@@ -113,9 +114,11 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                       width: 35,
                       child: AnimatedSwitcher(
                         duration: kDefaultAnimationDuration,
-                        child: Text(
-                          '${currentPage + 1}/${widget.items.length}',
-                          textAlign: .center,
+                        child: FittedBox(
+                          child: Text(
+                            '${currentPage + 1}/${widget.items.length}',
+                            textAlign: .center,
+                          ),
                         ),
                       ),
                     ),
@@ -202,146 +205,103 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final theme = FTheme.of(context);
-
-    final maxwidth = size.width > theme.breakpoints.sm
-        ? size.width * 0.4
-        : size.width > theme.breakpoints.md
-        ? size.width * 0.6
-        : size.width * 0.8;
+    final sm = size.width < theme.breakpoints.sm;
 
     return Align(
       alignment: .bottomCenter,
       child: Padding(
-        padding: const EdgeInsets.all(50.0),
-        child: Column(
-          spacing: 10,
-          mainAxisSize: .min,
-          children: [
-            SizedBox(
-              width: maxwidth,
-              child: CachedNetworkImage(
-                imageUrl: _getLogo(),
-                errorBuilder: (context, error, stackTrace) =>
-                    CachedNetworkImage(
-                      imageUrl: _getPrimary(),
-                      errorBuilder: (context, error, stackTrace) =>
-                          Text(error.toString()),
-                    ),
-              ),
-            ),
-            SizedBox(
-              width: maxwidth,
-              child: FDeterminateProgress(
-                value: _progress(),
-              ).setOpacity(opacity: resumable ? 1 : 0),
-            ),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: maxwidth),
-              child: FCard(
-                style: .delta(
-                  decoration: .boxDelta(),
+        padding: const EdgeInsets.all(30),
+        child: AnimatedSwitcher(
+          duration: kDefaultAnimationDuration,
+          child: sm
+              ? ItemSm(item: item)
+              : ItemLg(
+                  item: item,
+                  key: ValueKey(item.id),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: IntrinsicWidth(
-                    child: Column(
-                      crossAxisAlignment: .center,
-                      spacing: 8,
-                      children: [
-                        Row(
-                          spacing: 8,
-                          mainAxisSize: .min,
-                          children: [
-                            FButton.icon(
-                              onPress: () {},
-                              child: Icon(FLucideIcons.info),
-                            ),
-                            FButton(
-                              onPress: () {},
-                              prefix: Icon(FLucideIcons.play),
-                              child: Row(
-                                children: [
-                                  Text(resumable ? 'Resume' : 'Play'),
-                                  if (isEpisode)
-                                    Text(
-                                      _episodeTitle(),
-                                      overflow: .ellipsis,
-                                    ),
-                                ].separatedby(Icon(FLucideIcons.dot)),
-                              ),
-                            ).expanded(),
-                            if (resumable)
-                              FButton.icon(
-                                onPress: () {},
-                                child: Icon(FLucideIcons.rotateCcw),
-                              ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisSize: .min,
-                          children: [
-                            Text(
-                              _playtime(),
-                              style: theme.typography.display.sm,
-                            ),
-                            Text(
-                              _endTime(),
-                              style: theme.typography.display.sm,
-                            ),
-                          ].separatedby(Icon(FLucideIcons.dot)),
-                        ).setOpacity(opacity: 0.6),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );
   }
+}
 
-  String _episodeTitle() {
-    final season = widget.item.parentIndexNumber;
-    final episode = widget.item.indexNumber;
+class ItemLg extends ConsumerWidget {
+  final JellyfinItem item;
+  const ItemLg({super.key, required this.item});
 
-    return 'S$season:E$episode';
-  }
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = FTheme.of(context);
 
-  double _progress() {
-    final played = (widget.item.userData?.playbackPositionTicks ?? 0) / 10000;
-    final duration = widget.item.durationMs ?? 0;
-
-    return (played / duration).clamp(0, 1);
-  }
-
-  String _getLogo() {
-    final item = widget.item;
-    return client.images.url(
-      itemId: item.seriesId ?? item.id,
-      type: JellyfinImagesApi.typeLogo,
+    return SizedBox(
+      height: 200,
+      child: Row(
+        spacing: 20,
+        crossAxisAlignment: .stretch,
+        children: [
+          Expanded(
+            flex: 2,
+            child: ClipRRect(
+              borderRadius: .circular(10),
+              child: CachedNetworkImage(
+                imageUrl: item.getLogo(),
+                height: 200,
+                errorBuilder: (context, error, stackTrace) =>
+                    CachedNetworkImage(
+                      imageUrl: item.getPrimary(),
+                      errorBuilder: (context, error, stackTrace) =>
+                          Text(error.toString()),
+                      height: 150,
+                      width: 200,
+                    ),
+              ),
+            ),
+          ),
+          FDivider(
+            axis: .vertical,
+            style: .delta(color: theme.colors.primary, padding: .value(.zero)),
+          ),
+          Expanded(
+            flex: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: .start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.getTitle(),
+                          style: theme.typography.body.xl.copyWith(
+                            fontWeight: .bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Text(item.getOverview() ?? ''),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
+}
 
-  String _getPrimary() {
-    final item = widget.item;
-    return client.images.url(
-      itemId: item.seriesId ?? item.id,
-      type: JellyfinImagesApi.typePrimary,
-    );
-  }
+class ItemSm extends ConsumerWidget {
+  final JellyfinItem item;
+  const ItemSm({super.key, required this.item});
 
-  String _playtime() {
-    return item.durationMs?.toFormattedDuration() ?? '';
-  }
-
-  String _endTime() {
-    final played = (item.userData?.playbackPositionTicks ?? 0) / 10000;
-    final total = item.durationMs ?? 0;
-    final left = (total - played).toInt();
-
-    return 'Ends at ${left.endsAt(context)}';
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container();
   }
 }
 
@@ -355,8 +315,10 @@ class ShowcaseItemBackdrop extends StatefulWidget {
 
 class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
     with TickerProviderStateMixin {
+  late JellyfinItem item = widget.item;
   late AnimationController anim;
   late Animation<double> scale;
+
   @override
   void initState() {
     super.initState();
@@ -373,34 +335,34 @@ class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
 
   @override
   Widget build(BuildContext context) {
-    return CachedNetworkImage(
-      imageUrl: _getImage(),
-      errorBuilder: (context, error, stackTrace) =>
-          Center(child: Text(error.toString())),
-      imageBuilder: (context, imageProvider) => AnimatedBuilder(
-        animation: anim,
-        builder: (context, _) {
-          return Transform.scale(
-            scale: scale.value,
-            child: Image(
-              image: imageProvider,
-              fit: .cover,
-            ),
-          );
-        },
-      ),
-      fit: .cover,
-      color: Colors.black38,
-      colorBlendMode: .darken,
-    ).fadeIn(duration: 1000.milliseconds, curve: Curves.easeInOut);
-  }
-
-  String _getImage() {
-    final client = services<JellyfinClient>();
-
-    return client.images.url(
-      itemId: widget.item.seriesId ?? widget.item.id,
-      type: JellyfinImagesApi.typeBackdrop,
+    return ShaderMask(
+      shaderCallback: (bounds) => LinearGradient(
+        begin: .topCenter,
+        end: .bottomCenter,
+        stops: [0.6, 1],
+        colors: [Colors.black12, Colors.black],
+      ).createShader(bounds),
+      blendMode: .dstOut,
+      child: CachedNetworkImage(
+        imageUrl: item.getBackdrop(),
+        errorBuilder: (context, error, stackTrace) =>
+            Center(child: Text(error.toString())),
+        imageBuilder: (context, imageProvider) => AnimatedBuilder(
+          animation: anim,
+          builder: (context, _) {
+            return Transform.scale(
+              scale: scale.value,
+              child: Image(
+                image: imageProvider,
+                fit: .cover,
+              ),
+            );
+          },
+        ),
+        fit: .cover,
+        color: Colors.black38,
+        colorBlendMode: .darken,
+      ).fadeIn(duration: 1000.milliseconds, curve: Curves.easeInOut),
     );
   }
 }
