@@ -55,14 +55,14 @@ extension JellyInfo on JellyfinItem {
 
   String getBackdrop() {
     return services<JellyfinClient>().images.url(
-      itemId: id,
+      itemId: seriesId ?? id,
       type: JellyfinImagesApi.typeBackdrop,
     );
   }
 
   String getPrimary() {
     return services<JellyfinClient>().images.url(
-      itemId: id,
+      itemId: seriesId ?? id,
       type: JellyfinImagesApi.typePrimary,
     );
   }
