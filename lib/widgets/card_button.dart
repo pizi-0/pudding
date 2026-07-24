@@ -31,13 +31,19 @@ class _CardButtonState extends State<CardButton> {
           hover = value;
         });
       },
-      child: AnimatedScale(
-        duration: kDefaultAnimationDuration,
-        scale: hover ? 1.025 : 1,
-        child: ClipRRect(
-          borderRadius:
-              theme.buttonStyles.ghost.lg.decoration.base.borderRadius!,
-          child: widget.child,
+      child: ColorFiltered(
+        colorFilter: ColorFilter.mode(
+          hover ? Colors.black12 : Colors.transparent,
+          .darken,
+        ),
+        child: AnimatedScale(
+          duration: kDefaultAnimationDuration,
+          scale: hover ? 1.025 : 1,
+          child: ClipRRect(
+            borderRadius:
+                theme.buttonStyles.ghost.lg.decoration.base.borderRadius!,
+            child: widget.child,
+          ),
         ),
       ),
     );
