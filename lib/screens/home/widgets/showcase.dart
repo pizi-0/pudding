@@ -272,74 +272,71 @@ class ItemLg extends ConsumerWidget {
               crossAxisAlignment: .stretch,
               mainAxisAlignment: .center,
               children: [
-                Expanded(
-                  child: Column(
-                    spacing: 8,
-                    children: [
-                      Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  item.getTitle(),
-                                  style: theme.typography.body.xl3.copyWith(
-                                    fontWeight: .bold,
-                                    height: 1.2,
+                Column(
+                  spacing: 8,
+                  children: [
+                    Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                item.getTitle(),
+                                style: theme.typography.body.xl3.copyWith(
+                                  fontWeight: .bold,
+                                  height: 1.2,
+                                ),
+                                maxLines: 2,
+                                overflow: .ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Text(item.productionYear?.toString() ?? ''),
+                            if (item.getOfficialRating() != null)
+                              Container(
+                                height: theme.typography.body.lg.fontSize,
+                                decoration: BoxDecoration(
+                                  border: .all(
+                                    color: theme.colors.foreground,
                                   ),
-                                  maxLines: 2,
-                                  overflow: .ellipsis,
+                                  borderRadius: .circular(4),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 1.5,
+                                    horizontal: 3,
+                                  ),
+                                  child: FittedBox(
+                                    child: Text(
+                                      item.getOfficialRating()!,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Text(item.productionYear?.toString() ?? ''),
-                              if (item.getOfficialRating() != null)
-                                Container(
-                                  height: theme.typography.body.lg.fontSize,
-                                  decoration: BoxDecoration(
-                                    border: .all(
-                                      color: theme.colors.foreground,
-                                    ),
-                                    borderRadius: .circular(4),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 1.5,
-                                      horizontal: 3,
-                                    ),
-                                    child: FittedBox(
-                                      child: Text(
-                                        item.getOfficialRating()!,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              if (item.showRuntime)
-                                Text(item.getRuntime() ?? ''),
+                            if (item.showRuntime) Text(item.getRuntime() ?? ''),
 
-                              if (item.isSeries)
-                                Text('${item.getSeasons()} season'),
-                            ].separatedby(Icon(FLucideIcons.dot)),
+                            if (item.isSeries)
+                              Text('${item.getSeasons()} season'),
+                          ].separatedby(Icon(FLucideIcons.dot)),
+                        ),
+                      ],
+                    ),
+                    FDeterminateProgress(value: item.getPlayProgress()),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.getOverview() ?? '',
+                            maxLines: 3,
+                            overflow: .ellipsis,
                           ),
-                        ],
-                      ),
-                      FDeterminateProgress(value: item.getPlayProgress()),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              item.getOverview() ?? '',
-                              maxLines: 3,
-                              overflow: .ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 Row(
                   spacing: 8,
