@@ -418,19 +418,19 @@ class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    return Container(
-      clipBehavior: .hardEdge,
-      decoration: BoxDecoration(color: Colors.transparent),
-      height: size.height,
-      width: size.width,
-      child: ShaderMask(
-        shaderCallback: (bounds) => LinearGradient(
-          begin: .topCenter,
-          end: .bottomCenter,
-          stops: [0.6, 1],
-          colors: [Colors.black12, Colors.black],
-        ).createShader(bounds),
-        blendMode: .dstOut,
+    return ShaderMask(
+      shaderCallback: (bounds) => LinearGradient(
+        begin: .topCenter,
+        end: .bottomCenter,
+        stops: [0.6, 1],
+        colors: [Colors.black12, Colors.black],
+      ).createShader(bounds),
+      blendMode: .dstOut,
+      child: Container(
+        clipBehavior: .hardEdge,
+        decoration: BoxDecoration(color: Colors.transparent),
+        height: size.height,
+        width: size.width,
         child: CachedNetworkImage(
           imageUrl: item.getBackdrop(),
           errorBuilder: (context, error, stackTrace) =>
