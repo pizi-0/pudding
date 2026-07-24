@@ -45,14 +45,14 @@ class _ShowcaseState extends ConsumerState<Showcase> {
 
   @override
   Widget build(BuildContext context) {
-    final items = (ref.watch(homeProvider).value ?? HomeData()).showcaseItem;
+    final data = (ref.watch(homeProvider).value ?? HomeData());
     return Stack(
       fit: .expand,
       children: [
-        if (items.isNotEmpty)
+        if (data.showcaseItem.isNotEmpty)
           ShowcaseItemBackdrop(
-            key: ValueKey(items[currentPage].id),
-            item: items[currentPage],
+            key: ValueKey(data.showcaseItem[currentPage].id),
+            item: data.showcaseItem[currentPage],
           ),
         ScrollConfiguration(
           behavior:
@@ -67,7 +67,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                 pauseSlideshow = true;
               } else {
                 pauseSlideshow = false;
-                _startSlideshow(items);
+                _startSlideshow(data.showcaseItem);
               }
               setState(() {});
 
@@ -75,10 +75,10 @@ class _ShowcaseState extends ConsumerState<Showcase> {
             },
             child: PageView.builder(
               controller: pageController,
-              itemCount: items.length,
+              itemCount: data.showcaseItem.length,
               itemBuilder: (context, index) => ShowcaseItem(
-                item: items[index],
-                key: ValueKey(items[index].id),
+                item: data.showcaseItem[index],
+                key: ValueKey(data.showcaseItem[index].id),
               ),
               onPageChanged: (value) => setState(() {
                 currentPage = value;
@@ -111,7 +111,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                         size: .lg,
                         onPress: currentPage == 0
                             ? null
-                            : () => _previousPage(items),
+                            : () => _previousPage(data.showcaseItem),
                         child: Icon(FLucideIcons.chevronLeft),
                       ),
                     ),
@@ -121,7 +121,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                         duration: kDefaultAnimationDuration,
                         child: FittedBox(
                           child: Text(
-                            '${currentPage + 1}/${items.length}',
+                            '${currentPage + 1}/${data.showcaseItem.length}',
                             textAlign: .center,
                           ),
                         ),
@@ -132,7 +132,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                       child: FButton.icon(
                         variant: .ghost,
                         size: .lg,
-                        onPress: () => _nextPage(items),
+                        onPress: () => _nextPage(data.showcaseItem),
                         child: Icon(FLucideIcons.chevronRight),
                       ),
                     ),
