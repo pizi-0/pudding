@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
-import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/screens/home/widgets/showcase.dart';
 
 class Home extends ConsumerStatefulWidget {
@@ -14,15 +13,13 @@ class Home extends ConsumerStatefulWidget {
 class _HomeState extends ConsumerState<Home> {
   @override
   Widget build(BuildContext context) {
-    final data = ref.watch(homeProvider).value ?? HomeData();
-
     return FScaffold(
       childPad: false,
       child: CustomScrollView(
         slivers: [
           SliverFillViewport(
             delegate: SliverChildListDelegate([
-              Showcase(items: data.showcaseItem),
+              Showcase(),
             ]),
           ),
         ],

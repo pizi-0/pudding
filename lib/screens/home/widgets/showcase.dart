@@ -15,23 +15,24 @@ import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
 class Showcase extends ConsumerStatefulWidget {
-  final List<JellyfinItem> items;
-  const Showcase({super.key, this.items = const []});
+  const Showcase({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ShowcaseState();
 }
 
 class _ShowcaseState extends ConsumerState<Showcase> {
-  PageController pageController = PageController();
+  late PageController pageController;
   int currentPage = 0;
   Timer? _pageTimer;
   bool pauseSlideshow = false;
 
   @override
   void initState() {
+    pageController = PageController();
+    final data = ref.read(homeProvider).value ?? HomeData();
     super.initState();
-    _startSlideshow();
+    _startSlideshow(data.showcaseItem);
   }
 
   @override
@@ -43,13 +44,14 @@ class _ShowcaseState extends ConsumerState<Showcase> {
 
   @override
   Widget build(BuildContext context) {
+    final items = (ref.watch(homeProvider).value ?? HomeData()).showcaseItem;
     return Stack(
       fit: .expand,
       children: [
-        if (pageController.hasClients)
+        if (items.isNotEmpty)
           ShowcaseItemBackdrop(
-            key: ValueKey(widget.items[currentPage].id),
-            item: widget.items[currentPage],
+            key: ValueKey(items[currentPage].id),
+            item: items[currentPage],
           ),
         ScrollConfiguration(
           behavior:
@@ -64,7 +66,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                 pauseSlideshow = true;
               } else {
                 pauseSlideshow = false;
-                _startSlideshow();
+                _startSlideshow(items);
               }
               setState(() {});
 
@@ -72,10 +74,10 @@ class _ShowcaseState extends ConsumerState<Showcase> {
             },
             child: PageView.builder(
               controller: pageController,
-              itemCount: widget.items.length,
+              itemCount: items.length,
               itemBuilder: (context, index) => ShowcaseItem(
-                item: widget.items[index],
-                key: ValueKey(widget.items[index].id),
+                item: items[index],
+                key: ValueKey(items[index].id),
               ),
               onPageChanged: (value) => setState(() {
                 currentPage = value;
@@ -106,7 +108,9 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                       child: FButton.icon(
                         variant: .ghost,
                         size: .lg,
-                        onPress: currentPage == 0 ? null : _previousPage,
+                        onPress: currentPage == 0
+                            ? null
+                            : () => _previousPage(items),
                         child: Icon(FLucideIcons.chevronLeft),
                       ),
                     ),
@@ -116,7 +120,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                         duration: kDefaultAnimationDuration,
                         child: FittedBox(
                           child: Text(
-                            '${currentPage + 1}/${widget.items.length}',
+                            '${currentPage + 1}/${items.length}',
                             textAlign: .center,
                           ),
                         ),
@@ -127,7 +131,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                       child: FButton.icon(
                         variant: .ghost,
                         size: .lg,
-                        onPress: _nextPage,
+                        onPress: () => _nextPage(items),
                         child: Icon(FLucideIcons.chevronRight),
                       ),
                     ),
@@ -141,22 +145,22 @@ class _ShowcaseState extends ConsumerState<Showcase> {
     );
   }
 
-  Future<void> _previousPage() async {
+  Future<void> _previousPage(List<JellyfinItem> items) async {
     _pageTimer?.cancel();
     await pageController.previousPage(
       duration: 500.milliseconds,
       curve: Curves.easeInOut,
     );
 
-    _startSlideshow();
+    _startSlideshow(items);
   }
 
-  Future<void> _nextPage() async {
+  Future<void> _nextPage(List<JellyfinItem> items) async {
     _pageTimer?.cancel();
 
-    if (pageController.page == widget.items.length - 1) {
+    if (pageController.page == items.length - 1) {
       pageController.jumpTo(0);
-      _startSlideshow();
+      _startSlideshow(items);
       return;
     }
     await pageController.nextPage(
@@ -164,17 +168,17 @@ class _ShowcaseState extends ConsumerState<Showcase> {
       curve: Curves.easeInOut,
     );
 
-    _startSlideshow();
+    _startSlideshow(items);
   }
 
-  void _startSlideshow() async {
+  void _startSlideshow(List<JellyfinItem> items) async {
     _pageTimer?.cancel();
     _pageTimer = Timer.periodic(
       10.seconds,
       (timer) async {
         if (pauseSlideshow) return;
 
-        if (pageController.page == widget.items.length - 1) {
+        if (pageController.page == items.length - 1) {
           pageController.jumpTo(0);
           return;
         }
