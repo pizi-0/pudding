@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/screens/home/home_provider.dart';
+import 'package:pudding/screens/home/models/home_data_model.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 

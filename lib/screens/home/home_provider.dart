@@ -2,8 +2,8 @@
 import 'dart:async';
 
 import 'package:dart_jellyfin/dart_jellyfin.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pudding/screens/home/models/home_data_model.dart';
 
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/list_extensions.dart';
@@ -80,27 +80,3 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
 }
 
 final homeProvider = AsyncNotifierProvider(() => HomeNotifier());
-
-class HomeData {
-  final List<JellyfinItem> showcaseItem;
-
-  HomeData({this.showcaseItem = const []});
-
-  HomeData copyWith({
-    List<JellyfinItem>? showcaseItem,
-  }) {
-    return HomeData(
-      showcaseItem: showcaseItem ?? this.showcaseItem,
-    );
-  }
-
-  @override
-  bool operator ==(covariant HomeData other) {
-    if (identical(this, other)) return true;
-
-    return listEquals(other.showcaseItem, showcaseItem);
-  }
-
-  @override
-  int get hashCode => showcaseItem.hashCode;
-}
