@@ -17,7 +17,8 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
 
   Future<HomeData> getData() async {
     final showcase = await _getShowcaseItems();
-    return HomeData(showcaseItem: showcase);
+    final libraries = await _getLibraries();
+    return HomeData(showcaseItem: showcase, libraries: libraries);
   }
 
   Future<List<JellyfinItem>> _getShowcaseItems() async {
@@ -74,6 +75,12 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
       limit: limit,
       type: [JellyfinItemKind.movie, JellyfinItemKind.series],
     );
+
+    return res.items;
+  }
+
+  Future<List<JellyfinView>> _getLibraries() async {
+    final res = await client.userViews.list();
 
     return res.items;
   }
