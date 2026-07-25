@@ -39,6 +39,13 @@ extension JellyInfo on JellyfinItem {
     return totalDurationMs.endsAt(context);
   }
 
+  String getRemaining() {
+    final playedDurationMs = ((userData?.playbackPositionTicks ?? 0) / 10000);
+    final totalDurationMs = durationMs ?? 0;
+
+    return (totalDurationMs - playedDurationMs).toInt().toFormattedDuration();
+  }
+
   double getPlayProgress() {
     if (isSeason || isSeries) return 0;
 
@@ -69,6 +76,10 @@ extension JellyInfo on JellyfinItem {
     );
   }
 
+  String getImage() {
+    return services<JellyfinClient>().images.url(itemId: id);
+  }
+
   String? getOfficialRating() {
     return raw['OfficialRating'];
   }
@@ -83,4 +94,5 @@ extension JellyInfo on JellyfinItem {
   bool get isSeason => type == JellyfinItemKind.season;
   bool get showRuntime =>
       (durationMs != null || durationMs != 0) && (isMovie || isEpisode);
+  bool get isResumable => userData?.playbackPositionTicks != 0;
 }

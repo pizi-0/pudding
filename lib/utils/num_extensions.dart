@@ -13,7 +13,7 @@ extension FormatMilliseconds on int {
       res += '${hours}h ';
     }
 
-    res += ' ${minutes}m ';
+    res += '${minutes}m ';
 
     if (seconds != '00') {
       res += '${seconds}s';
