@@ -4,9 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/screens/home/models/home_data_model.dart';
+import 'package:pudding/screens/home/widgets/media_card.dart';
 import 'package:pudding/screens/home/widgets/showcase.dart';
-import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/utils/jellyfin_view_extension.dart';
+import 'package:pudding/widgets/card_button.dart';
 
 class Home extends ConsumerStatefulWidget {
   const Home({super.key});
@@ -61,9 +62,11 @@ class _HomeState extends ConsumerState<Home> {
                       mainAxisSpacing: 10,
                       crossAxisSpacing: 10,
                     ),
-                    itemBuilder: (context, index) => CachedNetworkImage(
-                      imageUrl: data.libraries[index].getPrimaryImage(),
-                      fit: .cover,
+                    itemBuilder: (context, index) => CardButton(
+                      child: CachedNetworkImage(
+                        imageUrl: data.libraries[index].getPrimaryImage(),
+                        fit: .cover,
+                      ),
                     ),
                   ),
                 ],
@@ -91,10 +94,8 @@ class _HomeState extends ConsumerState<Home> {
                       mainAxisSpacing: 10,
                       crossAxisSpacing: 10,
                     ),
-                    itemBuilder: (context, index) => CachedNetworkImage(
-                      imageUrl: data.continueWatching[index].getBackdrop(),
-                      fit: .cover,
-                    ),
+                    itemBuilder: (context, index) =>
+                        MediaCard(item: data.continueWatching[index]),
                   ),
                 ],
               ),

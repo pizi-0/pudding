@@ -4,7 +4,8 @@ import 'package:pudding/const/const.dart';
 
 class CardButton extends StatefulWidget {
   final Widget child;
-  const CardButton({super.key, required this.child});
+  final Function()? onPress;
+  const CardButton({super.key, required this.child, this.onPress});
 
   @override
   State<CardButton> createState() => _CardButtonState();
@@ -17,33 +18,18 @@ class _CardButtonState extends State<CardButton> {
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
 
-    return FButton(
+    return FButton.raw(
       variant: .ghost,
-      style: .delta(contentStyle: .delta(padding: .value(.zero))),
-      onPress: () {},
-      onHoverChange: (value) {
-        setState(() {
-          hover = value;
-        });
-      },
-      onFocusChange: (value) {
-        setState(() {
-          hover = value;
-        });
-      },
-      child: ColorFiltered(
-        colorFilter: ColorFilter.mode(
-          hover ? Colors.black12 : Colors.transparent,
-          .darken,
-        ),
-        child: AnimatedScale(
-          duration: kDefaultAnimationDuration,
-          scale: hover ? 1.025 : 1,
-          child: ClipRRect(
-            borderRadius:
-                theme.buttonStyles.ghost.lg.decoration.base.borderRadius!,
-            child: widget.child,
-          ),
+      onPress: widget.onPress,
+      onHoverChange: (h) => setState(() => hover = h),
+      onFocusChange: (f) => setState(() => hover = f),
+      child: AnimatedScale(
+        duration: kDefaultAnimationDuration,
+        scale: hover ? 1.02 : 1,
+        child: ClipRRect(
+          borderRadius:
+              theme.buttonStyles.ghost.lg.decoration.base.borderRadius!,
+          child: widget.child,
         ),
       ),
     );
