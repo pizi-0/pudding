@@ -1,13 +1,11 @@
-import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/screens/home/models/home_data_model.dart';
-import 'package:pudding/screens/home/widgets/media_card.dart';
+import 'package:pudding/screens/home/widgets/library_card.dart';
+import 'package:pudding/widgets/media_card.dart';
 import 'package:pudding/screens/home/widgets/showcase.dart';
-import 'package:pudding/utils/jellyfin_view_extension.dart';
-import 'package:pudding/widgets/card_button.dart';
 
 class Home extends ConsumerStatefulWidget {
   const Home({super.key});
@@ -58,15 +56,13 @@ class _HomeState extends ConsumerState<Home> {
                     itemCount: data.libraries.length,
                     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: 350,
-                      childAspectRatio: 16 / 10,
+                      childAspectRatio: 16 / 9,
                       mainAxisSpacing: 10,
                       crossAxisSpacing: 10,
                     ),
-                    itemBuilder: (context, index) => CardButton(
-                      child: CachedNetworkImage(
-                        imageUrl: data.libraries[index].getPrimaryImage(),
-                        fit: .cover,
-                      ),
+                    itemBuilder: (context, index) => LibraryCard(
+                      view: data.libraries[index],
+                      onPress: () {},
                     ),
                   ),
                 ],
@@ -90,7 +86,7 @@ class _HomeState extends ConsumerState<Home> {
                     itemCount: data.continueWatching.length,
                     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: 350,
-                      childAspectRatio: 16 / 10,
+                      childAspectRatio: 450 / 350,
                       mainAxisSpacing: 10,
                       crossAxisSpacing: 10,
                     ),
