@@ -431,6 +431,7 @@ class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
         decoration: BoxDecoration(color: Colors.transparent),
         height: size.height,
         width: size.width,
+        margin: .only(bottom: 5),
         child: CachedNetworkImage(
           imageUrl: item.getBackdrop(),
           errorBuilder: (context, error, stackTrace) =>

@@ -19,6 +19,9 @@ class _HomeState extends ConsumerState<Home> {
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
     final data = ref.watch(homeProvider).value ?? HomeData();
+    final size = MediaQuery.sizeOf(context);
+    final double horizontalPad = size.width < theme.breakpoints.md ? 10 : 30;
+
     return TapRegion(
       onTapInside: (event) => FocusScope.of(context).unfocus(),
       child: CustomScrollView(
@@ -31,7 +34,7 @@ class _HomeState extends ConsumerState<Home> {
             ]),
           ),
           SliverPadding(
-            padding: .symmetric(vertical: 20, horizontal: 30),
+            padding: .symmetric(vertical: 20, horizontal: horizontalPad),
             sliver: SliverMainAxisGroup(
               slivers: [
                 PinnedHeaderSliver(
@@ -53,7 +56,7 @@ class _HomeState extends ConsumerState<Home> {
                 SliverGrid.builder(
                   itemCount: data.libraries.length,
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 350,
+                    maxCrossAxisExtent: 300,
                     childAspectRatio: 16 / 9,
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
@@ -67,7 +70,7 @@ class _HomeState extends ConsumerState<Home> {
             ),
           ),
           SliverPadding(
-            padding: .symmetric(vertical: 20, horizontal: 30),
+            padding: .symmetric(vertical: 20, horizontal: horizontalPad),
             sliver: SliverMainAxisGroup(
               slivers: [
                 PinnedHeaderSliver(
@@ -83,8 +86,8 @@ class _HomeState extends ConsumerState<Home> {
                 SliverGrid.builder(
                   itemCount: data.continueWatching.length,
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 350,
-                    childAspectRatio: 350 / 250,
+                    maxCrossAxisExtent: 300,
+                    childAspectRatio: 300 / 250,
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
                   ),
