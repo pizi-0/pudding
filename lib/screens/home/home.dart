@@ -87,7 +87,7 @@ class _HomeState extends ConsumerState<Home> {
                   itemCount: data.continueWatching.length,
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 300,
-                    childAspectRatio: 300 / 250,
+                    childAspectRatio: 300 / 200,
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
                   ),
