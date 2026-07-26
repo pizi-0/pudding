@@ -10,60 +10,52 @@ class MediaCard extends StatefulWidget {
   const MediaCard({super.key, required this.item});
 
   @override
-  State<MediaCard> createState() => _MediaCardState();
+  State<MediaCard> createState() => MediaCardState();
 }
 
-class _MediaCardState extends State<MediaCard> {
+class MediaCardState extends State<MediaCard> {
   bool hover = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
+    final borderRadius =
+        theme.buttonStyles.base.lg.decoration.base.borderRadius ??
+        BorderRadius.circular(10);
+    final item = widget.item;
 
     return AnimatedScale(
-      duration: kDefaultAnimationDuration,
       scale: hover ? 1.02 : 1,
-      child: LayoutBuilder(
-        builder: (context, size) {
-          return Stack(
+      duration: kDefaultAnimationDuration,
+      curve: Curves.ease,
+      child: FButton.raw(
+        style: .delta(
+          decoration: .delta([.all(.boxDelta(color: Colors.transparent))]),
+        ),
+        variant: .ghost,
+        onHoverChange: (h) => setState(() => hover = h),
+        onFocusChange: (f) => setState(() => hover = f),
+        onPress: () {},
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: Stack(
             fit: .expand,
             children: [
-              FButton(
-                variant: .ghost,
-                style: .delta(contentStyle: .delta(padding: .value(.zero))),
-                onPress: () {},
-                onHoverChange: (h) => setState(() => hover = h),
-                onFocusChange: (f) => setState(() => hover = f),
-                crossAxisAlignment: .stretch,
-                child: Expanded(
-                  child: ClipRRect(
-                    borderRadius: theme
-                        .buttonStyles
-                        .ghost
-                        .lg
-                        .decoration
-                        .base
-                        .borderRadius!,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                      ),
-                      child: ShaderMask(
-                        shaderCallback: (rect) => LinearGradient(
-                          begin: .topCenter,
-                          end: .bottomCenter,
-                          stops: [0.2, 1],
-                          colors: [Colors.black12, Colors.black],
-                        ).createShader(rect),
-                        blendMode: .darken,
-                        child: CachedNetworkImage(
-                          imageUrl: widget.item.getBackdrop(),
-
-                          fit: .cover,
-                        ),
-                      ),
-                    ),
-                  ),
+              ShaderMask(
+                shaderCallback: (rect) => LinearGradient(
+                  begin: .topCenter,
+                  end: .bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black,
+                  ],
+                  stops: [0.2, 1],
+                ).createShader(rect),
+                blendMode: .darken,
+                child: CachedNetworkImage(
+                  imageUrl: item.getBackdrop(),
+                  fit: .cover,
+                  memCacheWidth: 800,
                 ),
               ),
               Align(
@@ -71,85 +63,41 @@ class _MediaCardState extends State<MediaCard> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
-                    spacing: 8,
-                    mainAxisAlignment: .end,
+                    crossAxisAlignment: .stretch,
+                    spacing: 6,
+                    mainAxisSize: .min,
                     children: [
+                      FDeterminateProgress(
+                        style: .delta(
+                          motion: .delta(
+                            duration: kDefaultAnimationDuration,
+                          ),
+                        ),
+                        value: item.getPlayProgress(),
+                      ),
+                      Text(
+                        widget.item.getTitle(),
+                        style: theme.typography.body.sm.copyWith(
+                          fontWeight: FontWeight(800),
+                        ),
+                        maxLines: 1,
+                        overflow: .ellipsis,
+                      ),
                       Row(
                         mainAxisAlignment: .spaceBetween,
                         children: [
-                          if (widget.item.isResumable)
-                            Text(
-                              '${widget.item.getRemaining()} left',
-                            ),
-                          if (hover)
-                            Text(
-                              'Ends: ${widget.item.getEndsAt(context)}',
-                            ),
-                        ],
-                      ),
-                      if (widget.item.isResumable)
-                        FDeterminateProgress(
-                          value: widget.item.getPlayProgress(),
-                          style: .delta(
-                            motion: .delta(
-                              duration: kDefaultAnimationDuration,
-                            ),
-                          ),
-                        ),
-                      Column(
-                        crossAxisAlignment: .stretch,
-                        spacing: 4,
-                        children: [
-                          Text(
-                            widget.item.getTitle(),
-                            style: theme.typography.body.sm.copyWith(
-                              fontWeight: FontWeight(800),
-                            ),
-                            maxLines: 1,
-                            overflow: .ellipsis,
-                          ),
-                          Row(
-                            mainAxisAlignment: .spaceBetween,
-                            children: [
-                              if (widget.item.seriesName != null)
-                                Text(widget.item.seriesName!),
-                              Text(widget.item.productionYear.toString()),
-                            ],
-                          ),
+                          if (widget.item.seriesName != null)
+                            Text(widget.item.seriesName!),
+                          Text(widget.item.productionYear.toString()),
                         ],
                       ),
                     ],
                   ),
                 ),
               ),
-              if (hover)
-                Align(
-                  alignment: .topRight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisSize: .min,
-                      spacing: 4,
-                      children: [
-                        FButton.icon(
-                          variant: .ghost,
-                          onHoverChange: (h) => setState(() => hover = h),
-                          onPress: () {},
-                          child: Icon(FLucideIcons.check),
-                        ),
-                        FButton.icon(
-                          variant: .ghost,
-                          onHoverChange: (h) => setState(() => hover = h),
-                          onPress: () {},
-                          child: Icon(FLucideIcons.heart),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
             ],
-          );
-        },
+          ),
+        ),
       ),
     );
   }

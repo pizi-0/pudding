@@ -28,6 +28,7 @@ class _LibraryCardState extends State<LibraryCard> {
     return AnimatedScale(
       duration: kDefaultAnimationDuration,
       scale: hover ? 1.02 : 1,
+      curve: Curves.ease,
       child: FButton(
         variant: .ghost,
         style: .delta(contentStyle: .delta(padding: .value(.zero))),
