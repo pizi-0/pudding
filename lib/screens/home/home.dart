@@ -16,6 +16,38 @@ class Home extends ConsumerStatefulWidget {
 }
 
 class _HomeState extends ConsumerState<Home> {
+  final ScrollController scrollController = ScrollController();
+  int alpha = 0;
+  final int targetAlpha = 220;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollController.addListener(_onScroll);
+    });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final scrollPercentage =
+        scrollController.offset /
+        (scrollController.position.maxScrollExtent - 300);
+
+    if (alpha < 220) {
+      alpha = (scrollPercentage * targetAlpha).toInt().clamp(0, targetAlpha);
+    } else {
+      alpha = (scrollPercentage * targetAlpha).toInt().clamp(0, targetAlpha);
+    }
+    print(alpha);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
@@ -30,119 +62,115 @@ class _HomeState extends ConsumerState<Home> {
         fit: .expand,
         children: [
           if (data.showcaseItem.isNotEmpty)
-            ShowcaseItemBackdrop(
-              key: ValueKey(item?.id),
+            ShaderMask(
+              shaderCallback: (rect) => LinearGradient(
+                colors: [
+                  Colors.black.withAlpha(alpha),
+                  Colors.black.withAlpha(targetAlpha),
+                ],
+                begin: .topCenter,
+                end: .bottomCenter,
+              ).createShader(rect),
+              blendMode: .dstOut,
+
+              child: ShowcaseItemBackdrop(
+                key: ValueKey(item?.id),
+              ),
             ),
-          LayoutBuilder(
-            builder: (context, size) {
-              return CustomScrollView(
+          CustomScrollView(
+            controller: scrollController,
+            slivers: [
+              SliverMainAxisGroup(
                 slivers: [
-                  DecoratedSliver(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withAlpha(220),
-                        ],
-                        begin: .topCenter,
-                        end: .bottomCenter,
-                        stops: [0, 0.6],
-                      ),
-                    ),
+                  SliverToBoxAdapter(
+                    child: Showcase(),
+                  ),
+                  SliverPadding(padding: .all(20)),
+                  SliverPadding(
+                    padding: .symmetric(horizontal: horizontalPad),
                     sliver: SliverMainAxisGroup(
                       slivers: [
                         SliverToBoxAdapter(
-                          child: Showcase(),
-                        ),
-                        SliverPadding(padding: .all(20)),
-                        SliverPadding(
-                          padding: .symmetric(horizontal: horizontalPad),
-                          sliver: SliverMainAxisGroup(
-                            slivers: [
-                              SliverToBoxAdapter(
-                                child: Text(
-                                  'Libraries',
-                                  style: theme.typography.display.xl2.copyWith(
-                                    fontWeight: .bold,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ),
-                              SliverPadding(padding: .all(10)),
-                              SliverGrid.builder(
-                                itemCount: data.libraries.length,
-                                gridDelegate:
-                                    SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent: 310,
-                                      childAspectRatio: 16 / 9,
-                                      mainAxisSpacing: 10,
-                                      crossAxisSpacing: 10,
-                                    ),
-                                itemBuilder: (context, index) => LibraryCard(
-                                  view: data.libraries[index],
-                                  onPress: () {},
-                                ),
-                              ),
-                              SliverPadding(padding: .all(20)),
-
-                              SliverToBoxAdapter(
-                                child: Text(
-                                  'Continue watching',
-                                  style: theme.typography.display.xl2.copyWith(
-                                    fontWeight: .bold,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ),
-                              SliverPadding(padding: .all(10)),
-                              SliverGrid.builder(
-                                itemCount: data.continueWatching.length,
-                                gridDelegate:
-                                    SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent: 310,
-                                      childAspectRatio: 3 / 2,
-                                      mainAxisSpacing: 10,
-                                      crossAxisSpacing: 10,
-                                    ),
-                                itemBuilder: (context, index) => MediaCard(
-                                  item: data.continueWatching[index],
-                                ),
-                              ),
-                              SliverPadding(padding: .all(20)),
-
-                              SliverToBoxAdapter(
-                                child: Text(
-                                  'Next up',
-                                  style: theme.typography.display.xl2.copyWith(
-                                    fontWeight: .bold,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ),
-                              SliverPadding(padding: .all(10)),
-                              SliverGrid.builder(
-                                itemCount: data.nextup.length,
-                                gridDelegate:
-                                    SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent: 310,
-                                      childAspectRatio: 3 / 2,
-                                      mainAxisSpacing: 10,
-                                      crossAxisSpacing: 10,
-                                    ),
-                                itemBuilder: (context, index) => MediaCard(
-                                  item: data.nextup[index],
-                                ),
-                              ),
-                              SliverPadding(padding: .all(10)),
-                            ],
+                          child: Text(
+                            'Libraries',
+                            style: theme.typography.display.xl2.copyWith(
+                              fontWeight: .bold,
+                              height: 1.5,
+                            ),
                           ),
                         ),
+                        SliverPadding(padding: .all(10)),
+                        SliverGrid.builder(
+                          itemCount: data.libraries.length,
+                          gridDelegate:
+                              SliverGridDelegateWithMaxCrossAxisExtent(
+                                maxCrossAxisExtent: 310,
+                                childAspectRatio: 16 / 9,
+                                mainAxisSpacing: 10,
+                                crossAxisSpacing: 10,
+                              ),
+                          itemBuilder: (context, index) => LibraryCard(
+                            view: data.libraries[index],
+                            onPress: () {},
+                          ),
+                        ),
+                        SliverPadding(padding: .all(20)),
+
+                        SliverToBoxAdapter(
+                          child: Text(
+                            'Continue watching',
+                            style: theme.typography.display.xl2.copyWith(
+                              fontWeight: .bold,
+                              height: 1.5,
+                            ),
+                          ),
+                        ),
+                        SliverPadding(padding: .all(10)),
+                        SliverGrid.builder(
+                          itemCount: data.continueWatching.length,
+                          gridDelegate:
+                              SliverGridDelegateWithMaxCrossAxisExtent(
+                                maxCrossAxisExtent: 310,
+                                childAspectRatio: 3 / 2,
+                                mainAxisSpacing: 10,
+                                crossAxisSpacing: 10,
+                              ),
+                          itemBuilder: (context, index) => MediaCard(
+                            item: data.continueWatching[index],
+                          ),
+                        ),
+                        SliverPadding(padding: .all(20)),
+
+                        SliverToBoxAdapter(
+                          child: Text(
+                            'Next up',
+                            style: theme.typography.display.xl2.copyWith(
+                              fontWeight: .bold,
+                              height: 1.5,
+                            ),
+                          ),
+                        ),
+                        SliverPadding(padding: .all(10)),
+                        SliverGrid.builder(
+                          itemCount: data.nextup.length,
+                          gridDelegate:
+                              SliverGridDelegateWithMaxCrossAxisExtent(
+                                maxCrossAxisExtent: 310,
+                                childAspectRatio: 3 / 2,
+                                mainAxisSpacing: 10,
+                                crossAxisSpacing: 10,
+                              ),
+                          itemBuilder: (context, index) => MediaCard(
+                            item: data.nextup[index],
+                          ),
+                        ),
+                        SliverPadding(padding: .all(10)),
                       ],
                     ),
                   ),
                 ],
-              );
-            },
+              ),
+            ],
           ),
         ],
       ),
