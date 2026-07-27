@@ -18,7 +18,7 @@ class Home extends ConsumerStatefulWidget {
 class _HomeState extends ConsumerState<Home> {
   final ScrollController scrollController = ScrollController();
   int alpha = 0;
-  final int targetAlpha = 220;
+  final int targetAlpha = 240;
 
   @override
   void initState() {
@@ -39,12 +39,12 @@ class _HomeState extends ConsumerState<Home> {
         scrollController.offset /
         (scrollController.position.maxScrollExtent - 300);
 
-    if (alpha < 220) {
+    if (alpha < targetAlpha) {
       alpha = (scrollPercentage * targetAlpha).toInt().clamp(0, targetAlpha);
     } else {
       alpha = (scrollPercentage * targetAlpha).toInt().clamp(0, targetAlpha);
     }
-    print(alpha);
+
     setState(() {});
   }
 
@@ -68,6 +68,7 @@ class _HomeState extends ConsumerState<Home> {
                   Colors.black.withAlpha(alpha),
                   Colors.black.withAlpha(targetAlpha),
                 ],
+                stops: [0, 0.8],
                 begin: .topCenter,
                 end: .bottomCenter,
               ).createShader(rect),
