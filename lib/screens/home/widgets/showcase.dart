@@ -46,103 +46,104 @@ class _ShowcaseState extends ConsumerState<Showcase> {
   @override
   Widget build(BuildContext context) {
     final data = (ref.watch(homeProvider).value ?? HomeData());
-    return Stack(
-      fit: .expand,
-      children: [
-        if (data.showcaseItem.isNotEmpty)
-          ShowcaseItemBackdrop(
-            key: ValueKey(data.showcaseItem[currentPage].id),
-            item: data.showcaseItem[currentPage],
-          ),
-        ScrollConfiguration(
-          behavior:
-              ScrollConfiguration.of(
-                context,
-              ).copyWith(
-                dragDevices: {...PointerDeviceKind.values},
-              ),
-          child: NotificationListener<UserScrollNotification>(
-            onNotification: (notification) {
-              if (notification.direction != ScrollDirection.idle) {
-                pauseSlideshow = true;
-              } else {
-                pauseSlideshow = false;
-                _startSlideshow(data.showcaseItem);
-              }
-              setState(() {});
+    final size = MediaQuery.sizeOf(context);
 
-              return false;
-            },
-            child: PageView.builder(
-              controller: pageController,
-              itemCount: data.showcaseItem.length,
-              itemBuilder: (context, index) => ShowcaseItem(
-                item: data.showcaseItem[index],
-                key: ValueKey(data.showcaseItem[index].id),
+    return SizedBox(
+      height: size.height,
+
+      child: Stack(
+        fit: .expand,
+        children: [
+          ScrollConfiguration(
+            behavior:
+                ScrollConfiguration.of(
+                  context,
+                ).copyWith(
+                  dragDevices: {...PointerDeviceKind.values},
+                ),
+            child: NotificationListener<UserScrollNotification>(
+              onNotification: (notification) {
+                if (notification.direction != ScrollDirection.idle) {
+                  pauseSlideshow = true;
+                } else {
+                  pauseSlideshow = false;
+                  _startSlideshow(data.showcaseItem);
+                }
+                setState(() {});
+
+                return false;
+              },
+              child: PageView.builder(
+                controller: pageController,
+                itemCount: data.showcaseItem.length,
+                itemBuilder: (context, index) => ShowcaseItem(
+                  item: data.showcaseItem[index],
+                  key: ValueKey(data.showcaseItem[index].id),
+                ),
+                onPageChanged: (value) => setState(() {
+                  currentPage = value;
+                }),
               ),
-              onPageChanged: (value) => setState(() {
-                currentPage = value;
-              }),
             ),
           ),
-        ),
-        Align(
-          alignment: .topRight,
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Row(
-              mainAxisSize: .min,
-              children: [
-                FButton.icon(
-                  variant: .ghost,
-                  onPress: () => ref.refresh(homeProvider),
-                  child: ref.read(homeProvider).isLoading
-                      ? FCircularProgress()
-                      : Icon(FLucideIcons.rotateCcw),
-                ),
-                Row(
-                  mainAxisSize: .min,
-                  spacing: 8,
-                  children: [
-                    AnimatedSwitcher(
-                      duration: kDefaultAnimationDuration,
-                      child: FButton.icon(
-                        variant: .ghost,
-                        size: .lg,
-                        onPress: currentPage == 0
-                            ? null
-                            : () => _previousPage(data.showcaseItem),
-                        child: Icon(FLucideIcons.chevronLeft),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 35,
-                      child: AnimatedSwitcher(
+          Align(
+            alignment: .topRight,
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Row(
+                mainAxisSize: .min,
+                children: [
+                  FButton.icon(
+                    variant: .ghost,
+                    onPress: () => ref.refresh(homeProvider),
+                    child: ref.read(homeProvider).isLoading
+                        ? FCircularProgress()
+                        : Icon(FLucideIcons.rotateCcw),
+                  ),
+                  Row(
+                    mainAxisSize: .min,
+                    spacing: 8,
+                    children: [
+                      AnimatedSwitcher(
                         duration: kDefaultAnimationDuration,
-                        child: FittedBox(
-                          child: Text(
-                            '${currentPage + 1}/${data.showcaseItem.length}',
-                            textAlign: .center,
+                        child: FButton.icon(
+                          variant: .ghost,
+                          size: .lg,
+                          onPress: currentPage == 0
+                              ? null
+                              : () => _previousPage(data.showcaseItem),
+                          child: Icon(FLucideIcons.chevronLeft),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 35,
+                        child: AnimatedSwitcher(
+                          duration: kDefaultAnimationDuration,
+                          child: FittedBox(
+                            child: Text(
+                              '${currentPage + 1}/${data.showcaseItem.length}',
+                              textAlign: .center,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    AnimatedSwitcher(
-                      duration: kDefaultAnimationDuration,
-                      child: FButton.icon(
-                        variant: .ghost,
-                        size: .lg,
-                        onPress: () => _nextPage(data.showcaseItem),
-                        child: Icon(FLucideIcons.chevronRight),
+                      AnimatedSwitcher(
+                        duration: kDefaultAnimationDuration,
+                        child: FButton.icon(
+                          variant: .ghost,
+                          size: .lg,
+                          onPress: () => _nextPage(data.showcaseItem),
+                          child: Icon(FLucideIcons.chevronRight),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ].separatedby(Icon(FLucideIcons.dot)),
+                    ],
+                  ),
+                ].separatedby(Icon(FLucideIcons.dot)),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -215,7 +216,7 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
     return Align(
       alignment: .bottomCenter,
       child: Padding(
-        padding: const EdgeInsets.all(30),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: AnimatedSwitcher(
           duration: kDefaultAnimationDuration,
           child: sm
@@ -261,10 +262,6 @@ class ItemLg extends ConsumerWidget {
                     ),
               ),
             ),
-          ),
-          FDivider(
-            axis: .vertical,
-            style: .delta(color: theme.colors.primary, padding: .value(.zero)),
           ),
           Expanded(
             flex: 7,
