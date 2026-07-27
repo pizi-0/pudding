@@ -87,7 +87,13 @@ class MediaCardState extends State<MediaCard> {
                         mainAxisAlignment: .spaceBetween,
                         children: [
                           if (widget.item.seriesName != null)
-                            Text(widget.item.seriesName!),
+                            Expanded(
+                              child: Text(
+                                widget.item.seriesName!,
+                                maxLines: 1,
+                                overflow: .ellipsis,
+                              ),
+                            ),
                           Text(widget.item.productionYear.toString()),
                         ],
                       ),
