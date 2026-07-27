@@ -1,12 +1,11 @@
-import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/screens/home/models/home_data_model.dart';
+import 'package:pudding/screens/home/providers/showcase_provider.dart';
 import 'package:pudding/screens/home/widgets/library_card.dart';
 import 'package:pudding/screens/home/widgets/showcase.dart';
-import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/media_card.dart';
 
 class Home extends ConsumerStatefulWidget {
@@ -23,6 +22,7 @@ class _HomeState extends ConsumerState<Home> {
     final data = ref.watch(homeProvider).value ?? HomeData();
     final size = MediaQuery.sizeOf(context);
     final double horizontalPad = size.width < theme.breakpoints.md ? 10 : 30;
+    final item = ref.watch(showcaseProvider);
 
     return TapRegion(
       onTapInside: (event) => FocusScope.of(context).unfocus(),
@@ -30,9 +30,8 @@ class _HomeState extends ConsumerState<Home> {
         fit: .expand,
         children: [
           if (data.showcaseItem.isNotEmpty)
-            CachedNetworkImage(
-              imageUrl: data.showcaseItem.first.getBackdrop(),
-              fit: .cover,
+            ShowcaseItemBackdrop(
+              key: ValueKey(item?.id),
             ),
           LayoutBuilder(
             builder: (context, size) {
@@ -43,12 +42,11 @@ class _HomeState extends ConsumerState<Home> {
                       gradient: LinearGradient(
                         colors: [
                           Colors.transparent,
-                          Colors.black.withAlpha(240),
-                          Colors.black.withAlpha(240),
+                          Colors.black.withAlpha(220),
                         ],
                         begin: .topCenter,
                         end: .bottomCenter,
-                        stops: [0, 0.7, 1],
+                        stops: [0, 0.6],
                       ),
                     ),
                     sliver: SliverMainAxisGroup(
@@ -61,21 +59,21 @@ class _HomeState extends ConsumerState<Home> {
                           padding: .symmetric(horizontal: horizontalPad),
                           sliver: SliverMainAxisGroup(
                             slivers: [
-                              PinnedHeaderSliver(
+                              SliverToBoxAdapter(
                                 child: Text(
                                   'Libraries',
-                                  style: theme.typography.display.xl3.copyWith(
+                                  style: theme.typography.display.xl2.copyWith(
                                     fontWeight: .bold,
                                     height: 1.5,
                                   ),
                                 ),
                               ),
-                              SliverPadding(padding: .all(8)),
+                              SliverPadding(padding: .all(10)),
                               SliverGrid.builder(
                                 itemCount: data.libraries.length,
                                 gridDelegate:
                                     SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent: 300,
+                                      maxCrossAxisExtent: 310,
                                       childAspectRatio: 16 / 9,
                                       mainAxisSpacing: 10,
                                       crossAxisSpacing: 10,
@@ -85,21 +83,24 @@ class _HomeState extends ConsumerState<Home> {
                                   onPress: () {},
                                 ),
                               ),
-                              PinnedHeaderSliver(
+                              SliverPadding(padding: .all(20)),
+
+                              SliverToBoxAdapter(
                                 child: Text(
                                   'Continue watching',
-                                  style: theme.typography.display.xl3.copyWith(
+                                  style: theme.typography.display.xl2.copyWith(
                                     fontWeight: .bold,
                                     height: 1.5,
                                   ),
                                 ),
                               ),
+                              SliverPadding(padding: .all(10)),
                               SliverGrid.builder(
                                 itemCount: data.continueWatching.length,
                                 gridDelegate:
                                     SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent: 300,
-                                      childAspectRatio: 300 / 200,
+                                      maxCrossAxisExtent: 310,
+                                      childAspectRatio: 3 / 2,
                                       mainAxisSpacing: 10,
                                       crossAxisSpacing: 10,
                                     ),
@@ -107,6 +108,32 @@ class _HomeState extends ConsumerState<Home> {
                                   item: data.continueWatching[index],
                                 ),
                               ),
+                              SliverPadding(padding: .all(20)),
+
+                              SliverToBoxAdapter(
+                                child: Text(
+                                  'Next up',
+                                  style: theme.typography.display.xl2.copyWith(
+                                    fontWeight: .bold,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                              SliverPadding(padding: .all(10)),
+                              SliverGrid.builder(
+                                itemCount: data.nextup.length,
+                                gridDelegate:
+                                    SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent: 310,
+                                      childAspectRatio: 3 / 2,
+                                      mainAxisSpacing: 10,
+                                      crossAxisSpacing: 10,
+                                    ),
+                                itemBuilder: (context, index) => MediaCard(
+                                  item: data.nextup[index],
+                                ),
+                              ),
+                              SliverPadding(padding: .all(10)),
                             ],
                           ),
                         ),

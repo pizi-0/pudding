@@ -12,6 +12,7 @@ import 'package:forui/forui.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/screens/home/models/home_data_model.dart';
+import 'package:pudding/screens/home/providers/showcase_provider.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
@@ -80,9 +81,15 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                   item: data.showcaseItem[index],
                   key: ValueKey(data.showcaseItem[index].id),
                 ),
-                onPageChanged: (value) => setState(() {
-                  currentPage = value;
-                }),
+                onPageChanged: (value) {
+                  ref
+                      .read(showcaseProvider.notifier)
+                      .setItem(data.showcaseItem[value]);
+
+                  setState(() {
+                    currentPage = value;
+                  });
+                },
               ),
             ),
           ),
@@ -217,14 +224,19 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
       alignment: .bottomCenter,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: AnimatedSwitcher(
-          duration: kDefaultAnimationDuration,
-          child: sm
-              ? ItemSm(item: item)
-              : ItemLg(
-                  item: item,
-                  key: ValueKey(item.id),
-                ),
+        child: Column(
+          mainAxisAlignment: .end,
+          children: [
+            AnimatedSwitcher(
+              duration: kDefaultAnimationDuration,
+              child: sm
+                  ? ItemSm(item: item)
+                  : ItemLg(
+                      item: item,
+                      key: ValueKey(item.id),
+                    ),
+            ),
+          ],
         ),
       ),
     );
@@ -384,17 +396,16 @@ class ItemSm extends ConsumerWidget {
   }
 }
 
-class ShowcaseItemBackdrop extends StatefulWidget {
-  final JellyfinItem item;
-  const ShowcaseItemBackdrop({super.key, required this.item});
+class ShowcaseItemBackdrop extends ConsumerStatefulWidget {
+  const ShowcaseItemBackdrop({super.key});
 
   @override
-  State<ShowcaseItemBackdrop> createState() => _ShowcaseItemBackdropState();
+  ConsumerState<ShowcaseItemBackdrop> createState() =>
+      _ShowcaseItemBackdropState();
 }
 
-class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
+class _ShowcaseItemBackdropState extends ConsumerState<ShowcaseItemBackdrop>
     with TickerProviderStateMixin {
-  late JellyfinItem item = widget.item;
   late AnimationController anim;
   late Animation<double> scale;
 
@@ -402,7 +413,7 @@ class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
   void initState() {
     super.initState();
     anim = AnimationController(vsync: this, duration: 15.seconds);
-    scale = Tween<double>(begin: 1, end: 1.05).animate(anim);
+    scale = Tween<double>(begin: 1, end: 1.1).animate(anim);
     anim.forward();
   }
 
@@ -415,6 +426,8 @@ class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
+    final item = ref.watch(showcaseProvider);
+
     return ShaderMask(
       shaderCallback: (bounds) => LinearGradient(
         begin: .topCenter,
@@ -429,26 +442,30 @@ class _ShowcaseItemBackdropState extends State<ShowcaseItemBackdrop>
         height: size.height,
         width: size.width,
         margin: .only(bottom: 5),
-        child: CachedNetworkImage(
-          imageUrl: item.getBackdrop(),
-          errorBuilder: (context, error, stackTrace) =>
-              Center(child: Text(error.toString())),
-          imageBuilder: (context, imageProvider) => AnimatedBuilder(
-            animation: anim,
-            builder: (context, _) {
-              return Transform.scale(
-                scale: scale.value,
-                child: Image(
-                  image: imageProvider,
-                  fit: .cover,
-                ),
-              );
-            },
-          ),
-          fit: .cover,
-          color: Colors.black38,
-          colorBlendMode: .darken,
-        ).fadeIn(duration: 1000.milliseconds, curve: Curves.easeInOut),
+        child:
+            CachedNetworkImage(
+              imageUrl: item!.getBackdrop(),
+              errorBuilder: (context, error, stackTrace) =>
+                  Center(child: Text(error.toString())),
+              imageBuilder: (context, imageProvider) => AnimatedBuilder(
+                animation: anim,
+                builder: (context, _) {
+                  return Transform.scale(
+                    scale: scale.value,
+                    child: Image(
+                      image: imageProvider,
+                      fit: .cover,
+                    ),
+                  );
+                },
+              ),
+              fit: .cover,
+              color: Colors.black38,
+              colorBlendMode: .darken,
+            ).fadeIn(
+              duration: 1000.milliseconds,
+              curve: Curves.easeInOut,
+            ),
       ),
     );
   }
