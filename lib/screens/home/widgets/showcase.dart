@@ -413,7 +413,7 @@ class _ShowcaseItemBackdropState extends ConsumerState<ShowcaseItemBackdrop>
   void initState() {
     super.initState();
     anim = AnimationController(vsync: this, duration: 15.seconds);
-    scale = Tween<double>(begin: 1, end: 1.1).animate(anim);
+    scale = Tween<double>(begin: 1, end: 1.05).animate(anim);
     anim.forward();
   }
 
@@ -428,45 +428,36 @@ class _ShowcaseItemBackdropState extends ConsumerState<ShowcaseItemBackdrop>
     final size = MediaQuery.sizeOf(context);
     final item = ref.watch(showcaseProvider);
 
-    return ShaderMask(
-      shaderCallback: (bounds) => LinearGradient(
-        begin: .topCenter,
-        end: .bottomCenter,
-        stops: [0.6, 1],
-        colors: [Colors.black12, Colors.black],
-      ).createShader(bounds),
-      blendMode: .dstOut,
-      child: Container(
-        clipBehavior: .hardEdge,
-        decoration: BoxDecoration(color: Colors.transparent),
-        height: size.height,
-        width: size.width,
-        margin: .only(bottom: 5),
-        child:
-            CachedNetworkImage(
-              imageUrl: item!.getBackdrop(),
-              errorBuilder: (context, error, stackTrace) =>
-                  Center(child: Text(error.toString())),
-              imageBuilder: (context, imageProvider) => AnimatedBuilder(
-                animation: anim,
-                builder: (context, _) {
-                  return Transform.scale(
-                    scale: scale.value,
-                    child: Image(
-                      image: imageProvider,
-                      fit: .cover,
-                    ),
-                  );
-                },
-              ),
-              fit: .cover,
-              color: Colors.black38,
-              colorBlendMode: .darken,
-            ).fadeIn(
-              duration: 1000.milliseconds,
-              curve: Curves.easeInOut,
+    return Container(
+      clipBehavior: .hardEdge,
+      decoration: BoxDecoration(color: Colors.transparent),
+      height: size.height,
+      width: size.width,
+      margin: .only(bottom: 5),
+      child:
+          CachedNetworkImage(
+            imageUrl: item!.getBackdrop(),
+            errorBuilder: (context, error, stackTrace) =>
+                Center(child: Text(error.toString())),
+            imageBuilder: (context, imageProvider) => AnimatedBuilder(
+              animation: anim,
+              builder: (context, _) {
+                return Transform.scale(
+                  scale: scale.value,
+                  child: Image(
+                    image: imageProvider,
+                    fit: .cover,
+                  ),
+                );
+              },
             ),
-      ),
+            fit: .cover,
+            color: Colors.black38,
+            colorBlendMode: .darken,
+          ).fadeIn(
+            duration: 1000.milliseconds,
+            curve: Curves.easeInOut,
+          ),
     );
   }
 }
