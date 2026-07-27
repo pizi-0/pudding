@@ -29,17 +29,26 @@ class _LibraryCardState extends State<LibraryCard> {
       duration: kDefaultAnimationDuration,
       scale: hover ? 1.02 : 1,
       curve: Curves.ease,
-      child: FButton(
-        variant: .ghost,
-        style: .delta(contentStyle: .delta(padding: .value(.zero))),
+      child: FButton.raw(
+        variant: .outline,
+        style: .delta(
+          decoration: .delta([
+            .all(
+              .boxDelta(
+                color: Colors.transparent,
+                border: Border.all(width: 2, color: theme.colors.border),
+              ),
+            ),
+          ]),
+        ),
         onPress: widget.onPress,
         onHoverChange: (h) => setState(() => hover = h),
         onFocusChange: (f) => setState(() => hover = f),
-        crossAxisAlignment: .stretch,
-        child: Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(2.0),
           child: ClipRRect(
             borderRadius:
-                theme.buttonStyles.primary.lg.decoration.base.borderRadius!,
+                theme.buttonStyles.outline.xs.decoration.base.borderRadius!,
             child: CachedNetworkImage(
               imageUrl: widget.view.getPrimaryImage(),
               fit: .cover,
