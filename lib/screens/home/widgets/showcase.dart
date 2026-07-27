@@ -223,7 +223,7 @@ class _ShowcaseItemState extends ConsumerState<ShowcaseItem> {
     return Align(
       alignment: .bottomCenter,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
         child: Column(
           mainAxisAlignment: .end,
           children: [
