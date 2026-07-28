@@ -61,6 +61,30 @@ class MediaCardState extends State<MediaCard> {
                 title: Text('Mark as unwatched'),
                 onPress: () {},
               ),
+              .submenu(
+                menuStyle: .delta(barrierFilter: () => null),
+                prefix: Icon(FLucideIcons.edit),
+                title: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 3.5),
+                  child: Text('Add to'),
+                ),
+                submenu: [
+                  .group(
+                    children: [
+                      .item(
+                        title: Text('Collection'),
+                        prefix: Icon(FLucideIcons.packagePlus),
+                        onPress: () {},
+                      ),
+                      .item(
+                        title: Text('Playlist'),
+                        prefix: Icon(FLucideIcons.listPlus),
+                        onPress: () {},
+                      ),
+                    ],
+                  ),
+                ],
+              ),
               .raw(
                 child: FDivider(
                   style: .delta(padding: .value(.zero)),
@@ -72,15 +96,24 @@ class MediaCardState extends State<MediaCard> {
                 onPress: () {},
               ),
               .submenu(
-                menuStyle: .delta(tileGroupStyle: .delta()),
+                menuStyle: .delta(barrierFilter: () => null),
                 prefix: Icon(FLucideIcons.edit),
-                title: Text('Edit'),
+                title: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 3.5),
+                  child: Text('Edit'),
+                ),
                 submenu: [
                   .group(
                     children: [
                       .item(
                         title: Text('Metadata'),
-                        prefix: Icon(FLucideIcons.handMetal),
+                        prefix: Icon(FLucideIcons.braces),
+                        onPress: () {},
+                      ),
+                      .item(
+                        title: Text('Images'),
+                        prefix: Icon(FLucideIcons.image),
+                        onPress: () {},
                       ),
                     ],
                   ),
