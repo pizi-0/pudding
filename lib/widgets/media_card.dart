@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
@@ -19,30 +21,144 @@ class MediaCardState extends State<MediaCard> {
   @override
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
-    final borderRadius =
-        theme.buttonStyles.base.xs.decoration.base.borderRadius ??
-        BorderRadius.circular(10);
+    final borderRadius = theme.style.borderRadius.xs;
+
     final item = widget.item;
+    final textDirection = Directionality.of(context);
 
     return AnimatedScale(
       scale: hover ? 1.02 : 1,
       duration: kDefaultAnimationDuration,
       curve: Curves.ease,
-      child: FButton.raw(
-        style: .delta(
-          decoration: .delta([
-            .all(
-              .boxDelta(
-                color: Colors.transparent,
-                border: Border.all(width: 2, color: theme.colors.border),
+      child: FPopoverMenu(
+        menuBuilder: (context, controller, menu) => [
+          .group(
+            children: [
+              .item(
+                prefix: Icon(FLucideIcons.play),
+                title: Text('Play'),
+                onPress: () {},
               ),
-            ),
-          ]),
+              .item(
+                prefix: Icon(FLucideIcons.play),
+                title: Text('Play all from here'),
+                onPress: () {},
+              ),
+              .raw(
+                child: FDivider(
+                  style: .delta(padding: .value(.zero)),
+                ),
+              ),
+              // if (!(item.userData?.played ?? true))
+              .item(
+                prefix: Icon(FLucideIcons.eye),
+                title: Text('Mark as watched'),
+                onPress: () {},
+              ),
+              // if (item.userData?.played ?? false)
+              .item(
+                prefix: Icon(FLucideIcons.eyeOff),
+                title: Text('Mark as unwatched'),
+                onPress: () {},
+              ),
+              .raw(
+                child: FDivider(
+                  style: .delta(padding: .value(.zero)),
+                ),
+              ),
+              .item(
+                prefix: Icon(FLucideIcons.info),
+                title: Text('Info'),
+                onPress: () {},
+              ),
+              .submenu(
+                menuStyle: .delta(tileGroupStyle: .delta()),
+                prefix: Icon(FLucideIcons.edit),
+                title: Text('Edit'),
+                submenu: [
+                  .group(
+                    children: [
+                      .item(
+                        title: Text('Metadata'),
+                        prefix: Icon(FLucideIcons.handMetal),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              .raw(
+                child: FDivider(
+                  style: .delta(padding: .value(.zero)),
+                ),
+              ),
+              .item(
+                prefix: Icon(FLucideIcons.trash2),
+                title: Text('Delete'),
+                onPress: () {},
+              ),
+            ],
+          ),
+        ],
+        cutout: true,
+        faded: false,
+        menuAnchor: .topLeft,
+        childAnchor: .topRight,
+        style: .delta(
+          tileGroupStyle: .delta(childPadding: .value(.all(100))),
+          itemGroupStyle: .delta(
+            itemStyles: .delta([
+              .all(
+                .delta(
+                  contentDecoration: .delta([
+                    .all(.boxDelta(borderRadius: borderRadius)),
+                  ]),
+                  contentStyle: .delta(unsuffixedPadding: .value(.all(10))),
+                ),
+              ),
+            ]),
+          ),
+          barrierFilter: () =>
+              (animation) => ImageFilter.compose(
+                outer: ImageFilter.blur(
+                  sigmaX: animation * 5,
+                  sigmaY: animation * 5,
+                ),
+                inner: ColorFilter.mode(
+                  Color.lerp(
+                    const Color(0x00000000),
+                    const Color(0x33000000),
+                    animation,
+                  )!,
+                  BlendMode.srcOver,
+                ),
+              ),
         ),
-        variant: .outline,
-        onHoverChange: (h) => setState(() => hover = h),
-        onFocusChange: (f) => setState(() => hover = f),
-        onPress: () {},
+        cutoutBuilder: (path, bounds) => path.addRRect(
+          RRect.fromRectAndRadius(
+            bounds,
+            borderRadius.resolve(textDirection).bottomLeft,
+          ),
+        ), //
+        builder: (context, controller, child) => FButton.raw(
+          style: .delta(
+            decoration: .delta([
+              .all(
+                .boxDelta(
+                  color: Colors.transparent,
+                  border: Border.all(width: 2, color: theme.colors.border),
+                ),
+              ),
+            ]),
+          ),
+          variant: .outline,
+          actions: {},
+          onHoverChange: (h) => setState(() => hover = h),
+          onFocusChange: (f) => setState(() => hover = f),
+          onPress: () {},
+          onSecondaryPress: () => controller.toggle(),
+          onLongPress: () => controller.toggle(),
+          child: child!,
+        ),
         child: Padding(
           padding: const EdgeInsets.all(2.0),
           child: ClipRRect(
