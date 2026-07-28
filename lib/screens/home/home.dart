@@ -68,7 +68,7 @@ class _HomeState extends ConsumerState<Home> {
                   Colors.black.withAlpha(alpha),
                   Colors.black.withAlpha(targetAlpha),
                 ],
-                stops: [0, 0.8],
+                stops: [0.3, 1],
                 begin: .topCenter,
                 end: .bottomCenter,
               ).createShader(rect),
