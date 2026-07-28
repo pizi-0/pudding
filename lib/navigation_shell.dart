@@ -22,41 +22,94 @@ class MainNavigationShell extends ConsumerWidget {
 
     return FScaffold(
       childPad: false,
-      child: Column(
+      child: Stack(
         children: [
-          Expanded(
-            child: AnimatedBranchContainer(
-              currentIndex: navigationShell.currentIndex,
-              children: children,
-            ),
+          Column(
+            children: [
+              Expanded(
+                child: AnimatedBranchContainer(
+                  currentIndex: navigationShell.currentIndex,
+                  children: children,
+                ),
+              ),
+              AnimatedSwitcher(
+                duration: kDefaultAnimationDuration,
+                child: bottomBar
+                    ? FBottomNavigationBar(
+                        index: navigationShell.currentIndex,
+                        onChange: (value) {
+                          navigationShell.goBranch(
+                            value,
+                            initialLocation:
+                                value == navigationShell.currentIndex,
+                          );
+                        },
+                        children: [
+                          FBottomNavigationBarItem(
+                            icon: Icon(FLucideIcons.home),
+                          ),
+                          FBottomNavigationBarItem(
+                            icon: Icon(FLucideIcons.library),
+                          ),
+                          FBottomNavigationBarItem(
+                            icon: Icon(FLucideIcons.settings),
+                          ),
+                          FBottomNavigationBarItem(
+                            icon: Icon(FLucideIcons.user),
+                          ),
+                        ],
+                      )
+                    : SizedBox.shrink(),
+              ),
+            ],
           ),
-          AnimatedSwitcher(
-            duration: kDefaultAnimationDuration,
-            child: bottomBar
-                ? FBottomNavigationBar(
-                    index: navigationShell.currentIndex,
-                    onChange: (value) {
-                      navigationShell.goBranch(
-                        value,
-                        initialLocation: value == navigationShell.currentIndex,
-                      );
-                    },
+          Positioned(
+            left: 0,
+            top: 0,
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: IntrinsicWidth(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: theme.colors.background.withAlpha(220),
+                    borderRadius: theme.style.borderRadius.lg,
+                    backgroundBlendMode: .darken,
+                  ),
+                  padding: .all(10),
+                  child: Row(
+                    mainAxisSize: .min,
+                    spacing: 10,
+                    crossAxisAlignment: .center,
                     children: [
-                      FBottomNavigationBarItem(
-                        icon: Icon(FLucideIcons.home),
+                      FButton(
+                        selected: navigationShell.currentIndex == 0,
+                        variant: .ghost,
+                        onPress: () {
+                          navigationShell.goBranch(
+                            0,
+                            initialLocation: navigationShell.currentIndex == 0,
+                          );
+                        },
+                        prefix: Icon(FLucideIcons.home),
+                        child: Text('Home'),
                       ),
-                      FBottomNavigationBarItem(
-                        icon: Icon(FLucideIcons.library),
-                      ),
-                      FBottomNavigationBarItem(
-                        icon: Icon(FLucideIcons.settings),
-                      ),
-                      FBottomNavigationBarItem(
-                        icon: Icon(FLucideIcons.user),
+                      FButton(
+                        selected: navigationShell.currentIndex == 1,
+                        variant: .ghost,
+                        onPress: () {
+                          navigationShell.goBranch(
+                            1,
+                            initialLocation: navigationShell.currentIndex == 1,
+                          );
+                        },
+                        prefix: Icon(FLucideIcons.library),
+                        child: Text('Libraries'),
                       ),
                     ],
-                  )
-                : SizedBox.shrink(),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
