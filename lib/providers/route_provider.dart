@@ -3,10 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:pudding/navigation_shell.dart';
 import 'package:pudding/screens/auth/auth_provider.dart';
 import 'package:pudding/screens/auth/auth_screen.dart';
+import 'package:pudding/screens/detail_screens/movies_detail_screen.dart';
 import 'package:pudding/screens/home/home.dart';
 import 'package:pudding/screens/library/library.dart';
+import 'package:pudding/screens/library_detail/library_detail_screen.dart';
 import 'package:pudding/screens/settings/settings.dart';
 import 'package:pudding/screens/splash/splash.dart';
+
+import '../screens/detail_screens/tv_detail_screens.dart';
 
 final routeProvider = Provider<GoRouter>(
   (ref) => GoRouter(
@@ -54,6 +58,22 @@ final routeProvider = Provider<GoRouter>(
                 name: 'Home',
                 path: '/',
                 builder: (context, state) => Home(),
+                routes: [
+                  GoRoute(
+                    name: 'TvShow details',
+                    path: 'show/:showId',
+                    builder: (context, state) => TvDetailScreen(
+                      showId: state.pathParameters['showId'],
+                    ),
+                  ),
+                  GoRoute(
+                    name: 'Movie details',
+                    path: 'movie/:movieId',
+                    builder: (context, state) => MovieDetailScreen(
+                      movieId: state.pathParameters['movieId'],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -63,6 +83,16 @@ final routeProvider = Provider<GoRouter>(
                 name: 'Library',
                 path: '/library',
                 builder: (context, state) => Library(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    builder: (context, state) {
+                      final id = state.pathParameters['id'];
+
+                      return LibraryDetail(id: id);
+                    },
+                  ),
+                ],
               ),
             ],
           ),

@@ -4,6 +4,7 @@ import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
@@ -187,7 +188,10 @@ class MediaCardState extends State<MediaCard> {
           actions: {},
           onHoverChange: (h) => setState(() => hover = h),
           onFocusChange: (f) => setState(() => hover = f),
-          onPress: () {},
+          onPress: () {
+            if (item.isSeries) context.go('/shows/${item.seriesId}');
+            if (item.isMovie) context.go('/movie/${item.id}');
+          },
           onSecondaryPress: () => controller.toggle(),
           onLongPress: () => controller.toggle(),
           child: child!,

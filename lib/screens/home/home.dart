@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/screens/home/models/home_data_model.dart';
 import 'package:pudding/screens/home/providers/showcase_provider.dart';
@@ -112,7 +113,11 @@ class _HomeState extends ConsumerState<Home> {
                               ),
                           itemBuilder: (context, index) => LibraryCard(
                             view: data.libraries[index],
-                            onPress: () {},
+                            onPress: () {
+                              context.go(
+                                '/library/${data.libraries[index].id}',
+                              );
+                            },
                           ),
                         ),
                         SliverPadding(padding: .all(20)),

@@ -75,7 +75,7 @@ class MainNavigationShell extends ConsumerWidget {
                     borderRadius: theme.style.borderRadius.lg,
                     backgroundBlendMode: .darken,
                   ),
-                  padding: .all(10),
+                  padding: .all(4),
                   child: Row(
                     mainAxisSize: .min,
                     spacing: 10,
@@ -83,7 +83,9 @@ class MainNavigationShell extends ConsumerWidget {
                     children: [
                       FButton(
                         selected: navigationShell.currentIndex == 0,
-                        variant: .ghost,
+                        variant: navigationShell.currentIndex == 0
+                            ? .primary
+                            : .ghost,
                         onPress: () {
                           navigationShell.goBranch(
                             0,
