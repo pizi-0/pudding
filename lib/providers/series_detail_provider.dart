@@ -20,17 +20,29 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   }
 
   Future<SeriesDetailModel> _populate() async {
-    final (series, seasons, episodes) = await (
+    String? selectedSeason;
+    final (series, seasons, episodes, nextUp) = await (
       _getSeriesDetail(),
       _getSeasons(),
       _getEpisodes(),
+      _getNextUp(),
     ).wait;
+
+    selectedSeason = nextUp?.seasonId ?? seasons.firstOrNull;
 
     return SeriesDetailModel(
       seriesId: id,
       seasonIds: seasons,
       episodeIds: episodes,
+      selectedSeasonId: selectedSeason,
+      nextUp: nextUp?.id,
     );
+  }
+
+  Future<JellyfinItem?> _getNextUp() async {
+    final res = await client.tvShows.nextUp(seriesId: id);
+
+    return res.items.firstOrNull;
   }
 
   Future<String> _getSeriesDetail() async {

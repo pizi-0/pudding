@@ -6,12 +6,14 @@ class SeriesDetailModel {
   final List<String> episodeIds;
   final String? selectedSeasonId;
   final String seriesId;
+  final String? nextUp;
 
   SeriesDetailModel({
     String? selectedSeasonId,
     this.seasonIds = const [],
     this.episodeIds = const [],
     required this.seriesId,
+    this.nextUp,
   }) : selectedSeasonId = seasonIds.firstOrNull;
 
   SeriesDetailModel copyWith({
@@ -19,12 +21,14 @@ class SeriesDetailModel {
     List<String>? episodeIds,
     String? selectedSeasonId,
     String? seriesId,
+    String? nextUp,
   }) {
     return SeriesDetailModel(
       seasonIds: seasonIds ?? this.seasonIds,
       episodeIds: episodeIds ?? this.episodeIds,
       selectedSeasonId: selectedSeasonId ?? this.selectedSeasonId,
       seriesId: seriesId ?? this.seriesId,
+      nextUp: nextUp ?? this.nextUp,
     );
   }
 
@@ -35,7 +39,8 @@ class SeriesDetailModel {
     return listEquals(other.seasonIds, seasonIds) &&
         listEquals(other.episodeIds, episodeIds) &&
         other.selectedSeasonId == selectedSeasonId &&
-        other.seriesId == seriesId;
+        other.seriesId == seriesId &&
+        other.nextUp == nextUp;
   }
 
   @override
@@ -43,6 +48,7 @@ class SeriesDetailModel {
     return seasonIds.hashCode ^
         episodeIds.hashCode ^
         selectedSeasonId.hashCode ^
-        seriesId.hashCode;
+        seriesId.hashCode ^
+        nextUp.hashCode;
   }
 }
