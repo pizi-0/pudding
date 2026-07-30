@@ -59,7 +59,7 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
       includeItemTypes: [JellyfinItemKind.season],
     );
 
-    final seasonIds = res.items.map((e) => e.toString()).toList();
+    final seasonIds = res.items.map((e) => e.id).toList();
 
     ref
         .read(seasonListCacheProvider.notifier)
