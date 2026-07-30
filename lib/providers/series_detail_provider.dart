@@ -16,7 +16,7 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
 
   @override
   FutureOr<SeriesDetailModel> build() async {
-    return await _populate();
+    return _populate();
   }
 
   Future<SeriesDetailModel> _populate() async {
@@ -34,7 +34,7 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   }
 
   Future<String> _getSeriesDetail() async {
-    final cache = ref.watch(mediaCacheProvider);
+    final cache = ref.read(mediaCacheProvider);
 
     if (cache.containsKey(id)) {
       return cache[id]!.id;
@@ -48,7 +48,7 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   }
 
   Future<List<String>> _getSeasons() async {
-    final cache = ref.watch(seasonListCacheProvider);
+    final cache = ref.read(seasonListCacheProvider);
 
     if (cache.containsKey(id)) {
       return cache[id]!;
@@ -74,7 +74,7 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   }
 
   Future<List<String>> _getEpisodes() async {
-    final cache = ref.watch(episodesListCacheProvider);
+    final cache = ref.read(episodesListCacheProvider);
 
     if (cache.containsKey(id)) {
       return cache[id]!;
@@ -99,9 +99,9 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
     return episodeIds;
   }
 
-  void setSelectedSeason(String id) {
+  void setSelectedSeason(String seasonId) {
     var currentState = state.value ?? SeriesDetailModel(seriesId: id);
-    state = AsyncValue.data(currentState.copyWith(selectedSeasonId: id));
+    state = AsyncValue.data(currentState.copyWith(selectedSeasonId: seasonId));
   }
 }
 
