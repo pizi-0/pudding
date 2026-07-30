@@ -1,22 +1,20 @@
-import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SeasonListCacheNotifier
-    extends Notifier<Map<String, List<JellyfinItem>>> {
+class SeasonListCacheNotifier extends Notifier<Map<String, List<String>>> {
   @override
-  Map<String, List<JellyfinItem>> build() {
+  Map<String, List<String>> build() {
     return {};
   }
 
   void addDetail({
     required String seriesId,
-    required List<JellyfinItem> seasons,
+    required List<String> seasons,
   }) {
     state = {...state, seriesId: seasons};
   }
 }
 
 final seasonListCacheProvider =
-    NotifierProvider<SeasonListCacheNotifier, Map<String, List<JellyfinItem>>>(
+    NotifierProvider<SeasonListCacheNotifier, Map<String, List<String>>>(
       () => SeasonListCacheNotifier(),
     );

@@ -7,10 +7,10 @@ class EpisodesListCacheNotifier extends Notifier<Map<String, List<String>>> {
   }
 
   void addEpisodes({
-    required String seasonId,
+    required String seriesId,
     required List<String> episodesIds,
   }) {
-    state = {...state, seasonId: episodesIds};
+    state = {...state, seriesId: episodesIds};
   }
 }
 
