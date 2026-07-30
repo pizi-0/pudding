@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:pudding/services/di.dart';
@@ -25,6 +27,17 @@ extension JellyInfo on JellyfinItem {
 
   String? getRuntime() {
     return (durationMs ?? 0).toFormattedDuration();
+  }
+
+  String getSeriesRunYears() {
+    final startYear = productionYear?.toString() ?? '';
+    final endYear = DateTime.tryParse(raw['EndDate']);
+    final status = raw['Status'];
+
+    if (status == 'Continuing') {
+      return '$startYear-';
+    }
+    return '$startYear-${endYear?.year ?? ''}';
   }
 
   String getEndsAt(BuildContext context) {
@@ -69,6 +82,13 @@ extension JellyInfo on JellyfinItem {
     );
   }
 
+  String getThumb() {
+    return services<JellyfinClient>().images.url(
+      itemId: id,
+      type: JellyfinImagesApi.typeThumb,
+    );
+  }
+
   String getPrimary() {
     return services<JellyfinClient>().images.url(
       itemId: seriesId ?? id,
@@ -84,8 +104,18 @@ extension JellyInfo on JellyfinItem {
     return raw['OfficialRating'];
   }
 
+  num? getCommunityRating() {
+    return raw['CommunityRating'];
+  }
+
   int? getSeasons() {
     return childCount;
+  }
+
+  String getRaw() {
+    final JsonEncoder encoder = JsonEncoder.withIndent(' ');
+    String pretty = encoder.convert(raw);
+    return pretty;
   }
 
   bool get isSeries => type == JellyfinItemKind.series;

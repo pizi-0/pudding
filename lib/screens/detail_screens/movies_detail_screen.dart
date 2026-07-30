@@ -1,9 +1,8 @@
-import 'package:dart_jellyfin/dart_jellyfin.dart';
+import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:forui/forui.dart';
-import 'package:forui/widgets/progress.dart';
-import 'package:pudding/services/di.dart';
+import 'package:pudding/providers/item_detail_provider.dart';
+import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
 class MovieDetailScreen extends ConsumerStatefulWidget {
   final String? movieId;
@@ -15,46 +14,33 @@ class MovieDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
-  final client = services<JellyfinClient>();
-  Future<JellyfinItem?> _getMovieDetails() async {
-    if (widget.movieId == null) return null;
-
-    return await client.items.byId(widget.movieId!);
-  }
-
   @override
   Widget build(BuildContext context) {
-    print(widget.movieId);
+    final itemAsync = ref.watch(itemDetailProvider(widget.movieId!));
+    final item = itemAsync.value;
 
-    return FScaffold(
-      header: Padding(
-        padding: const EdgeInsets.all(80.0),
-        child: FHeader(
-          title: Text('data'),
+    if (itemAsync.hasError) {
+      return Center(
+        child: Text(itemAsync.error.toString()),
+      );
+    }
+
+    if (item == null) {
+      return Center(
+        child: Text('item == null'),
+      );
+    }
+
+    return Stack(
+      fit: .expand,
+      children: [
+        CachedNetworkImage(
+          imageUrl: item.getBackdrop(),
+          fit: .cover,
+          color: Colors.black.withAlpha(230),
+          colorBlendMode: .darken,
         ),
-      ),
-      child: FutureBuilder(
-        future: _getMovieDetails(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(snapshot.error.toString()),
-            );
-          }
-
-          if (snapshot.hasData) {
-            final item = snapshot.data;
-
-            if (item != null) {
-              return Text(item.name);
-            }
-          }
-
-          return Center(
-            child: FCircularProgress(),
-          );
-        },
-      ),
+      ],
     );
   }
 }

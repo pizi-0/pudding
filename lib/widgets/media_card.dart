@@ -189,7 +189,9 @@ class MediaCardState extends State<MediaCard> {
           onHoverChange: (h) => setState(() => hover = h),
           onFocusChange: (f) => setState(() => hover = f),
           onPress: () {
-            if (item.isSeries) context.go('/shows/${item.seriesId}');
+            if (item.isSeries || item.isSeason || item.isEpisode) {
+              context.go('/show/${item.seriesId}');
+            }
             if (item.isMovie) context.go('/movie/${item.id}');
           },
           onSecondaryPress: () => controller.toggle(),
