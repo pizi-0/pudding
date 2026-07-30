@@ -28,8 +28,8 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
 
     return SeriesDetailModel(
       seriesId: id,
-      seasonIds: seasons.map((e) => e.id).toList(),
-      episodeIds: episodes.map((e) => e.id).toList(),
+      seasonIds: seasons,
+      episodeIds: episodes,
     );
   }
 
@@ -47,25 +47,7 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
     return id;
   }
 
-  Future<List<JellyfinItem>> _getSeasons() async {
-    final cache = ref.watch(seasonListCacheProvider);
-
-    if (cache.containsKey(id)) {
-      return cache[id]!;
-    }
-
-    final res = await client.items.list(parentId: id);
-
-    ref
-        .read(seasonListCacheProvider.notifier)
-        .addDetail(seriesId: id, seasons: res.items);
-
-    ref.read(mediaCacheProvider.notifier).populateCache(res.items);
-
-    return res.items;
-  }
-
-  Future<List<JellyfinItem>> _getEpisodes() async {
+  Future<List<String>> _getSeasons() async {
     final cache = ref.watch(seasonListCacheProvider);
 
     if (cache.containsKey(id)) {
@@ -73,19 +55,48 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
     }
 
     final res = await client.items.list(
-      parentId: state.value?.selectedSeasonId,
+      parentId: id,
+      includeItemTypes: [JellyfinItemKind.season],
     );
 
+    final seasonIds = res.items.map((e) => e.toString()).toList();
+
     ref
-        .read(episodesListCacheProvider.notifier)
-        .addEpisodes(
-          seasonId: state.value!.selectedSeasonId!,
-          episodesIds: res.items.map((e) => e.id).toList(),
+        .read(seasonListCacheProvider.notifier)
+        .addDetail(
+          seriesId: id,
+          seasons: seasonIds,
         );
 
     ref.read(mediaCacheProvider.notifier).populateCache(res.items);
 
-    return res.items;
+    return seasonIds;
+  }
+
+  Future<List<String>> _getEpisodes() async {
+    final cache = ref.watch(episodesListCacheProvider);
+
+    if (cache.containsKey(id)) {
+      return cache[id]!;
+    }
+
+    final res = await client.items.list(
+      parentId: id,
+      includeItemTypes: [JellyfinItemKind.episode],
+    );
+
+    final episodeIds = res.items.map((e) => e.id).toList();
+
+    ref
+        .read(episodesListCacheProvider.notifier)
+        .addEpisodes(
+          seriesId: id,
+          episodesIds: episodeIds,
+        );
+
+    ref.read(mediaCacheProvider.notifier).populateCache(res.items);
+
+    return episodeIds;
   }
 
   void setSelectedSeason(String id) {
