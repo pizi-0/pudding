@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:go_transitions/go_transitions.dart';
 import 'package:pudding/navigation_shell.dart';
 import 'package:pudding/screens/auth/auth_provider.dart';
 import 'package:pudding/screens/auth/auth_screen.dart';
@@ -65,6 +66,7 @@ final routeProvider = Provider<GoRouter>(
                     builder: (context, state) => TvDetailScreen(
                       showId: state.pathParameters['showId'],
                     ),
+                    pageBuilder: GoTransitions.fade.call,
                   ),
                   GoRoute(
                     name: 'Movie details',
@@ -72,6 +74,7 @@ final routeProvider = Provider<GoRouter>(
                     builder: (context, state) => MovieDetailScreen(
                       movieId: state.pathParameters['movieId'],
                     ),
+                    pageBuilder: GoTransitions.fade.call,
                   ),
                 ],
               ),
@@ -91,6 +94,7 @@ final routeProvider = Provider<GoRouter>(
 
                       return LibraryDetail(id: id);
                     },
+                    pageBuilder: GoTransitions.fade.call,
                   ),
                 ],
               ),
