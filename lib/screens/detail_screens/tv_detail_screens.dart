@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:awesome_extensions/awesome_extensions_dart.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,8 +29,9 @@ class _ShowsDetailScreensState extends ConsumerState<TvDetailScreen> {
     final theme = FTheme.of(context);
     final style = theme.style;
 
-    final size = MediaQuery.sizeOf(context);
+    final mediaCache = ref.watch(mediaCacheProvider);
     final detAsync = ref.watch(seriesDetailProvider(widget.showId!));
+    final detNotifier = ref.read(seriesDetailProvider(widget.showId!).notifier);
 
     return Stack(
       fit: .expand,
@@ -56,14 +58,23 @@ class _ShowsDetailScreensState extends ConsumerState<TvDetailScreen> {
           ),
         ),
         detAsync.when(
+          skipLoadingOnReload: true,
           loading: () => Center(
-            child: LogoShimmer(id: widget.showId!),
+            child: LogoShimmer(
+              id: widget.showId!,
+            ).fadeIn(delay: 100.milliseconds),
           ),
           error: (error, stackTrace) => Center(
             child: Text(error.toString()),
           ),
           data: (data) {
             final item = ref.watch(mediaCacheProvider)[data.seriesId]!;
+
+            final seasons = data.seasonIds.map((e) => mediaCache[e]);
+
+            final episodes = data.episodeIds
+                .map((e) => mediaCache[e])
+                .where((e) => e?.seasonId == data.selectedSeasonId);
 
             return Stack(
               fit: .expand,
@@ -75,70 +86,106 @@ class _ShowsDetailScreensState extends ConsumerState<TvDetailScreen> {
                       Expanded(
                         flex: 3,
                         child: IntrinsicWidth(
-                          child: Column(
-                            mainAxisAlignment: .center,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Container(
-                                  height: size.height * 0.6,
-                                  clipBehavior: .antiAlias,
-                                  decoration: BoxDecoration(
-                                    borderRadius: style.borderRadius.lg,
-                                    border: .all(
-                                      color: theme.colors.border,
-                                      width: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              spacing: 10,
+                              mainAxisAlignment: .center,
+                              children: [
+                                Row(
+                                  spacing: 10,
+                                  children: [
+                                    FButton.icon(
+                                      onPress: () {},
+                                      child: Icon(FLucideIcons.chevronLeft),
                                     ),
-                                  ),
+                                    Expanded(
+                                      child: FSelect.rich(
+                                        control: .managed(
+                                          initial: seasons.firstWhereOrNull(
+                                            (e) =>
+                                                e?.id == data.selectedSeasonId,
+                                          ),
+                                          onChange: (value) {
+                                            detNotifier.setSelectedSeason(
+                                              value!.id,
+                                            );
+                                          },
+                                        ),
+                                        format: (value) => value.name,
+                                        children: seasons
+                                            .map(
+                                              (s) => FSelectItem.item(
+                                                title: Text(s!.name),
+                                                value: s,
+                                              ),
+                                            )
+                                            .toList(),
+                                      ),
+                                    ),
+                                    FButton.icon(
+                                      onPress: () {},
+                                      child: Icon(FLucideIcons.chevronRight),
+                                    ),
+                                  ],
+                                ),
+                                ClipRRect(
+                                  borderRadius: style.borderRadius.lg,
                                   child: CachedNetworkImage(
                                     imageUrl: item.getPrimary(),
                                     fit: .cover,
                                   ),
                                 ),
-                              ),
-                              Row(
-                                mainAxisAlignment: .center,
-                                children: [
-                                  Text(item.getSeriesRunYears()),
-                                  Text('${item.childCount} seasons'),
-                                  if (item.getOfficialRating() != null)
-                                    Container(
-                                      height: theme.typography.body.lg.fontSize,
-                                      decoration: BoxDecoration(
-                                        border: .all(
-                                          color: theme.colors.foreground,
+                                Row(
+                                  mainAxisAlignment: .center,
+                                  children: [
+                                    Text(item.getSeriesRunYears()),
+                                    Text('${item.childCount} seasons'),
+                                    if (item.getOfficialRating() != null)
+                                      Container(
+                                        height:
+                                            theme.typography.body.lg.fontSize,
+                                        decoration: BoxDecoration(
+                                          border: .all(
+                                            color: theme.colors.foreground,
+                                          ),
+                                          borderRadius: .circular(4),
                                         ),
-                                        borderRadius: .circular(4),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 1.5,
-                                          horizontal: 3,
-                                        ),
-                                        child: FittedBox(
-                                          child: Text(
-                                            item.getOfficialRating()!,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 1.5,
+                                            horizontal: 3,
+                                          ),
+                                          child: FittedBox(
+                                            child: Text(
+                                              item.getOfficialRating()!,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  if (item.getCommunityRating() != null)
-                                    Row(
-                                      spacing: 4,
-                                      children: [
-                                        Icon(
-                                          FLucideIcons.star,
-                                          size:
-                                              theme.typography.body.sm.fontSize,
-                                        ),
-                                        Text(
-                                          item.getCommunityRating()!.toString(),
-                                        ),
-                                      ],
-                                    ),
-                                ].separatedby(Icon(FLucideIcons.dot)),
-                              ),
-                            ],
+                                    if (item.getCommunityRating() != null)
+                                      Row(
+                                        spacing: 4,
+                                        children: [
+                                          Icon(
+                                            FLucideIcons.star,
+                                            size: theme
+                                                .typography
+                                                .body
+                                                .sm
+                                                .fontSize,
+                                          ),
+                                          Text(
+                                            item
+                                                .getCommunityRating()!
+                                                .toString(),
+                                          ),
+                                        ],
+                                      ),
+                                  ].separatedby(Icon(FLucideIcons.dot)),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -147,6 +194,19 @@ class _ShowsDetailScreensState extends ConsumerState<TvDetailScreen> {
                         child: SingleChildScrollView(
                           child: Column(
                             children: [
+                              ListView.builder(
+                                shrinkWrap: true,
+                                primary: false,
+                                itemCount: episodes.length,
+                                itemBuilder: (context, index) {
+                                  final item = episodes.elementAt(index);
+                                  return Text(item?.name ?? '');
+                                },
+                              ),
+                              FButton(
+                                onPress: detNotifier.refreshData,
+                                child: Text('refresh'),
+                              ),
                               SelectableText(item.getRaw()),
                             ],
                           ),
