@@ -39,6 +39,8 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
     );
   }
 
+  Future<void> refreshData() async {}
+
   Future<JellyfinItem?> _getNextUp() async {
     final res = await client.tvShows.nextUp(seriesId: id);
 
