@@ -19,12 +19,24 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
     return _populate();
   }
 
-  Future<SeriesDetailModel> _populate() async {
+  Future<SeriesDetailModel> _populate({bool refresh = false}) async {
+    final mediaCache = ref.read(mediaCacheProvider);
+    final seasonCache = ref.read(seasonListCacheProvider);
+    final episodeCache = ref.read(episodesListCacheProvider);
+
+    bool hasSeries = mediaCache.containsKey(id);
+    bool hasSeasons = seasonCache.containsKey(id);
+    bool hasEpisode = episodeCache.containsKey(id);
+
     String? selectedSeason;
     final (series, seasons, episodes, nextUp) = await (
-      _getSeriesDetail(),
-      _getSeasons(),
-      _getEpisodes(),
+      (!hasSeries || refresh)
+          ? _getSeriesDetail()
+          : Future.value(mediaCache[id]),
+      (!hasSeasons || refresh) ? _getSeasons() : Future.value(seasonCache[id]!),
+      (!hasEpisode || refresh)
+          ? _getEpisodes()
+          : Future.value(episodeCache[id]!),
       _getNextUp(),
     ).wait;
 
@@ -39,7 +51,10 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
     );
   }
 
-  Future<void> refreshData() async {}
+  Future<void> refreshData() async {
+    state = AsyncLoading();
+    state = AsyncValue.data(await _populate(refresh: true));
+  }
 
   Future<JellyfinItem?> _getNextUp() async {
     final res = await client.tvShows.nextUp(seriesId: id);
@@ -48,12 +63,6 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   }
 
   Future<String> _getSeriesDetail() async {
-    final cache = ref.read(mediaCacheProvider);
-
-    if (cache.containsKey(id)) {
-      return cache[id]!.id;
-    }
-
     final res = await client.items.byId(id);
 
     ref.read(mediaCacheProvider.notifier).updateItem(res!);
@@ -62,12 +71,6 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   }
 
   Future<List<String>> _getSeasons() async {
-    final cache = ref.read(seasonListCacheProvider);
-
-    if (cache.containsKey(id)) {
-      return cache[id]!;
-    }
-
     final res = await client.items.list(
       parentId: id,
       includeItemTypes: [JellyfinItemKind.season],
@@ -88,12 +91,6 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   }
 
   Future<List<String>> _getEpisodes() async {
-    final cache = ref.read(episodesListCacheProvider);
-
-    if (cache.containsKey(id)) {
-      return cache[id]!;
-    }
-
     final res = await client.items.list(
       parentId: id,
       includeItemTypes: [JellyfinItemKind.episode],
