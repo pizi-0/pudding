@@ -9,6 +9,7 @@ import 'package:pudding/providers/media_cache_provider.dart';
 import 'package:pudding/providers/series_detail_provider.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/widgets/logo_shimmer.dart';
 
 class TvDetailScreen extends ConsumerStatefulWidget {
   final String? showId;
@@ -30,20 +31,33 @@ class _ShowsDetailScreensState extends ConsumerState<TvDetailScreen> {
     final size = MediaQuery.sizeOf(context);
     final detAsync = ref.watch(seriesDetailProvider(widget.showId!));
 
-    return AnimatedSwitcher(
-      duration: 5.seconds,
-      child: Container(
-        color: Colors.black,
-        child: detAsync.when(
-          loading: () => Center(
-            child: CachedNetworkImage(
-              imageUrl: services<JellyfinClient>().images.url(
-                itemId: widget.showId!,
-                type: JellyfinImagesApi.typeLogo,
-                width: 200,
-              ),
-              errorBuilder: (context, error, stackTrace) => FCircularProgress(),
+    return Stack(
+      fit: .expand,
+      children: [
+        Positioned.fill(
+          child: CachedNetworkImage(
+            imageUrl: services<JellyfinClient>().images.url(
+              itemId: widget.showId!,
+              type: JellyfinImagesApi.typeBackdrop,
             ),
+            errorBuilder: (context, error, stackTrace) => Align(
+              alignment: .bottomRight,
+              child: Text(
+                'Backdrop error: ${error.toString()}',
+                style: theme.typography.body.xs2.copyWith(
+                  fontStyle: .italic,
+                  color: theme.colors.foreground.withAlpha(150),
+                ),
+              ),
+            ),
+            fit: .cover,
+            color: Colors.black.withAlpha(230),
+            colorBlendMode: .darken,
+          ),
+        ),
+        detAsync.when(
+          loading: () => Center(
+            child: LogoShimmer(id: widget.showId!),
           ),
           error: (error, stackTrace) => Center(
             child: Text(error.toString()),
@@ -54,12 +68,6 @@ class _ShowsDetailScreensState extends ConsumerState<TvDetailScreen> {
             return Stack(
               fit: .expand,
               children: [
-                CachedNetworkImage(
-                  imageUrl: item.getBackdrop(),
-                  fit: .cover,
-                  color: Colors.black.withAlpha(230),
-                  colorBlendMode: .darken,
-                ),
                 Positioned.fill(
                   top: kToolbarHeight + 8,
                   child: Row(
@@ -151,7 +159,7 @@ class _ShowsDetailScreensState extends ConsumerState<TvDetailScreen> {
             ).fadeIn();
           },
         ),
-      ),
+      ],
     );
   }
 }
