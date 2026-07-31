@@ -116,11 +116,7 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   }
 }
 
-final seriesDetailProvider =
-    AsyncNotifierProvider.family<
-      SeriesDetailNotifier,
-      SeriesDetailModel,
-      String
-    >(
+final seriesDetailProvider = AsyncNotifierProvider.autoDispose
+    .family<SeriesDetailNotifier, SeriesDetailModel, String>(
       (id) => SeriesDetailNotifier(id: id),
     );
