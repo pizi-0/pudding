@@ -14,7 +14,7 @@ class SeriesDetailModel {
     this.episodeIds = const [],
     required this.seriesId,
     this.nextUp,
-  }) : selectedSeasonId = seasonIds.firstOrNull;
+  }) : selectedSeasonId = selectedSeasonId ?? seasonIds.firstOrNull;
 
   SeriesDetailModel copyWith({
     List<String>? seasonIds,
