@@ -96,8 +96,10 @@ extension JellyInfo on JellyfinItem {
     );
   }
 
-  String getImage() {
-    return services<JellyfinClient>().images.url(itemId: id);
+  String getImage({
+    String type = JellyfinImagesApi.typePrimary,
+  }) {
+    return services<JellyfinClient>().images.url(itemId: id, type: type);
   }
 
   String? getOfficialRating() {
