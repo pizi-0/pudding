@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/screens/home/models/home_data_model.dart';
@@ -352,7 +353,15 @@ class ItemLg extends ConsumerWidget {
                   spacing: 8,
                   children: [
                     FButton.icon(
-                      onPress: () {},
+                      onPress: () {
+                        if (item.isEpisode) {
+                          context.go('/show/${item.seriesId}');
+                        }
+
+                        if (item.isSeries) {
+                          context.go('/show/${item.id}');
+                        }
+                      },
                       child: Icon(FLucideIcons.info),
                     ),
                     FButton.icon(
