@@ -99,7 +99,7 @@ class EpisodeCard extends ConsumerWidget {
         ),
         if (isNext)
           Text(
-            'Ends: ${item.getEndsAt(context)}',
+            '${item.getRemaining()} left',
           ),
       ],
     );
@@ -165,9 +165,11 @@ class EpisodeCard extends ConsumerWidget {
                 alignment: .topRight,
                 child: Padding(
                   padding: const EdgeInsets.all(
-                    8.0,
+                    4.0,
                   ),
-                  child: Text('Resume'),
+                  child: FBadge(
+                    child: Text(item.isResumable ? 'Continue' : 'Next'),
+                  ),
                 ),
               ),
           ],
