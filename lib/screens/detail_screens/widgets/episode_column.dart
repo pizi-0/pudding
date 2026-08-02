@@ -95,6 +95,7 @@ class EpisodesColumnState extends ConsumerState<EpisodesColumn> {
                     });
 
                     return CustomScrollView(
+                      physics: ClampingScrollPhysics(),
                       controller: scrollController,
                       slivers: [
                         PinnedHeaderSliver(
