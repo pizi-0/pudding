@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/providers/series_detail_provider.dart';
-import 'package:pudding/screens/detail_screens/widgets/detail_column.dart';
+import 'package:pudding/screens/detail_screens/widgets/episode_column.dart';
 import 'package:pudding/screens/detail_screens/widgets/poster_column.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/widgets/logo_shimmer.dart';
@@ -79,7 +79,7 @@ class _ShowsDetailScreensState extends ConsumerState<TvDetailScreen> {
                           ),
                         ),
                       ),
-                      DetailColumn(seriesId: widget.showId!),
+                      EpisodesColumn(seriesId: widget.showId!),
                     ],
                   ),
                 ),

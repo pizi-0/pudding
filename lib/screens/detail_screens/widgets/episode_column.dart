@@ -10,15 +10,15 @@ import 'package:pudding/screens/detail_screens/widgets/episode_card.dart';
 
 import 'season_selector.dart';
 
-class DetailColumn extends ConsumerStatefulWidget {
+class EpisodesColumn extends ConsumerStatefulWidget {
   final String seriesId;
-  const DetailColumn({super.key, required this.seriesId});
+  const EpisodesColumn({super.key, required this.seriesId});
 
   @override
-  ConsumerState<DetailColumn> createState() => _DetailColumnState();
+  ConsumerState<EpisodesColumn> createState() => EpisodesColumnState();
 }
 
-class _DetailColumnState extends ConsumerState<DetailColumn> {
+class EpisodesColumnState extends ConsumerState<EpisodesColumn> {
   final scrollController = ScrollController();
   final double itemHeight = 120;
   late final double totalItemHeight =
