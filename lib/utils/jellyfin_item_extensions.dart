@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
+import 'package:pudding/models/jelly_people.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/num_extensions.dart';
 
@@ -35,7 +36,7 @@ extension JellyInfo on JellyfinItem {
     final status = raw['Status'];
 
     if (status == 'Continuing') {
-      return '$startYear-';
+      return '$startYear-Present';
     }
     return '$startYear-${endYear?.year ?? ''}';
   }
@@ -129,6 +130,12 @@ extension JellyInfo on JellyfinItem {
     final JsonEncoder encoder = JsonEncoder.withIndent(' ');
     String pretty = encoder.convert(raw);
     return pretty;
+  }
+
+  List<JellyPeople> getPeoples() {
+    final people = raw['People'] as List<dynamic>;
+
+    return people.map((p) => JellyPeople.fromMap(p)).toList();
   }
 
   bool get isSeries => type == JellyfinItemKind.series;
