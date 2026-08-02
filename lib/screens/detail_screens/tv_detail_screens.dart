@@ -79,10 +79,7 @@ class _ShowsDetailScreensState extends ConsumerState<TvDetailScreen> {
                           ),
                         ),
                       ),
-                      Expanded(
-                        flex: 2,
-                        child: DetailColumn(seriesId: widget.showId!),
-                      ),
+                      DetailColumn(seriesId: widget.showId!),
                     ],
                   ),
                 ),
