@@ -6,9 +6,9 @@ import 'package:pudding/providers/media_cache_provider.dart';
 import 'package:pudding/providers/series_detail_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
-class PosterColumn extends ConsumerWidget {
+class DetailColumn extends ConsumerWidget {
   final String seriesId;
-  const PosterColumn({super.key, required this.seriesId});
+  const DetailColumn({super.key, required this.seriesId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
