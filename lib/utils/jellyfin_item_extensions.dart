@@ -59,6 +59,13 @@ extension JellyInfo on JellyfinItem {
     return (totalDurationMs - playedDurationMs).toInt().toFormattedDuration();
   }
 
+  int getSeasonPlayPercentage() {
+    final unplayed = raw['UserData']['UnplayedItemCount'] ?? 0;
+    final totalEpisodes = childCount ?? 0;
+
+    return ((1 - (unplayed / totalEpisodes)) * 100).floor();
+  }
+
   double getPlayProgress() {
     if (isSeason || isSeries) return 0;
 
@@ -94,6 +101,10 @@ extension JellyInfo on JellyfinItem {
       itemId: seriesId ?? id,
       type: JellyfinImagesApi.typePrimary,
     );
+  }
+
+  double getSeasonCoverAspectRatio() {
+    return (raw['PrimaryImageAspectRatio'] ?? 0.68);
   }
 
   String getImage({
