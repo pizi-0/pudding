@@ -220,6 +220,13 @@ class MediaCardState extends State<MediaCard> {
                     imageUrl: item.getBackdrop(),
                     fit: .cover,
                     memCacheWidth: 800,
+                    errorBuilder: (context, error, stackTrace) =>
+                        CachedNetworkImage(
+                          imageUrl: item.getImage(
+                            type: JellyfinImagesApi.typePrimary,
+                          ),
+                          fit: .cover,
+                        ),
                   ),
                 ),
                 Align(
