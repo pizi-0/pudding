@@ -86,10 +86,10 @@ class EpisodesColumnState extends ConsumerState<EpisodesColumn> {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (!hasScrolled) {
                         hasScrolled = true;
-                        if (nextUpIndex > 0 && scrollController.hasClients) {
-                          _scrollTo(nextUpIndex);
-                        } else {
-                          _scrollTo(0);
+                        if (scrollController.position.maxScrollExtent > 0) {
+                          _scrollTo(
+                            (nextUpIndex).clamp(0, episodeItems.length - 1),
+                          );
                         }
                       }
                     });
@@ -166,14 +166,10 @@ class EpisodesColumnState extends ConsumerState<EpisodesColumn> {
 
     final episodes = episodeItems.map((e) => e!.id).toList();
 
-    if (episodes.contains(data.nextUp)) {
-      final next = episodes.indexOf(
-        data.nextUp!,
-      );
+    final nextUpIndex = episodes.indexOf(data.nextUp!);
 
-      _scrollTo(next);
-    } else {
-      _scrollTo(0);
+    if (scrollController.position.maxScrollExtent > 0) {
+      _scrollTo((nextUpIndex).clamp(0, episodeItems.length - 1));
     }
   }
 
