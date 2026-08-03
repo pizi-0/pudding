@@ -49,7 +49,7 @@ class _ShowsDetailScreensState extends ConsumerState<TvDetailScreen> {
               ),
             ),
             fit: .cover,
-            color: Colors.black.withAlpha(230),
+            color: Colors.black.withAlpha(220),
             colorBlendMode: .darken,
           ),
         ),

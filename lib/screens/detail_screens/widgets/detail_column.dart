@@ -6,6 +6,8 @@ import 'package:forui/forui.dart';
 import 'package:pudding/providers/media_cache_provider.dart';
 import 'package:pudding/providers/series_detail_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/widgets/rating_container.dart';
+import 'package:pudding/widgets/star_rating_container.dart';
 
 class DetailColumn extends ConsumerStatefulWidget {
   final String seriesId;
@@ -19,6 +21,7 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
+    final theme = FTheme.of(context);
     final mediaCache = ref.watch(mediaCacheProvider);
     final series = mediaCache[widget.seriesId]!;
     final detAsync = ref.watch(seriesDetailProvider(widget.seriesId));
@@ -30,178 +33,211 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
       ),
       data: (data) {
         final selectedSeason = mediaCache[data.selectedSeasonId]!;
+        final nextUpItem = mediaCache[data.nextUp];
 
         return Padding(
           padding: const EdgeInsets.all(20.0),
-          child: CustomScrollView(
-            slivers: [
-              PinnedHeaderSliver(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+          child: Column(
+            spacing: 10,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IntrinsicHeight(
                   child: Row(
-                    spacing: 8,
-                    crossAxisAlignment: .center,
+                    spacing: 10,
                     children: [
                       Flexible(
                         child: CachedNetworkImage(
-                          imageUrl: selectedSeason.getLogo(),
-                          width: 300,
+                          imageUrl: series.getLogo(),
                           height: 100,
+                          width: 300,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 100,
+                        child: FDivider(
+                          axis: .vertical,
+                          style: .delta(padding: .value(.zero)),
                         ),
                       ),
                       Column(
                         crossAxisAlignment: .start,
+                        mainAxisAlignment: .center,
+                        spacing: 10,
                         children: [
                           Row(
                             children: [
                               Text(series.getSeriesRunYears()),
-                              Text('${series.childCount} seasons'),
                               if (series.getOfficialRating() != null)
-                                Text(series.getOfficialRating() ?? ''),
+                                RatingContainer(
+                                  rating: series.getOfficialRating()!,
+                                ),
+                              if (series.getCommunityRating() != null)
+                                StarRatingContainer(
+                                  rating: series
+                                      .getCommunityRating()!
+                                      .toStringAsFixed(1),
+                                ),
                             ].separatedby(Icon(FLucideIcons.dot)),
                           ),
-                          Row(
-                            children: [
-                              Text('${data.episodeIds.length} episodes'),
+                          if (nextUpItem != null)
+                            Row(
+                              spacing: 8,
+                              children: [
+                                FButton(
+                                  onPress: () {},
+                                  prefix: Icon(FLucideIcons.play),
+                                  child: Row(
+                                    children: [
+                                      Text(nextUpItem.getTitle(short: true)),
+                                      Text(
+                                        'Ends at ${nextUpItem.getEndsAt(context)}',
+                                      ),
+                                    ].separatedby(Icon(FLucideIcons.dot)),
+                                  ),
+                                ),
+                                Row(
+                                  spacing: 8,
+                                  children: [
+                                    FButton.icon(
+                                      onPress: () {},
+                                      child: Icon(FLucideIcons.heart),
+                                    ),
+                                    FButton.icon(
+                                      onPress: () {},
+                                      child: Icon(FLucideIcons.check),
+                                    ),
+                                  ],
+                                ),
+                              ].separatedby(Icon(FLucideIcons.dot)),
+                            ),
 
-                              Text(
-                                '${series.raw['UserData']['UnplayedItemCount'] ?? 0} left',
-                              ),
-                            ].separatedby(Icon(FLucideIcons.dot)),
-                          ),
+                          // Row(
+                          //   children: [
+                          //     Text('${series.getSeasons().toString()} seasons'),
+                          //   ].separatedby(Icon(FLucideIcons.dot)),
+                          // ),
                         ],
                       ),
                     ],
                   ),
                 ),
               ),
-              SliverMainAxisGroup(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Text('Genres'),
-                  ),
-                ],
+              FDivider(
+                style: .delta(padding: .value(.zero)),
               ),
-              SliverToBoxAdapter(
-                child: SelectableText(series.getRaw()),
+
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    spacing: 20,
+                    crossAxisAlignment: .start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: .start,
+                        spacing: 4,
+                        children: [
+                          Text(
+                            'Genres'.toUpperCase(),
+                          ).bold().setOpacity(opacity: 0.5),
+                          Wrap(
+                            runSpacing: 8,
+                            spacing: 8,
+                            children: series.genres
+                                .map(
+                                  (g) =>
+                                      FBadge(variant: .outline, child: Text(g)),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: .start,
+                        spacing: 4,
+                        children: [
+                          Text(
+                            'Tags'.toUpperCase(),
+                          ).bold().setOpacity(opacity: 0.5),
+                          Wrap(
+                            runSpacing: 8,
+                            spacing: 8,
+                            children: series.tags
+                                .map(
+                                  (g) => FBadge(
+                                    variant: .outline,
+                                    child: Text(g.capitalize),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: .start,
+                        spacing: 4,
+                        children: [
+                          Text(
+                            'Series Summary'.toUpperCase(),
+                          ).bold().setOpacity(opacity: 0.5),
+                          if (series.getOverview() != null &&
+                              (series.getOverview()?.isNotEmpty ?? false))
+                            Text(series.getOverview()!.trim())
+                          else
+                            Text(
+                              'No overview',
+                              style: theme.typography.body.sm.copyWith(
+                                fontStyle: .italic,
+                              ),
+                            ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: .start,
+                        spacing: 4,
+                        children: [
+                          Text(
+                            '${selectedSeason.name} Summary'.toUpperCase(),
+                          ).bold().setOpacity(opacity: 0.5),
+                          if (selectedSeason.getOverview() != null &&
+                              (selectedSeason.getOverview()?.isNotEmpty ??
+                                  false))
+                            Text(selectedSeason.getOverview()!.trim())
+                          else
+                            Text(
+                              'No overview',
+                              style: theme.typography.body.sm.copyWith(
+                                fontStyle: .italic,
+                              ),
+                            ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: .start,
+                        spacing: 4,
+                        children: [
+                          Text(
+                            'Next episode Summary'.toUpperCase(),
+                          ).bold().setOpacity(opacity: 0.5),
+                          if (nextUpItem!.getOverview() != null &&
+                              (nextUpItem.getOverview()?.isNotEmpty ?? false))
+                            Text(nextUpItem.getOverview()!.trim())
+                          else
+                            Text(
+                              'No overview',
+                              style: theme.typography.body.sm.copyWith(
+                                fontStyle: .italic,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
         );
-
-        // return Padding(
-        //   padding: const EdgeInsets.all(20.0),
-        //   child: SingleChildScrollView(
-        //     child: Column(
-        //       spacing: 20,
-        //       crossAxisAlignment: .start,
-        //       children: [
-        //         Row(
-        //           children: [
-        //             CachedNetworkImage(
-        //               imageUrl: series.getLogo(),
-        //               height: 100,
-        //             ),
-        //           ],
-        //         ),
-        //         Column(
-        //           crossAxisAlignment: .start,
-        //           spacing: 4,
-        //           children: [
-        //             Text(
-        //               'Genres'.toUpperCase(),
-        //             ).bold().setOpacity(opacity: 0.5),
-        //             Wrap(
-        //               runSpacing: 8,
-        //               spacing: 8,
-        //               children: series.genres
-        //                   .map((g) => FBadge(variant: .outline, child: Text(g)))
-        //                   .toList(),
-        //             ),
-        //           ],
-        //         ),
-        //         Column(
-        //           crossAxisAlignment: .start,
-        //           spacing: 4,
-        //           children: [
-        //             Text(
-        //               'Tags'.toUpperCase(),
-        //             ).bold().setOpacity(opacity: 0.5),
-        //             Wrap(
-        //               runSpacing: 8,
-        //               spacing: 8,
-        //               children: series.tags
-        //                   .map(
-        //                     (g) => FBadge(
-        //                       variant: .outline,
-        //                       child: Text(g.capitalize),
-        //                     ),
-        //                   )
-        //                   .toList(),
-        //             ),
-        //           ],
-        //         ),
-        //         Column(
-        //           crossAxisAlignment: .start,
-        //           spacing: 4,
-        //           children: [
-        //             Text(
-        //               'Series Summary'.toUpperCase(),
-        //             ).bold().setOpacity(opacity: 0.5),
-        //             Text(series.getOverview()?.trim() ?? 'No overview'),
-        //           ],
-        //         ),
-        //         Column(
-        //           crossAxisAlignment: .start,
-        //           spacing: 4,
-        //           children: [
-        //             Text(
-        //               '${selectedSeason.name} Summary'.toUpperCase(),
-        //             ).bold().setOpacity(opacity: 0.5),
-        //             Text(selectedSeason.getOverview()?.trim() ?? 'No overview'),
-        //           ],
-        //         ),
-
-        //         // Wrap(
-        //         //   spacing: 8,
-        //         //   runSpacing: 8,
-        //         //   children: series
-        //         //       .getPeoples()
-        //         //       .map(
-        //         //         (p) => Column(
-        //         //           children: [
-        //         //             Container(
-        //         //               clipBehavior: .antiAlias,
-        //         //               height: 100,
-        //         //               width: 100,
-        //         //               decoration: BoxDecoration(
-        //         //                 shape: .circle,
-        //         //                 color: theme.colors.card,
-        //         //               ),
-        //         //               child: CachedNetworkImage(
-        //         //                 imageUrl: services<JellyfinClient>().images.url(
-        //         //                   itemId: p.Id,
-        //         //                 ),
-        //         //                 fit: .cover,
-        //         //                 errorBuilder: (context, error, stackTrace) =>
-        //         //                     Icon(
-        //         //                       FLucideIcons.user,
-        //         //                       size: 50,
-        //         //                     ),
-        //         //               ),
-        //         //             ),
-        //         //             Text(p.Name),
-        //         //             Text(p.Role),
-        //         //           ],
-        //         //         ),
-        //         //       )
-        //         //       .toList(),
-        //         // ),
-        //         SelectableText(series.getRaw()),
-        //       ],
-        //     ),
-        //   ),
-        // );
       },
     );
   }
