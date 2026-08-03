@@ -7,12 +7,17 @@ import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/num_extensions.dart';
 
 extension JellyInfo on JellyfinItem {
-  String getTitle() {
+  String getTitle({bool short = false}) {
     String title = '';
 
     if (type == JellyfinItemKind.episode) {
       final season = (parentIndexNumber ?? 0).toString().padLeft(2, '0');
       final eps = (indexNumber ?? 0).toString().padLeft(2, '0');
+
+      if (short) {
+        title = 'S$season: E$eps';
+        return title;
+      }
 
       title = 'S$season: E$eps - $name';
     } else {
