@@ -56,6 +56,17 @@ class SeasonCard extends StatelessWidget {
                     type: JellyfinImagesApi.typePrimary,
                   ),
                   fit: .cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      CachedNetworkImage(
+                        imageUrl: season.getPrimary(),
+                        fit: .cover,
+                        errorBuilder: (context, error, stackTrace) => Center(
+                          child: Text(
+                            season.indexNumber?.toString() ?? '',
+                            style: theme.typography.display.xl,
+                          ).bold(),
+                        ),
+                      ),
                 ),
               ),
             ),
