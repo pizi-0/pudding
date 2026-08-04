@@ -37,7 +37,7 @@ extension JellyInfo on JellyfinItem {
 
   String getSeriesRunYears() {
     final startYear = productionYear?.toString() ?? '';
-    final endYear = DateTime.tryParse(raw['EndDate']);
+    final endYear = DateTime.tryParse(raw['EndDate'] ?? '');
     final status = raw['Status'];
 
     if (status == 'Continuing') {
