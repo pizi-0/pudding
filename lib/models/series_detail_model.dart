@@ -7,11 +7,13 @@ class SeriesDetailModel {
   final String? selectedSeasonId;
   final String seriesId;
   final String? nextUp;
+  final bool showSeriesCast;
 
   SeriesDetailModel({
     String? selectedSeasonId,
     this.seasonIds = const [],
     this.episodeIds = const [],
+    this.showSeriesCast = false,
     required this.seriesId,
     String? nextUp,
   }) : selectedSeasonId = selectedSeasonId ?? seasonIds.firstOrNull,
@@ -23,6 +25,7 @@ class SeriesDetailModel {
     String? selectedSeasonId,
     String? seriesId,
     String? nextUp,
+    bool? showSeriesCast,
   }) {
     return SeriesDetailModel(
       seasonIds: seasonIds ?? this.seasonIds,
@@ -30,6 +33,7 @@ class SeriesDetailModel {
       selectedSeasonId: selectedSeasonId ?? this.selectedSeasonId,
       seriesId: seriesId ?? this.seriesId,
       nextUp: nextUp ?? this.nextUp,
+      showSeriesCast: showSeriesCast ?? this.showSeriesCast,
     );
   }
 
@@ -41,7 +45,8 @@ class SeriesDetailModel {
         listEquals(other.episodeIds, episodeIds) &&
         other.selectedSeasonId == selectedSeasonId &&
         other.seriesId == seriesId &&
-        other.nextUp == nextUp;
+        other.nextUp == nextUp &&
+        other.showSeriesCast == showSeriesCast;
   }
 
   @override
@@ -50,6 +55,7 @@ class SeriesDetailModel {
         episodeIds.hashCode ^
         selectedSeasonId.hashCode ^
         seriesId.hashCode ^
-        nextUp.hashCode;
+        nextUp.hashCode ^
+        showSeriesCast.hashCode;
   }
 }
