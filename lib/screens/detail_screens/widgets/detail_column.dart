@@ -1,10 +1,12 @@
 import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
+import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/providers/media_cache_provider.dart';
 import 'package:pudding/providers/series_detail_provider.dart';
+import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/rating_container.dart';
 import 'package:pudding/widgets/star_rating_container.dart';
@@ -173,117 +175,222 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
               ),
 
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    spacing: 20,
-                    crossAxisAlignment: .start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: .start,
-                        spacing: 4,
-                        children: [
-                          Text(
-                            'Genres'.toUpperCase(),
-                          ).bold().setOpacity(opacity: 0.5),
-                          Wrap(
-                            runSpacing: 8,
-                            spacing: 8,
-                            children: series.genres
-                                .map(
-                                  (g) =>
-                                      FBadge(variant: .outline, child: Text(g)),
-                                )
-                                .toList(),
-                          ),
-                        ],
+                child: CustomScrollView(
+                  slivers: [
+                    SectionSliver(
+                      title: 'Genres',
+                      sliver: SliverToBoxAdapter(
+                        child: Wrap(
+                          runSpacing: 8,
+                          spacing: 8,
+                          children: series.genres
+                              .map(
+                                (g) => FBadge(
+                                  variant: .outline,
+                                  child: Text(g.capitalize),
+                                ),
+                              )
+                              .toList(),
+                        ),
                       ),
-                      Column(
-                        crossAxisAlignment: .start,
-                        spacing: 4,
-                        children: [
-                          Text(
-                            'Tags'.toUpperCase(),
-                          ).bold().setOpacity(opacity: 0.5),
-                          Wrap(
-                            runSpacing: 8,
-                            spacing: 8,
-                            children: series.tags
-                                .map(
-                                  (g) => FBadge(
-                                    variant: .outline,
-                                    child: Text(g.capitalize),
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ],
+                    ),
+                    SectionSliver(
+                      title: 'Tags',
+                      sliver: SliverToBoxAdapter(
+                        child: Wrap(
+                          runSpacing: 8,
+                          spacing: 8,
+                          children: series.tags
+                              .map(
+                                (g) => FBadge(
+                                  variant: .outline,
+                                  child: Text(g.capitalize),
+                                ),
+                              )
+                              .toList(),
+                        ),
                       ),
-                      Column(
-                        crossAxisAlignment: .start,
-                        spacing: 4,
-                        children: [
-                          Text(
-                            'Series Summary'.toUpperCase(),
-                          ).bold().setOpacity(opacity: 0.5),
-                          if (series.getOverview() != null &&
-                              (series.getOverview()?.isNotEmpty ?? false))
-                            Text(series.getOverview()!.trim())
-                          else
-                            Text(
-                              'No overview',
-                              style: theme.typography.body.sm.copyWith(
-                                fontStyle: .italic,
+                    ),
+                    SectionSliver(
+                      title: 'Series Summary',
+                      sliver: SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: .start,
+                          children: [
+                            if (series.getOverview() != null &&
+                                (series.getOverview()?.isNotEmpty ?? false))
+                              Text(series.getOverview()!.trim())
+                            else
+                              Text(
+                                'No overview',
+                                style: theme.typography.body.sm.copyWith(
+                                  fontStyle: .italic,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SectionSliver(
+                      title: '${selectedSeason.name} Summary',
+                      sliver: SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: .start,
+                          children: [
+                            if (selectedSeason.getOverview() != null &&
+                                (selectedSeason.getOverview()?.isNotEmpty ??
+                                    false))
+                              Text(selectedSeason.getOverview()!.trim())
+                            else
+                              Text(
+                                'No overview',
+                                style: theme.typography.body.sm.copyWith(
+                                  fontStyle: .italic,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SectionSliver(
+                      title: 'Next episode Summary',
+                      sliver: SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: .start,
+                          children: [
+                            if (nextUpItem!.getOverview() != null &&
+                                (nextUpItem.getOverview()?.isNotEmpty ?? false))
+                              Text(nextUpItem.getOverview()!.trim())
+                            else
+                              Text(
+                                'No overview',
+                                style: theme.typography.body.sm.copyWith(
+                                  fontStyle: .italic,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SectionSliver(
+                      title: 'Casts & Crews',
+                      sliver: SliverGrid.builder(
+                        itemCount: selectedSeason.getPeoples().length,
+                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                          childAspectRatio: 1 / 1.2,
+                          maxCrossAxisExtent: 180,
+                        ),
+                        itemBuilder: (context, index) {
+                          final people = selectedSeason.getPeoples()[index];
+
+                          return FButton.raw(
+                            variant: .outline,
+                            onPress: () {},
+                            child: Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: ClipRRect(
+                                borderRadius: style.borderRadius.sm,
+                                child: Stack(
+                                  fit: .expand,
+                                  children: [
+                                    ShaderMask(
+                                      shaderCallback: (rect) => LinearGradient(
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black,
+                                        ],
+                                        stops: [0.4, 1],
+                                        begin: .topCenter,
+                                        end: .bottomCenter,
+                                      ).createShader(rect),
+                                      blendMode: .darken,
+                                      child: CachedNetworkImage(
+                                        imageUrl: services<JellyfinClient>()
+                                            .images
+                                            .url(itemId: people.Id),
+                                        fit: .cover,
+                                        height: 50,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                Container(
+                                                  color: Colors.black,
+                                                  child: Icon(
+                                                    FLucideIcons.user,
+                                                    size: 50,
+                                                  ),
+                                                ),
+                                      ),
+                                    ),
+                                    Align(
+                                      alignment: .bottomCenter,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          mainAxisSize: .min,
+                                          children: [
+                                            FittedBox(
+                                              child: Text(
+                                                people.Name,
+                                                textAlign: .center,
+                                                style: theme.typography.body.sm,
+                                              ).bold(),
+                                            ),
+                                            Text(
+                                              'as ${people.Role}',
+                                              textAlign: .center,
+                                              style: theme.typography.body.xs,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                        ],
+                          );
+                        },
                       ),
-                      Column(
-                        crossAxisAlignment: .start,
-                        spacing: 4,
-                        children: [
-                          Text(
-                            '${selectedSeason.name} Summary'.toUpperCase(),
-                          ).bold().setOpacity(opacity: 0.5),
-                          if (selectedSeason.getOverview() != null &&
-                              (selectedSeason.getOverview()?.isNotEmpty ??
-                                  false))
-                            Text(selectedSeason.getOverview()!.trim())
-                          else
-                            Text(
-                              'No overview',
-                              style: theme.typography.body.sm.copyWith(
-                                fontStyle: .italic,
-                              ),
-                            ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: .start,
-                        spacing: 4,
-                        children: [
-                          Text(
-                            'Next episode Summary'.toUpperCase(),
-                          ).bold().setOpacity(opacity: 0.5),
-                          if (nextUpItem!.getOverview() != null &&
-                              (nextUpItem.getOverview()?.isNotEmpty ?? false))
-                            Text(nextUpItem.getOverview()!.trim())
-                          else
-                            Text(
-                              'No overview',
-                              style: theme.typography.body.sm.copyWith(
-                                fontStyle: .italic,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    ),
+                    // SliverToBoxAdapter(
+                    //   child: SelectableText(
+                    //     series.getRaw(),
+                    //   ),
+                    // ),
+                  ].separatedby(SliverPadding(padding: .only(bottom: 20))),
                 ),
               ),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class SectionSliver extends StatelessWidget {
+  final String title;
+  final Widget sliver;
+  const SectionSliver({super.key, required this.title, required this.sliver});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverMainAxisGroup(
+      slivers: [
+        PinnedHeaderSliver(
+          child: Row(
+            children: [
+              Icon(FLucideIcons.dot),
+              Text(
+                title.toUpperCase(),
+              ).bold(),
+            ],
+          ).setOpacity(opacity: 0.5),
+        ),
+        sliver,
+      ].separatedby(SliverPadding(padding: .only(bottom: 4))),
     );
   }
 }
