@@ -156,6 +156,12 @@ class _ShowcaseState extends ConsumerState<Showcase> {
 
   Future<void> _previousPage(List<JellyfinItem> items) async {
     _pageTimer?.cancel();
+    ref
+        .read(showcaseProvider.notifier)
+        .setItem(
+          items[(currentPage - 1).clamp(0, items.length - 1)],
+        );
+
     await pageController.previousPage(
       duration: 500.milliseconds,
       curve: Curves.easeInOut,
@@ -168,10 +174,12 @@ class _ShowcaseState extends ConsumerState<Showcase> {
     _pageTimer?.cancel();
 
     if (pageController.page == items.length - 1) {
+      ref.read(showcaseProvider.notifier).setItem(items[0]);
       pageController.jumpTo(0);
       _startSlideshow(items);
       return;
     }
+    ref.read(showcaseProvider.notifier).setItem(items[currentPage + 1]);
     await pageController.nextPage(
       duration: 500.milliseconds,
       curve: Curves.easeInOut,
@@ -188,9 +196,11 @@ class _ShowcaseState extends ConsumerState<Showcase> {
         if (pauseSlideshow) return;
 
         if (pageController.page == items.length - 1) {
+          ref.read(showcaseProvider.notifier).setItem(items[0]);
           pageController.jumpTo(0);
           return;
         }
+        ref.read(showcaseProvider.notifier).setItem(items[currentPage + 1]);
         await pageController.nextPage(
           duration: 500.milliseconds,
           curve: Curves.easeInOut,
