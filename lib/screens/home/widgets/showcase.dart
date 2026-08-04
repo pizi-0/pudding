@@ -193,7 +193,8 @@ class _ShowcaseState extends ConsumerState<Showcase> {
     _pageTimer = Timer.periodic(
       10.seconds,
       (timer) async {
-        if (pauseSlideshow) return;
+        final route = context.routeName;
+        if (pauseSlideshow || route != 'Home') return;
 
         if (pageController.page == items.length - 1) {
           ref.read(showcaseProvider.notifier).setItem(items[0]);
