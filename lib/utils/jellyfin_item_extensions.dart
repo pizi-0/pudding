@@ -77,12 +77,14 @@ extension JellyInfo on JellyfinItem {
   }
 
   double getPlayProgress() {
-    if (isSeason || isSeries) return 0;
+    final played = raw['UserData']['Played'] ?? false;
+    final percentage = raw['UserData']['PlayedPercentage'] ?? 0;
 
-    final playedDurationMs = ((userData?.playbackPositionTicks ?? 0) / 10000);
-    final totalDurationMs = durationMs ?? 0;
+    if (played) {
+      return 1;
+    }
 
-    return (playedDurationMs / totalDurationMs).clamp(0, 1);
+    return percentage / 100;
   }
 
   String getLogo() {
