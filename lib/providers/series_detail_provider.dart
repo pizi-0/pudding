@@ -7,6 +7,7 @@ import 'package:pudding/providers/episodes_list_cache_provider.dart';
 import 'package:pudding/providers/media_cache_provider.dart';
 import 'package:pudding/providers/season_list_cache_provider.dart';
 import 'package:pudding/services/di.dart';
+import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
 class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   final client = services<JellyfinClient>();
@@ -42,6 +43,10 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
 
     selectedSeason = nextUp?.seasonId ?? seasons.firstOrNull;
 
+    if (selectedSeason != null) {
+      await _getSeasonDetail(selectedSeason);
+    }
+
     return SeriesDetailModel(
       seriesId: id,
       seasonIds: seasons,
@@ -68,6 +73,21 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
     ref.read(mediaCacheProvider.notifier).updateItem(res!);
 
     return id;
+  }
+
+  Future<void> _getSeasonDetail(String seasonId) async {
+    final mediaCache = ref.read(mediaCacheProvider);
+
+    if (mediaCache.containsKey(seasonId)) {
+      if (mediaCache[seasonId]!.getPeoples().isNotEmpty) {
+        return;
+      }
+    }
+    final res = await client.items.byId(seasonId);
+
+    if (res != null) {
+      ref.read(mediaCacheProvider.notifier).updateItem(res);
+    }
   }
 
   Future<List<String>> _getSeasons() async {
@@ -112,6 +132,7 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
 
   void setSelectedSeason(String seasonId) {
     var currentState = state.value ?? SeriesDetailModel(seriesId: id);
+    _getSeasonDetail(seasonId);
     state = AsyncValue.data(currentState.copyWith(selectedSeasonId: seasonId));
   }
 }
