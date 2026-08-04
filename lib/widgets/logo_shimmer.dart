@@ -2,6 +2,8 @@ import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
+import 'package:forui/theme.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pudding/services/di.dart';
 
 class LogoShimmer extends StatefulWidget {
@@ -32,41 +34,44 @@ class _LogoShimmerState extends State<LogoShimmer>
 
   @override
   Widget build(BuildContext context) {
+    final theme = FTheme.of(context);
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        return CachedNetworkImage(
-          imageUrl: services<JellyfinClient>().images.url(
-            itemId: widget.id,
-            type: JellyfinImagesApi.typeLogo,
-            width: widget.width,
+        return ShaderMask(
+          shaderCallback: (rect) => LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: const [
+              Colors.white54,
+              Colors.white,
+              Colors.white54,
+            ],
+            stops: [
+              _controller.value - 0.1,
+              _controller.value,
+              _controller.value + 0.1,
+            ],
+          ).createShader(rect),
+          child: CachedNetworkImage(
+            imageUrl: services<JellyfinClient>().images.url(
+              itemId: widget.id,
+              type: JellyfinImagesApi.typeLogo,
+              width: widget.width,
+            ),
+            errorBuilder: (context, error, stackTrace) => Center(
+              child: Text(
+                'Pudding',
+                style: GoogleFonts.flavors(
+                  textStyle: theme.typography.display.xl6.copyWith(
+                    fontWeight: .bold,
+                    color: theme.colors.primary,
+                  ),
+                ),
+              ),
+            ),
           ),
-          imageBuilder: (context, img) {
-            return AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                return ShaderMask(
-                  shaderCallback: (rect) => LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: const [
-                      Colors.white54,
-                      Colors.white,
-                      Colors.white54,
-                    ],
-                    stops: [
-                      _controller.value - 0.1,
-                      _controller.value,
-                      _controller.value + 0.1,
-                    ],
-                  ).createShader(rect),
-                  child: child,
-                );
-              },
-              child: Image(image: img),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) => Text(error.toString()),
         );
       },
     );
