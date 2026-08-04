@@ -138,7 +138,7 @@ extension JellyInfo on JellyfinItem {
   }
 
   List<JellyPeople> getPeoples() {
-    final people = raw['People'] as List<dynamic>;
+    final people = (raw['People'] ?? []) as List<dynamic>;
 
     return people.map((p) => JellyPeople.fromMap(p)).toList();
   }
