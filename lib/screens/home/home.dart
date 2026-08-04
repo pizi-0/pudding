@@ -4,7 +4,6 @@ import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/screens/home/models/home_data_model.dart';
-import 'package:pudding/screens/home/providers/showcase_provider.dart';
 import 'package:pudding/screens/home/widgets/library_card.dart';
 import 'package:pudding/screens/home/widgets/showcase.dart';
 import 'package:pudding/widgets/media_card.dart';
@@ -55,7 +54,6 @@ class _HomeState extends ConsumerState<Home> {
     final data = ref.watch(homeProvider).value ?? HomeData();
     final size = MediaQuery.sizeOf(context);
     final double horizontalPad = size.width < theme.breakpoints.md ? 10 : 30;
-    final item = ref.watch(showcaseProvider);
 
     return TapRegion(
       onTapInside: (event) => FocusScope.of(context).unfocus(),
@@ -74,10 +72,7 @@ class _HomeState extends ConsumerState<Home> {
                 end: .bottomCenter,
               ).createShader(rect),
               blendMode: .dstOut,
-
-              child: ShowcaseItemBackdrop(
-                key: ValueKey(item?.id),
-              ),
+              child: const ShowcaseItemBackdrop(),
             ),
           CustomScrollView(
             controller: scrollController,
