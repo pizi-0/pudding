@@ -279,7 +279,7 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
                         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                           mainAxisSpacing: 8,
                           crossAxisSpacing: 8,
-                          childAspectRatio: 1 / 1.2,
+                          childAspectRatio: 1 / 1.35,
                           maxCrossAxisExtent: 180,
                         ),
                         itemBuilder: (context, index) {
@@ -295,32 +295,35 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
                                 child: Stack(
                                   fit: .expand,
                                   children: [
-                                    ShaderMask(
-                                      shaderCallback: (rect) => LinearGradient(
-                                        colors: [
-                                          Colors.transparent,
-                                          Colors.black,
-                                        ],
-                                        stops: [0.4, 1],
-                                        begin: .topCenter,
-                                        end: .bottomCenter,
-                                      ).createShader(rect),
-                                      blendMode: .darken,
-                                      child: CachedNetworkImage(
-                                        imageUrl: services<JellyfinClient>()
-                                            .images
-                                            .url(itemId: people.Id),
-                                        fit: .cover,
-                                        height: 50,
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                Container(
-                                                  color: Colors.black,
-                                                  child: Icon(
-                                                    FLucideIcons.user,
-                                                    size: 50,
+                                    Positioned.fill(
+                                      child: ShaderMask(
+                                        shaderCallback: (rect) =>
+                                            LinearGradient(
+                                              colors: [
+                                                Colors.transparent,
+                                                Colors.black,
+                                              ],
+                                              stops: [0.4, 1],
+                                              begin: .topCenter,
+                                              end: .bottomCenter,
+                                            ).createShader(rect),
+                                        blendMode: .darken,
+                                        child: CachedNetworkImage(
+                                          imageUrl: services<JellyfinClient>()
+                                              .images
+                                              .url(itemId: people.Id),
+                                          fit: .cover,
+                                          height: 50,
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  Container(
+                                                    color: Colors.black,
+                                                    child: Icon(
+                                                      FLucideIcons.user,
+                                                      size: 50,
+                                                    ),
                                                   ),
-                                                ),
+                                        ),
                                       ),
                                     ),
                                     Align(
