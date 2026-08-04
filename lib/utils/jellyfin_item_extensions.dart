@@ -69,6 +69,10 @@ extension JellyInfo on JellyfinItem {
     final unplayed = raw['UserData']['UnplayedItemCount'] ?? 0;
     final totalEpisodes = childCount ?? 0;
 
+    if (totalEpisodes == 0) {
+      return 100;
+    }
+
     return ((1 - (unplayed / totalEpisodes)) * 100).floor();
   }
 

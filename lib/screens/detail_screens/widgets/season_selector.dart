@@ -97,7 +97,9 @@ class SeasonSelector extends ConsumerWidget {
                 selected: season.id == selectedSeasonItem?.id,
                 onPress: () {
                   detNotifier.setSelectedSeason(season.id);
-                  onSeasonChange(season);
+                  if ((season.childCount ?? 0) != 0) {
+                    onSeasonChange(season);
+                  }
                   controller.hide();
                 },
               );
