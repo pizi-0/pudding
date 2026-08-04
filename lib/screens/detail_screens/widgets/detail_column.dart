@@ -22,6 +22,7 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
   @override
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
+    final style = theme.style;
     final mediaCache = ref.watch(mediaCacheProvider);
     final series = mediaCache[widget.seriesId]!;
     final detAsync = ref.watch(seriesDetailProvider(widget.seriesId));
@@ -47,77 +48,121 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
                     spacing: 10,
                     children: [
                       Flexible(
-                        child: CachedNetworkImage(
-                          imageUrl: series.getLogo(),
-                          height: 100,
-                          width: 300,
+                        child: SizedBox(
+                          height: 150,
+                          child: AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: CachedNetworkImage(
+                              imageUrl: series.getLogo(),
+                              height: 150,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  ClipRRect(
+                                    borderRadius: style.borderRadius.sm,
+                                    child: CachedNetworkImage(
+                                      imageUrl: series.getBackdrop(),
+                                      height: 150,
+                                      fit: .cover,
+                                    ),
+                                  ),
+                            ),
+                          ),
                         ),
                       ),
                       SizedBox(
-                        height: 100,
+                        height: 150,
                         child: FDivider(
                           axis: .vertical,
                           style: .delta(padding: .value(.zero)),
                         ),
                       ),
-                      Column(
-                        crossAxisAlignment: .start,
-                        mainAxisAlignment: .center,
-                        spacing: 10,
-                        children: [
-                          Row(
-                            children: [
-                              Text(series.getSeriesRunYears()),
-                              if (series.getOfficialRating() != null)
-                                RatingContainer(
-                                  rating: series.getOfficialRating()!,
-                                ),
-                              if (series.getCommunityRating() != null)
-                                StarRatingContainer(
-                                  rating: series
-                                      .getCommunityRating()!
-                                      .toStringAsFixed(1),
-                                ),
-                            ].separatedby(Icon(FLucideIcons.dot)),
-                          ),
-                          if (nextUpItem != null)
-                            Row(
-                              spacing: 8,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: .start,
+                          mainAxisAlignment: .center,
+                          spacing: 10,
+                          children: [
+                            Column(
                               children: [
-                                FButton(
-                                  onPress: () {},
-                                  prefix: Icon(FLucideIcons.play),
-                                  child: Row(
-                                    children: [
-                                      Text(nextUpItem.getTitle(short: true)),
-                                      Text(
-                                        'Ends at ${nextUpItem.getEndsAt(context)}',
-                                      ),
-                                    ].separatedby(Icon(FLucideIcons.dot)),
-                                  ),
-                                ),
                                 Row(
-                                  spacing: 8,
                                   children: [
-                                    FButton.icon(
-                                      onPress: () {},
-                                      child: Icon(FLucideIcons.heart),
-                                    ),
-                                    FButton.icon(
-                                      onPress: () {},
-                                      child: Icon(FLucideIcons.check),
+                                    Expanded(
+                                      child: Text(
+                                        series.getTitle(),
+                                        style: theme.typography.display.xl
+                                            .copyWith(height: 1.5),
+                                      ).bold(),
                                     ),
                                   ],
                                 ),
+                                if (series.getTitle().toLowerCase() !=
+                                    series.raw['OriginalTitle']
+                                        ?.toString()
+                                        .toLowerCase())
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          series.raw['OriginalTitle'],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Text(series.getSeriesRunYears()),
+                                if (series.getOfficialRating() != null)
+                                  RatingContainer(
+                                    rating: series.getOfficialRating()!,
+                                  ),
+                                if (series.getCommunityRating() != null)
+                                  StarRatingContainer(
+                                    rating: series
+                                        .getCommunityRating()!
+                                        .toStringAsFixed(1),
+                                  ),
                               ].separatedby(Icon(FLucideIcons.dot)),
                             ),
+                            if (nextUpItem != null)
+                              Row(
+                                spacing: 8,
+                                children: [
+                                  FButton(
+                                    onPress: () {},
+                                    prefix: Icon(FLucideIcons.play),
+                                    child: Row(
+                                      children: [
+                                        Text(nextUpItem.getTitle(short: true)),
+                                        Text(
+                                          'Ends at ${nextUpItem.getEndsAt(context)}',
+                                        ),
+                                      ].separatedby(Icon(FLucideIcons.dot)),
+                                    ),
+                                  ),
+                                  Row(
+                                    spacing: 8,
+                                    children: [
+                                      FButton.icon(
+                                        onPress: () {},
+                                        child: Icon(FLucideIcons.heart),
+                                      ),
+                                      FButton.icon(
+                                        onPress: () {},
+                                        child: Icon(FLucideIcons.check),
+                                      ),
+                                    ],
+                                  ),
+                                ].separatedby(Icon(FLucideIcons.dot)),
+                              ),
 
-                          // Row(
-                          //   children: [
-                          //     Text('${series.getSeasons().toString()} seasons'),
-                          //   ].separatedby(Icon(FLucideIcons.dot)),
-                          // ),
-                        ],
+                            // Row(
+                            //   children: [
+                            //     Text('${series.getSeasons().toString()} seasons'),
+                            //   ].separatedby(Icon(FLucideIcons.dot)),
+                            // ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
