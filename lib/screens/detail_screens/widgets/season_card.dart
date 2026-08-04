@@ -29,77 +29,84 @@ class SeasonCard extends StatelessWidget {
       variant: selected ? .primary : .outline,
       onPress: onPress,
       child: Padding(
-        padding: const EdgeInsets.all(
-          2.0,
-        ),
-        child: Stack(
-          fit: .expand,
-          children: [
-            ClipRRect(
-              borderRadius: style.borderRadius.sm,
-              child: ShaderMask(
-                shaderCallback: (rect) =>
-                    LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        Colors.transparent,
-                        Colors.black,
-                      ],
-                      begin: .topCenter,
-                      end: .bottomCenter,
-                    ).createShader(
-                      rect,
+        padding: const EdgeInsets.all(2.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: style.borderRadius.sm,
+          ),
+          child: Stack(
+            fit: .expand,
+            children: [
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: style.borderRadius.sm,
+                  child: ShaderMask(
+                    shaderCallback: (rect) =>
+                        LinearGradient(
+                          colors: [
+                            Colors.transparent,
+                            Colors.transparent,
+                            Colors.black,
+                          ],
+                          begin: .topCenter,
+                          end: .bottomCenter,
+                        ).createShader(
+                          rect,
+                        ),
+                    blendMode: .darken,
+                    child: CachedNetworkImage(
+                      imageUrl: season.getImage(
+                        type: JellyfinImagesApi.typePrimary,
+                      ),
+                      fit: .cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          CachedNetworkImage(
+                            imageUrl: season.getPrimary(),
+                            fit: .cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Center(
+                                  child: Text(
+                                    season.indexNumber?.toString() ?? '',
+                                    style: theme.typography.display.xl,
+                                  ).bold(),
+                                ),
+                          ),
                     ),
-                blendMode: .darken,
-                child: CachedNetworkImage(
-                  imageUrl: season.getImage(
-                    type: JellyfinImagesApi.typePrimary,
                   ),
-                  fit: .cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      CachedNetworkImage(
-                        imageUrl: season.getPrimary(),
-                        fit: .cover,
-                        errorBuilder: (context, error, stackTrace) => Center(
-                          child: Text(
-                            season.indexNumber?.toString() ?? '',
-                            style: theme.typography.display.xl,
-                          ).bold(),
-                        ),
-                      ),
                 ),
               ),
-            ),
-            Align(
-              alignment: .bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.all(
-                  10.0,
-                ),
-                child: Row(
-                  mainAxisAlignment: .spaceBetween,
-                  children:
-                      [
-                        Text(
-                          season.name,
+              Align(
+                alignment: .bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.all(
+                    10.0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: .spaceBetween,
+                    children:
+                        [
+                          Text(
+                            season.name,
+                          ),
+                          isPlayed
+                              ? Icon(
+                                  FLucideIcons.check,
+                                  color: Colors.green,
+                                )
+                              : Text(
+                                  '${season.getSeasonPlayPercentage()}%',
+                                ),
+                        ].separatedby(
+                          Icon(
+                            FLucideIcons.dot,
+                          ),
                         ),
-                        isPlayed
-                            ? Icon(
-                                FLucideIcons.check,
-                                color: Colors.green,
-                              )
-                            : Text(
-                                '${season.getSeasonPlayPercentage()}%',
-                              ),
-                      ].separatedby(
-                        Icon(
-                          FLucideIcons.dot,
-                        ),
-                      ),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

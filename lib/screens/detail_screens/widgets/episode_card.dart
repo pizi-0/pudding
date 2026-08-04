@@ -1,12 +1,13 @@
+import 'package:awesome_extensions/awesome_extensions_flutter.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:pudding/const/const.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
-class EpisodeCard extends ConsumerWidget {
-  final double imageHeight = 120;
+class EpisodeCard extends ConsumerStatefulWidget {
   final JellyfinItem episode;
   final bool isLast;
   final int index;
@@ -21,47 +22,66 @@ class EpisodeCard extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<EpisodeCard> createState() => _EpisodeCardState();
+}
+
+class _EpisodeCardState extends ConsumerState<EpisodeCard> {
+  final double imageHeight = 180;
+  bool hover = false;
+
+  @override
+  Widget build(BuildContext context) {
     final double totalItemHeight = imageHeight + 30;
 
     final theme = FTheme.of(context);
     final style = theme.style;
 
-    final isPlayed = episode.userData?.played ?? false;
+    final isPlayed = widget.episode.userData?.played ?? false;
 
-    return SizedBox(
-      height: totalItemHeight,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          8,
-          0,
-          8,
-          isLast ? 0 : 8.0,
-        ),
-        child: FButton(
-          variant: .outline,
-          onPress: () {},
-          mainAxisAlignment: .start,
-          child: Expanded(
-            child: Row(
-              spacing: 10,
-              children: [
-                _buildImage(
-                  style,
-                  episode,
-                  isPlayed,
-                  isNext,
+    return AnimatedScale(
+      duration: kDefaultAnimationDuration,
+      scale: hover ? 1.02 : 1,
+      child: SizedBox(
+        height: totalItemHeight,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            8,
+            0,
+            8,
+            widget.isLast ? 0 : 8.0,
+          ),
+          child: FButton.raw(
+            variant: .outline,
+            onPress: () {},
+            onFocusChange: (value) => setState(() => hover = !hover),
+            onHoverChange: (value) => setState(() => hover = !hover),
+            child: Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withAlpha(220),
+                  borderRadius: style.borderRadius.sm,
                 ),
-                Expanded(
-                  child: _buildDetail(
-                    episode,
-                    index,
-                    theme,
-                    isNext,
-                    context,
-                  ),
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: _buildImage(
+                        style,
+                        widget.episode,
+                        isPlayed,
+                        widget.isNext,
+                      ),
+                    ),
+                    _buildDetail(
+                      widget.episode,
+                      widget.index,
+                      theme,
+                      widget.isNext,
+                      context,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -69,39 +89,57 @@ class EpisodeCard extends ConsumerWidget {
     );
   }
 
-  Column _buildDetail(
+  Widget _buildDetail(
     JellyfinItem item,
     int index,
     FThemeData theme,
     bool isNext,
     BuildContext context,
   ) {
-    return Column(
-      spacing: 8,
-      mainAxisAlignment: .center,
-      crossAxisAlignment: .start,
-      children: [
-        Text(
-          '${(item.indexNumber ?? (index + 1))}. ${item.name}',
-          style: theme.typography.body.sm.copyWith(
-            fontWeight: .bold,
-          ),
-        ),
-        Text(
-          item.getOverview() ?? 'No overview provided',
-          maxLines: 3,
-          overflow: .ellipsis,
-          style: theme.typography.body.sm.copyWith(
-            color: theme.colors.foreground.withAlpha(
-              100,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        spacing: 8,
+        mainAxisAlignment: .end,
+        crossAxisAlignment: .start,
+        children: [
+          FDeterminateProgress(
+            style: .delta(
+              motion: .delta(
+                duration: .zero,
+              ),
             ),
+            value: item.getPlayProgress(),
+          ).setOpacity(opacity: isNext ? 1 : 0),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '${(item.indexNumber ?? (index + 1))}. ${item.name}',
+                  style: theme.typography.body.sm.copyWith(
+                    fontWeight: .bold,
+                  ),
+                ),
+              ),
+              if (isNext)
+                Text(
+                  '${item.getRemaining()} left',
+                ),
+            ],
           ),
-        ),
-        if (isNext)
-          Text(
-            '${item.getRemaining()} left',
-          ),
-      ],
+
+          // Text(
+          //   item.getOverview() ?? 'No overview provided',
+          //   maxLines: 2,
+          //   overflow: .ellipsis,
+          //   style: theme.typography.body.sm.copyWith(
+          //     color: theme.colors.foreground.withAlpha(
+          //       150,
+          //     ),
+          //   ),
+          // ),
+        ],
+      ),
     );
   }
 
@@ -115,25 +153,35 @@ class EpisodeCard extends ConsumerWidget {
       borderRadius: style.borderRadius.sm,
       child: SizedBox(
         height: imageHeight,
-        width: 16 / 10 * imageHeight,
+        width: 16 / 7 * imageHeight,
         child: Stack(
           fit: .expand,
           children: [
-            CachedNetworkImage(
-              key: ValueKey(item.id),
-              imageUrl: item.getImage(
-                type: JellyfinImagesApi.typePrimary,
+            AnimatedOpacity(
+              duration: kDefaultAnimationDuration,
+              opacity: hover ? 0.8 : 1,
+              child: ShaderMask(
+                shaderCallback: (rect) => LinearGradient(
+                  colors: [Colors.transparent, Colors.black],
+                  begin: .topCenter,
+                  end: .bottomCenter,
+                ).createShader(rect),
+                blendMode: .dstOut,
+                child: CachedNetworkImage(
+                  key: ValueKey(item.id),
+                  imageUrl: item.getImage(
+                    type: JellyfinImagesApi.typePrimary,
+                  ),
+                  useOldImageOnUrlChange: true,
+                  fit: .cover,
+                  color: isPlayed
+                      ? Colors.black.withAlpha(
+                          220,
+                        )
+                      : Colors.transparent,
+                  colorBlendMode: .srcATop,
+                ),
               ),
-              useOldImageOnUrlChange: true,
-              height: 150,
-              memCacheHeight: 150,
-              fit: .cover,
-              color: isPlayed
-                  ? Colors.black.withAlpha(
-                      220,
-                    )
-                  : Colors.transparent,
-              colorBlendMode: .srcATop,
             ),
             if (isPlayed)
               Center(
@@ -142,24 +190,23 @@ class EpisodeCard extends ConsumerWidget {
                 ),
               ),
 
-            if (item.getPlayProgress() != 0 || isNext)
-              Align(
-                alignment: .bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(
-                    8.0,
-                  ),
-                  child: FDeterminateProgress(
-                    style: .delta(
-                      motion: .delta(
-                        duration: .zero,
-                      ),
-                    ),
-                    value: item.getPlayProgress(),
-                  ),
-                ),
-              ),
-
+            // if (item.getPlayProgress() != 0 || isNext)
+            //   Align(
+            //     alignment: .bottomCenter,
+            //     child: Padding(
+            //       padding: const EdgeInsets.all(
+            //         8.0,
+            //       ),
+            //       child: FDeterminateProgress(
+            //         style: .delta(
+            //           motion: .delta(
+            //             duration: .zero,
+            //           ),
+            //         ),
+            //         value: item.getPlayProgress(),
+            //       ),
+            //     ),
+            //   ),
             if (isNext)
               Align(
                 alignment: .topRight,

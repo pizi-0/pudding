@@ -20,7 +20,7 @@ class EpisodesColumn extends ConsumerStatefulWidget {
 
 class EpisodesColumnState extends ConsumerState<EpisodesColumn> {
   final scrollController = ScrollController();
-  final double itemHeight = 120;
+  final double itemHeight = 180;
   late final double totalItemHeight =
       itemHeight + 30; // hwit padding and hwat not
   bool hasScrolled = false;
