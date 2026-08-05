@@ -258,9 +258,10 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
                         child: Column(
                           crossAxisAlignment: .start,
                           children: [
-                            if (nextUpItem!.getOverview() != null &&
-                                (nextUpItem.getOverview()?.isNotEmpty ?? false))
-                              Text(nextUpItem.getOverview()!.trim())
+                            if (nextUpItem?.getOverview() != null &&
+                                (nextUpItem?.getOverview()?.isNotEmpty ??
+                                    false))
+                              Text(nextUpItem!.getOverview()!.trim())
                             else
                               Text(
                                 'No overview',

@@ -8,13 +8,11 @@ import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
 class EpisodeCard extends ConsumerStatefulWidget {
   final JellyfinItem episode;
-  final bool isLast;
   final int index;
   final bool isNext;
 
   const EpisodeCard({
     super.key,
-    this.isLast = false,
     required this.episode,
     required this.index,
     this.isNext = false,
@@ -25,13 +23,10 @@ class EpisodeCard extends ConsumerStatefulWidget {
 }
 
 class _EpisodeCardState extends ConsumerState<EpisodeCard> {
-  final double imageHeight = 180;
   bool hover = false;
 
   @override
   Widget build(BuildContext context) {
-    final double totalItemHeight = imageHeight + 30;
-
     final theme = FTheme.of(context);
     final style = theme.style;
 
@@ -41,50 +36,42 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
       duration: kDefaultAnimationDuration,
       scale: hover ? 1.02 : 1,
       child: SizedBox(
-        height: totalItemHeight,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            8,
-            0,
-            8,
-            widget.isLast ? 0 : 8.0,
-          ),
-          child: FButton.raw(
-            variant: .outline,
-            onPress: () {},
-            onFocusChange: (value) => setState(() => hover = !hover),
-            onHoverChange: (value) => setState(() => hover = !hover),
-            child: Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withAlpha(220),
-                  borderRadius: style.borderRadius.sm,
-                ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: _buildImage(
-                        style,
-                        widget.episode,
-                        isPlayed,
-                        widget.isNext,
-                      ),
+        height: kEpisodeCardHeight,
+        child: FButton.raw(
+          variant: .outline,
+          onPress: () {},
+          onFocusChange: (value) => setState(() => hover = !hover),
+          onHoverChange: (value) => setState(() => hover = !hover),
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withAlpha(220),
+                borderRadius: style.borderRadius.sm,
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: _buildImage(
+                      style,
+                      widget.episode,
+                      isPlayed,
+                      widget.isNext,
                     ),
-                    Positioned.fill(
-                      child: _buildDetail(
-                        widget.episode,
-                        widget.index,
-                        theme,
-                        widget.isNext,
-                        isPlayed,
-                      ),
+                  ),
+                  Positioned.fill(
+                    child: _buildDetail(
+                      widget.episode,
+                      widget.index,
+                      theme,
+                      widget.isNext,
+                      isPlayed,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -172,8 +159,8 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
     return ClipRRect(
       borderRadius: style.borderRadius.sm,
       child: SizedBox(
-        height: imageHeight,
-        width: 16 / 9 * imageHeight,
+        height: kEpisodeCardHeight,
+        width: 16 / 9 * kEpisodeCardHeight,
         child: Stack(
           fit: .expand,
           children: [

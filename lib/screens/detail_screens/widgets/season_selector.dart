@@ -32,80 +32,83 @@ class SeasonSelector extends ConsumerWidget {
       seriesDetailProvider(seriesId).notifier,
     );
 
-    return LayoutBuilder(
-      builder: (context, constraints) => FPopover(
-        overflow: .allow,
-        style: .delta(
-          barrierFilter: (animation) => .compose(
-            outer: ImageFilter.blur(
-              sigmaX: animation * 5,
-              sigmaY: animation * 5,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: LayoutBuilder(
+        builder: (context, constraints) => FPopover(
+          overflow: .allow,
+          style: .delta(
+            barrierFilter: (animation) => .compose(
+              outer: ImageFilter.blur(
+                sigmaX: animation * 5,
+                sigmaY: animation * 5,
+              ),
+              inner: ColorFilter.mode(
+                Color.lerp(
+                  Colors.transparent,
+                  Colors.black.withValues(
+                    alpha: 0.2,
+                  ),
+                  animation,
+                )!,
+                .srcOver,
+              ),
             ),
-            inner: ColorFilter.mode(
-              Color.lerp(
-                Colors.transparent,
-                Colors.black.withValues(
-                  alpha: 0.2,
-                ),
-                animation,
-              )!,
-              .srcOver,
+          ),
+          cutoutBuilder: (path, bounds) => path.addRRect(
+            RRect.fromRectAndRadius(
+              bounds,
+              style.borderRadius.md.bottomLeft,
+            ),
+          ), //
+          constraints: FPortalConstraints(
+            maxWidth: constraints.maxWidth,
+            minWidth: constraints.maxWidth,
+            maxHeight: maxHeight - 36,
+          ),
+          builder: (context, controller, child) => FButton(
+            variant: .outline,
+            mainAxisAlignment: .spaceBetween,
+            onPress: controller.toggle,
+            suffix: Icon(
+              FLucideIcons.chevronDown,
+            ),
+            child: Text(
+              selectedSeasonItem!.name,
             ),
           ),
-        ),
-        cutoutBuilder: (path, bounds) => path.addRRect(
-          RRect.fromRectAndRadius(
-            bounds,
-            style.borderRadius.md.bottomLeft,
-          ),
-        ), //
-        constraints: FPortalConstraints(
-          maxWidth: constraints.maxWidth,
-          minWidth: constraints.maxWidth,
-          maxHeight: maxHeight - 36,
-        ),
-        builder: (context, controller, child) => FButton(
-          variant: .outline,
-          mainAxisAlignment: .spaceBetween,
-          onPress: controller.toggle,
-          suffix: Icon(
-            FLucideIcons.chevronDown,
-          ),
-          child: Text(
-            selectedSeasonItem!.name,
-          ),
-        ),
-        popoverBuilder: (context, controller) {
-          return GridView.builder(
-            itemCount: seasonItems.length,
-            shrinkWrap: true,
-            padding: .all(10),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio:
-                  seasonItems.first?.getSeasonCoverAspectRatio() ?? 1,
-            ),
-            itemBuilder: (context, index) {
-              final season = seasonItems.elementAt(
-                index,
-              )!;
+          popoverBuilder: (context, controller) {
+            return GridView.builder(
+              itemCount: seasonItems.length,
+              shrinkWrap: true,
+              padding: .all(10),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio:
+                    seasonItems.first?.getSeasonCoverAspectRatio() ?? 1,
+              ),
+              itemBuilder: (context, index) {
+                final season = seasonItems.elementAt(
+                  index,
+                )!;
 
-              return SeasonCard(
-                season: season,
-                selected: season.id == selectedSeasonItem?.id,
-                onPress: () {
-                  detNotifier.setSelectedSeason(season.id);
-                  if ((season.childCount ?? 0) != 0) {
-                    onSeasonChange(season);
-                  }
-                  controller.hide();
-                },
-              );
-            },
-          );
-        },
+                return SeasonCard(
+                  season: season,
+                  selected: season.id == selectedSeasonItem?.id,
+                  onPress: () {
+                    detNotifier.setSelectedSeason(season.id);
+                    if ((season.childCount ?? 0) != 0) {
+                      onSeasonChange(season);
+                    }
+                    controller.hide();
+                  },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
