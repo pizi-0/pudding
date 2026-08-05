@@ -1,4 +1,3 @@
-import 'package:awesome_extensions/awesome_extensions_flutter.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +63,10 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                 ),
                 child: Stack(
                   children: [
-                    Positioned.fill(
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      bottom: 0,
                       child: _buildImage(
                         style,
                         widget.episode,
@@ -72,12 +74,14 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                         widget.isNext,
                       ),
                     ),
-                    _buildDetail(
-                      widget.episode,
-                      widget.index,
-                      theme,
-                      widget.isNext,
-                      context,
+                    Positioned.fill(
+                      child: _buildDetail(
+                        widget.episode,
+                        widget.index,
+                        theme,
+                        widget.isNext,
+                        isPlayed,
+                      ),
                     ),
                   ],
                 ),
@@ -94,50 +98,66 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
     int index,
     FThemeData theme,
     bool isNext,
-    BuildContext context,
+    bool isPlayed,
   ) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        spacing: 8,
-        mainAxisAlignment: .end,
-        crossAxisAlignment: .start,
+      child: Row(
         children: [
-          FDeterminateProgress(
-            style: .delta(
-              motion: .delta(
-                duration: .zero,
-              ),
+          Expanded(
+            child: AnimatedSwitcher(
+              duration: kDefaultAnimationDuration,
+              child: isPlayed
+                  ? Icon(
+                      FLucideIcons.check,
+                      color: Colors.green,
+                    )
+                  : SizedBox.shrink(),
             ),
-            value: item.getPlayProgress(),
-          ).setOpacity(opacity: isNext ? 1 : 0),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  '${(item.indexNumber ?? (index + 1))}. ${item.name}',
-                  style: theme.typography.body.sm.copyWith(
-                    fontWeight: .bold,
+          ),
+          Expanded(
+            child: Column(
+              spacing: 8,
+              mainAxisAlignment: .center,
+              crossAxisAlignment: .start,
+              children: [
+                Row(
+                  spacing: 10,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${(item.indexNumber ?? (index + 1))}. ${item.name}',
+                        style: theme.typography.body.sm.copyWith(
+                          fontWeight: .bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                AnimatedSize(
+                  duration: kDefaultAnimationDuration,
+                  alignment: .topCenter,
+                  child: SizedBox(
+                    height: hover || isNext || isPlayed ? null : 0,
+                    child: Text(
+                      item.getOverview() ?? 'No overview provided',
+                      overflow: .ellipsis,
+                      maxLines: 5,
+                      style: theme.typography.body.sm.copyWith(
+                        color: theme.colors.foreground.withAlpha(
+                          150,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              if (isNext)
-                Text(
-                  '${item.getRemaining()} left',
-                ),
-            ],
+                if (isNext)
+                  Text(
+                    '${item.getRemaining()} left',
+                  ),
+              ],
+            ),
           ),
-
-          // Text(
-          //   item.getOverview() ?? 'No overview provided',
-          //   maxLines: 2,
-          //   overflow: .ellipsis,
-          //   style: theme.typography.body.sm.copyWith(
-          //     color: theme.colors.foreground.withAlpha(
-          //       150,
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );
@@ -153,7 +173,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
       borderRadius: style.borderRadius.sm,
       child: SizedBox(
         height: imageHeight,
-        width: 16 / 7 * imageHeight,
+        width: 16 / 9 * imageHeight,
         child: Stack(
           fit: .expand,
           children: [
@@ -163,8 +183,9 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
               child: ShaderMask(
                 shaderCallback: (rect) => LinearGradient(
                   colors: [Colors.transparent, Colors.black],
-                  begin: .topCenter,
-                  end: .bottomCenter,
+                  begin: .centerLeft,
+                  end: .centerRight,
+                  stops: [0.4, 1],
                 ).createShader(rect),
                 blendMode: .dstOut,
                 child: CachedNetworkImage(
@@ -176,40 +197,16 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                   fit: .cover,
                   color: isPlayed
                       ? Colors.black.withAlpha(
-                          220,
+                          200,
                         )
                       : Colors.transparent,
                   colorBlendMode: .srcATop,
                 ),
               ),
             ),
-            if (isPlayed)
-              Center(
-                child: Icon(
-                  FLucideIcons.check,
-                ),
-              ),
-
-            // if (item.getPlayProgress() != 0 || isNext)
-            //   Align(
-            //     alignment: .bottomCenter,
-            //     child: Padding(
-            //       padding: const EdgeInsets.all(
-            //         8.0,
-            //       ),
-            //       child: FDeterminateProgress(
-            //         style: .delta(
-            //           motion: .delta(
-            //             duration: .zero,
-            //           ),
-            //         ),
-            //         value: item.getPlayProgress(),
-            //       ),
-            //     ),
-            //   ),
             if (isNext)
               Align(
-                alignment: .topRight,
+                alignment: .topLeft,
                 child: Padding(
                   padding: const EdgeInsets.all(
                     4.0,
