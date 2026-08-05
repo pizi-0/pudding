@@ -55,9 +55,19 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   }
 
   Future<JellyfinItem?> _getNextUp() async {
-    final res = await client.tvShows.nextUp(seriesId: id);
+    final next = await client.tvShows.nextUp(seriesId: id);
 
-    return res.items.firstOrNull;
+    if (next.items.isEmpty) {
+      final firstEpisode = await client.items.list(
+        parentId: id,
+        limit: 1,
+        includeItemTypes: [JellyfinItemKind.episode],
+      );
+
+      return firstEpisode.items.firstOrNull;
+    }
+
+    return next.items.firstOrNull;
   }
 
   Future<String> _getSeriesDetail() async {
