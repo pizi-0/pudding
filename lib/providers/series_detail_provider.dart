@@ -68,6 +68,13 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
       item = firstEpisode.items.firstOrNull;
     } else {
       item = next.items.firstOrNull;
+
+      if (item != null) {
+        if (item.getOverview() == null) {
+          final byId = await client.items.byId(item.id);
+          item = byId;
+        }
+      }
     }
 
     if (item != null) {
