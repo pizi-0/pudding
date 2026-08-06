@@ -4,6 +4,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:pudding/models/jelly_people.dart';
 import 'package:pudding/providers/media_cache_provider.dart';
 import 'package:pudding/providers/series_detail_provider.dart';
 import 'package:pudding/services/di.dart';
@@ -28,6 +29,7 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
     final mediaCache = ref.watch(mediaCacheProvider);
     final series = mediaCache[widget.seriesId]!;
     final detAsync = ref.watch(seriesDetailProvider(widget.seriesId));
+    final detNoti = ref.read(seriesDetailProvider(widget.seriesId).notifier);
 
     return detAsync.when(
       loading: () => FCircularProgress(),
@@ -274,88 +276,18 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
                       ),
                     ),
                     SectionSliver(
-                      title: 'Casts & Crews',
-                      sliver: SliverGrid.builder(
-                        itemCount: selectedSeason.getPeoples().length,
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                          childAspectRatio: 1 / 1.35,
-                          maxCrossAxisExtent: 180,
-                        ),
-                        itemBuilder: (context, index) {
-                          final people = selectedSeason.getPeoples()[index];
-
-                          return FButton.raw(
-                            variant: .outline,
-                            onPress: () {},
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: ClipRRect(
-                                borderRadius: style.borderRadius.sm,
-                                child: Stack(
-                                  fit: .expand,
-                                  children: [
-                                    Positioned.fill(
-                                      child: ShaderMask(
-                                        shaderCallback: (rect) =>
-                                            LinearGradient(
-                                              colors: [
-                                                Colors.transparent,
-                                                Colors.black,
-                                              ],
-                                              stops: [0.4, 1],
-                                              begin: .topCenter,
-                                              end: .bottomCenter,
-                                            ).createShader(rect),
-                                        blendMode: .darken,
-                                        child: CachedNetworkImage(
-                                          imageUrl: services<JellyfinClient>()
-                                              .images
-                                              .url(itemId: people.Id),
-                                          fit: .cover,
-                                          height: 50,
-                                          errorBuilder:
-                                              (context, error, stackTrace) =>
-                                                  Container(
-                                                    color: Colors.black,
-                                                    child: Icon(
-                                                      FLucideIcons.user,
-                                                      size: 50,
-                                                    ),
-                                                  ),
-                                        ),
-                                      ),
-                                    ),
-                                    Align(
-                                      alignment: .bottomCenter,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          mainAxisSize: .min,
-                                          children: [
-                                            FittedBox(
-                                              child: Text(
-                                                people.Name,
-                                                textAlign: .center,
-                                                style: theme.typography.body.sm,
-                                              ).bold(),
-                                            ),
-                                            Text(
-                                              'as ${people.Role}',
-                                              textAlign: .center,
-                                              style: theme.typography.body.xs,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
+                      title: data.showSeriesCast
+                          ? 'Series casts & crews'
+                          : '${selectedSeason.name} Casts & Crews',
+                      titleTrailing: FButton.icon(
+                        variant: .ghost,
+                        onPress: detNoti.toggleSeriesCast,
+                        child: Icon(FLucideIcons.arrowLeftRight),
+                      ),
+                      sliver: PeopleGrid(
+                        peoples: data.showSeriesCast
+                            ? series.getPeoples()
+                            : selectedSeason.getPeoples(),
                       ),
                     ),
                     // SliverToBoxAdapter(
@@ -374,10 +306,110 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
   }
 }
 
+class PeopleGrid extends StatelessWidget {
+  final List<JellyPeople> peoples;
+
+  const PeopleGrid({
+    super.key,
+    required this.peoples,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = FTheme.of(context);
+    final style = theme.style;
+    return SliverGrid.builder(
+      itemCount: peoples.length,
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: 1 / 1.35,
+        maxCrossAxisExtent: 180,
+      ),
+      itemBuilder: (context, index) {
+        final people = peoples[index];
+
+        return FButton.raw(
+          variant: .outline,
+          onPress: () {},
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: ClipRRect(
+              borderRadius: style.borderRadius.sm,
+              child: Stack(
+                fit: .expand,
+                children: [
+                  Positioned.fill(
+                    child: ShaderMask(
+                      shaderCallback: (rect) => LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          Colors.black,
+                        ],
+                        stops: [0.4, 1],
+                        begin: .topCenter,
+                        end: .bottomCenter,
+                      ).createShader(rect),
+                      blendMode: .darken,
+                      child: CachedNetworkImage(
+                        imageUrl: services<JellyfinClient>().images.url(
+                          itemId: people.Id,
+                        ),
+                        fit: .cover,
+                        height: 50,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.black,
+                          child: Icon(
+                            FLucideIcons.user,
+                            size: 50,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: .bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisSize: .min,
+                        children: [
+                          FittedBox(
+                            child: Text(
+                              people.Name,
+                              textAlign: .center,
+                              style: theme.typography.body.sm,
+                            ).bold(),
+                          ),
+                          Text(
+                            'as ${people.Role}',
+                            textAlign: .center,
+                            style: theme.typography.body.xs,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class SectionSliver extends StatelessWidget {
   final String title;
+  final Widget? titleTrailing;
   final Widget sliver;
-  const SectionSliver({super.key, required this.title, required this.sliver});
+  const SectionSliver({
+    super.key,
+    this.titleTrailing,
+    required this.title,
+    required this.sliver,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -390,6 +422,7 @@ class SectionSliver extends StatelessWidget {
               Text(
                 title.toUpperCase(),
               ).bold(),
+              ?titleTrailing,
             ],
           ).setOpacity(opacity: 0.5),
         ),

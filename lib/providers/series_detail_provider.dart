@@ -132,6 +132,14 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
     _getSeasonDetail(seasonId);
     state = AsyncValue.data(currentState.copyWith(selectedSeasonId: seasonId));
   }
+
+  void toggleSeriesCast() {
+    var currentState = state.value ?? SeriesDetailModel(seriesId: id);
+
+    state = AsyncValue.data(
+      currentState.copyWith(showSeriesCast: !currentState.showSeriesCast),
+    );
+  }
 }
 
 final seriesDetailProvider = AsyncNotifierProvider.autoDispose
