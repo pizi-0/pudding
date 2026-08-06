@@ -64,6 +64,7 @@ class _EpisodeListDisplayState extends ConsumerState<EpisodeListDisplay> {
         );
 
         return ListView.separated(
+          physics: ClampingScrollPhysics(),
           padding: .fromLTRB(8, 4, 8, 8),
           controller: scrollController,
           itemCount: data.length,
