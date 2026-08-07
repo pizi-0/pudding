@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 
 class SeriesDetailModel {
   final List<String> seasonIds;
+  final List<String> episodesForSeason;
   final String? selectedSeasonId;
   final String seriesId;
   final String? nextUp;
@@ -11,6 +12,7 @@ class SeriesDetailModel {
   SeriesDetailModel({
     String? selectedSeasonId,
     this.seasonIds = const [],
+    this.episodesForSeason = const [],
     this.showSeriesCast = false,
     required this.seriesId,
     this.nextUp,
@@ -18,6 +20,7 @@ class SeriesDetailModel {
 
   SeriesDetailModel copyWith({
     List<String>? seasonIds,
+    List<String>? episodesForSeason,
     String? selectedSeasonId,
     String? seriesId,
     String? nextUp,
@@ -25,6 +28,7 @@ class SeriesDetailModel {
   }) {
     return SeriesDetailModel(
       seasonIds: seasonIds ?? this.seasonIds,
+      episodesForSeason: episodesForSeason ?? this.episodesForSeason,
       selectedSeasonId: selectedSeasonId ?? this.selectedSeasonId,
       seriesId: seriesId ?? this.seriesId,
       nextUp: nextUp ?? this.nextUp,
@@ -37,6 +41,7 @@ class SeriesDetailModel {
     if (identical(this, other)) return true;
 
     return listEquals(other.seasonIds, seasonIds) &&
+        listEquals(other.episodesForSeason, episodesForSeason) &&
         other.selectedSeasonId == selectedSeasonId &&
         other.seriesId == seriesId &&
         other.nextUp == nextUp &&
@@ -46,6 +51,7 @@ class SeriesDetailModel {
   @override
   int get hashCode {
     return seasonIds.hashCode ^
+        episodesForSeason.hashCode ^
         selectedSeasonId.hashCode ^
         seriesId.hashCode ^
         nextUp.hashCode ^

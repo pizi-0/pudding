@@ -32,6 +32,8 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
     final detNoti = ref.read(seriesDetailProvider(widget.seriesId).notifier);
 
     return detAsync.when(
+      skipLoadingOnRefresh: true,
+      skipLoadingOnReload: true,
       loading: () => FCircularProgress(),
       error: (error, stackTrace) => Center(
         child: Text(error.toString()),
@@ -319,6 +321,7 @@ class PeopleGrid extends StatelessWidget {
     final theme = FTheme.of(context);
     final style = theme.style;
     return SliverGrid.builder(
+      key: ValueKey(peoples.toString()),
       itemCount: peoples.length,
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         mainAxisSpacing: 8,

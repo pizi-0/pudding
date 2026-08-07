@@ -54,6 +54,7 @@ class _ShowsDetailScreensState extends ConsumerState<TvDetailScreen> {
           ),
         ),
         detAsync.when(
+          skipLoadingOnRefresh: true,
           skipLoadingOnReload: true,
           loading: () => Center(
             child: LogoShimmer(

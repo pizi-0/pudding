@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:dart_jellyfin/dart_jellyfin.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pudding/models/series_detail_model.dart';
+import 'package:pudding/providers/episodes_list_cache_provider.dart';
 import 'package:pudding/providers/jelly_cache_provider.dart';
 import 'package:pudding/providers/season_list_cache_provider.dart';
 import 'package:pudding/services/di.dart';
@@ -19,34 +21,89 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
     return _populate();
   }
 
+  late SeriesDetailModel empty = SeriesDetailModel(seriesId: id);
+
   Future<SeriesDetailModel> _populate({bool refresh = false}) async {
-    final jellyCache = ref.read(jellyCacheProvider);
-    final seasonCache = ref.read(seasonListCacheProvider);
+    try {
+      String? selectedSeason;
+      List<String> episodes = [];
 
-    bool hasSeries = jellyCache.containsKey(id);
-    bool hasSeasons = seasonCache.containsKey(id);
+      final (series, seasons, nextUp) = await (
+        _getSeriesDetail(refresh: refresh),
+        _getSeasons(refresh: refresh),
+        _getNextUp(),
+      ).wait;
 
-    String? selectedSeason;
-    final (series, seasons, nextUp) = await (
-      (!hasSeries || refresh)
-          ? _getSeriesDetail()
-          : Future.value(jellyCache[id]),
-      (!hasSeasons || refresh) ? _getSeasons() : Future.value(seasonCache[id]!),
-      _getNextUp(),
-    ).wait;
+      selectedSeason = nextUp?.seasonId ?? seasons.firstOrNull;
 
-    selectedSeason = nextUp?.seasonId ?? seasons.firstOrNull;
+      if (selectedSeason != null) {
+        final (_, eps) = await (
+          _getSeasonDetail(selectedSeason),
+          _getEpisodeForSeason(selectedSeason),
+        ).wait;
 
-    if (selectedSeason != null) {
-      await _getSeasonDetail(selectedSeason);
+        episodes = eps;
+      }
+
+      return SeriesDetailModel(
+        seriesId: id,
+        seasonIds: seasons,
+        selectedSeasonId: selectedSeason,
+        episodesForSeason: episodes,
+        nextUp: nextUp?.id,
+      );
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+      rethrow;
     }
+  }
 
-    return SeriesDetailModel(
-      seriesId: id,
-      seasonIds: seasons,
-      selectedSeasonId: selectedSeason,
-      nextUp: nextUp?.id ?? '',
-    );
+  Future<void> manualEpisode(String seasonId) async {
+    final current = state.value ?? empty;
+
+    state = AsyncValue.data(current.copyWith(selectedSeasonId: seasonId));
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final res = await _getEpisodeForSeason(seasonId);
+      return current.copyWith(
+        episodesForSeason: res,
+        selectedSeasonId: seasonId,
+      );
+    });
+  }
+
+  Future<List<String>> _getEpisodeForSeason(
+    String seasonId, {
+    bool refresh = false,
+  }) async {
+    try {
+      final cache = ref.read(episodesCacheProvider);
+
+      if (cache.containsKey(seasonId) && !refresh) {
+        return cache[seasonId]!;
+      }
+
+      final episodes = await client.items.list(
+        parentId: seasonId,
+        includeItemTypes: [JellyfinItemKind.episode],
+      );
+
+      final episodeIds = episodes.items.map((e) => e.id).toList();
+
+      if (episodeIds.isNotEmpty) {
+        ref.read(episodesCacheProvider.notifier).add(seasonId, episodeIds);
+        ref.read(jellyCacheProvider.notifier).addAll(episodes.items);
+      }
+
+      return episodeIds;
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> manualRefresh() async {
+    state = AsyncData(await _populate(refresh: true));
   }
 
   Future<void> refreshData() async {
@@ -55,41 +112,60 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   }
 
   Future<JellyfinItem?> _getNextUp() async {
-    JellyfinItem? item;
-    final next = await client.tvShows.nextUp(seriesId: id);
+    try {
+      JellyfinItem? item;
+      final next = await client.tvShows.nextUp(seriesId: id);
 
-    if (next.items.isEmpty) {
-      final firstEpisode = await client.items.list(
-        parentId: id,
-        limit: 1,
-        includeItemTypes: [JellyfinItemKind.episode],
-      );
+      if (next.items.isEmpty) {
+        final firstEpisode = await client.items.list(
+          parentId: id,
+          limit: 1,
+          includeItemTypes: [JellyfinItemKind.episode],
+        );
 
-      item = firstEpisode.items.firstOrNull;
-    } else {
-      item = next.items.firstOrNull;
+        item = firstEpisode.items.firstOrNull;
+      } else {
+        item = next.items.firstOrNull;
 
-      if (item != null) {
-        if (item.getOverview() == null) {
-          final byId = await client.items.byId(item.id);
-          item = byId;
+        if (item != null) {
+          if (item.getOverview() == null) {
+            final byId = await client.items.byId(item.id);
+            item = byId;
+          }
         }
       }
-    }
 
-    if (item != null) {
-      ref.read(jellyCacheProvider.notifier).addSingle(item);
-    }
+      if (item != null) {
+        ref.read(jellyCacheProvider.notifier).addSingle(item);
+      }
 
-    return item;
+      return item;
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+      rethrow;
+    }
   }
 
-  Future<String> _getSeriesDetail() async {
-    final res = await client.items.byId(id);
+  Future<String> _getSeriesDetail({bool refresh = false}) async {
+    try {
+      final cache = ref.read(jellyCacheProvider);
 
-    ref.read(jellyCacheProvider.notifier).addSingle(res!);
+      if (cache.containsKey(id) && !refresh) {
+        return id;
+      }
 
-    return id;
+      final res = await client.items.byId(id);
+      ref.read(jellyCacheProvider.notifier).addSingle(res!);
+
+      return id;
+    } on Exception catch (e) {
+      if (state.hasValue) {
+        return id;
+      }
+
+      debugPrint(e.toString());
+      rethrow;
+    }
   }
 
   Future<void> _getSeasonDetail(String seasonId) async {
@@ -107,30 +183,37 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
     }
   }
 
-  Future<List<String>> _getSeasons() async {
-    final res = await client.items.list(
-      parentId: id,
-      includeItemTypes: [JellyfinItemKind.season],
-    );
+  Future<List<String>> _getSeasons({bool refresh = false}) async {
+    try {
+      final cache = ref.read(seasonsCacheProvider);
 
-    final seasonIds = res.items.map((e) => e.id).toList();
+      if (cache.containsKey(id) && !refresh) {
+        return cache[id]!;
+      }
 
-    ref
-        .read(seasonListCacheProvider.notifier)
-        .addDetail(
-          seriesId: id,
-          seasons: seasonIds,
-        );
+      final res = await client.items.list(
+        parentId: id,
+        includeItemTypes: [JellyfinItemKind.season],
+      );
 
-    ref.read(jellyCacheProvider.notifier).addAll(res.items);
+      final seasonIds = res.items.map((e) => e.id).toList();
 
-    return seasonIds;
+      ref.read(seasonsCacheProvider.notifier).add(id, seasonIds);
+      ref.read(jellyCacheProvider.notifier).addAll(res.items);
+
+      return seasonIds;
+    } on Exception catch (e) {
+      if (state.hasValue) {
+        return state.value!.seasonIds;
+      }
+      debugPrint(e.toString());
+      rethrow;
+    }
   }
 
   void setSelectedSeason(String seasonId) {
-    var currentState = state.value ?? SeriesDetailModel(seriesId: id);
     _getSeasonDetail(seasonId);
-    state = AsyncValue.data(currentState.copyWith(selectedSeasonId: seasonId));
+    manualEpisode(seasonId);
   }
 
   void toggleSeriesCast() {

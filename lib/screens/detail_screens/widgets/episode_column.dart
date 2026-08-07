@@ -77,7 +77,7 @@ class EpisodesColumnState extends ConsumerState<EpisodesColumn> {
                         Expanded(
                           child: EpisodeListDisplay(
                             key: ValueKey(data.selectedSeasonId),
-                            seasonId: data.selectedSeasonId!,
+                            seriesId: widget.seriesId,
                           ),
                         ),
                       ],

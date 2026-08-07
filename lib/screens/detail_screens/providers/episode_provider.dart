@@ -6,7 +6,7 @@ import 'package:pudding/services/di.dart';
 
 final episodeProvider = FutureProvider.family<List<String>, String>(
   (ref, seasonId) async {
-    final episodeCache = ref.read(episodesListCacheProvider);
+    final episodeCache = ref.read(episodesCacheProvider);
     if (episodeCache.containsKey(seasonId)) {
       return episodeCache[seasonId]!;
     }
@@ -18,12 +18,7 @@ final episodeProvider = FutureProvider.family<List<String>, String>(
 
     final ids = res.items.map((e) => e.id).toList();
     if (res.items.isNotEmpty) {
-      ref
-          .read(episodesListCacheProvider.notifier)
-          .addEpisodes(
-            seriesId: seasonId,
-            episodesIds: ids,
-          );
+      ref.read(episodesCacheProvider.notifier).add(seasonId, ids);
       ref.read(jellyCacheProvider.notifier).addAll(res.items);
     }
 

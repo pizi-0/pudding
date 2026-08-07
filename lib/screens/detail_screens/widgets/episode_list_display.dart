@@ -3,16 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/widgets/progress.dart';
 import 'package:pudding/providers/jelly_cache_provider.dart';
 import 'package:pudding/providers/series_detail_provider.dart';
-import 'package:pudding/screens/detail_screens/providers/episode_provider.dart';
 import 'package:pudding/screens/detail_screens/widgets/episode_card.dart';
 
 import '../../../const/const.dart';
 
 class EpisodeListDisplay extends ConsumerStatefulWidget {
-  final String seasonId;
+  final String seriesId;
   const EpisodeListDisplay({
     super.key,
-    required this.seasonId,
+    required this.seriesId,
   });
 
   @override
@@ -33,14 +32,10 @@ class _EpisodeListDisplayState extends ConsumerState<EpisodeListDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    final epAsync = ref.watch(episodeProvider(widget.seasonId));
     final jellyCache = ref.watch(jellyCacheProvider);
-    final season = jellyCache[widget.seasonId];
-    final seriesId = season!.seriesId!;
+    final detAsync = ref.watch(seriesDetailProvider(widget.seriesId));
 
-    final seriesDetail = ref.watch(seriesDetailProvider(seriesId)).value!;
-
-    return epAsync.when(
+    return detAsync.when(
       loading: () => Center(
         child: FCircularProgress(),
       ),
@@ -48,10 +43,9 @@ class _EpisodeListDisplayState extends ConsumerState<EpisodeListDisplay> {
         child: Text(error.toString()),
       ),
       data: (data) {
-        final nextIndex =
-            seriesDetail.nextUp == null || seriesDetail.nextUp!.isEmpty
+        final nextIndex = data.nextUp == null || data.nextUp!.isEmpty
             ? 0
-            : data.indexOf(seriesDetail.nextUp!);
+            : data.episodesForSeason.indexOf(data.nextUp!);
 
         WidgetsBinding.instance.addPostFrameCallback(
           (timeStamp) {
@@ -67,10 +61,10 @@ class _EpisodeListDisplayState extends ConsumerState<EpisodeListDisplay> {
           physics: ClampingScrollPhysics(),
           padding: .fromLTRB(8, 4, 8, 8),
           controller: scrollController,
-          itemCount: data.length,
+          itemCount: data.episodesForSeason.length,
           separatorBuilder: (context, index) => SizedBox(height: 8),
           itemBuilder: (context, index) {
-            final episodeId = data[index];
+            final episodeId = data.episodesForSeason[index];
             final episodeItem = jellyCache[episodeId]!;
 
             return EpisodeCard(
