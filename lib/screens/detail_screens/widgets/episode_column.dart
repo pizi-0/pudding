@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
-import 'package:pudding/providers/media_cache_provider.dart';
+import 'package:pudding/providers/jelly_cache_provider.dart';
 import 'package:pudding/providers/series_detail_provider.dart';
 import 'package:pudding/screens/detail_screens/widgets/episode_list_display.dart';
 
@@ -32,7 +32,7 @@ class EpisodesColumnState extends ConsumerState<EpisodesColumn> {
 
     final detAsync = ref.watch(seriesDetailProvider(widget.seriesId));
 
-    final mediaCache = ref.watch(mediaCacheProvider);
+    final jellyCache = ref.watch(jellyCacheProvider);
 
     return TapRegion(
       onTapInside: (event) => FocusScope.of(context).unfocus(),
@@ -57,7 +57,7 @@ class EpisodesColumnState extends ConsumerState<EpisodesColumn> {
                   ),
                   data: (data) {
                     final seasonItems = data.seasonIds
-                        .map((s) => mediaCache[s])
+                        .map((s) => jellyCache[s])
                         .where((e) => e != null);
 
                     final selectedSeasonItem = seasonItems.firstWhere(

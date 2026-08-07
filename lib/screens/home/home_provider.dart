@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pudding/providers/media_cache_provider.dart';
+import 'package:pudding/providers/jelly_cache_provider.dart';
 import 'package:pudding/screens/home/models/home_data_model.dart';
 import 'package:pudding/screens/home/providers/showcase_provider.dart';
 
@@ -33,7 +33,7 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
     ].uniqueBy((e) => e.id).toList();
 
     ref.read(showcaseProvider.notifier).setItem(showcase.first);
-    ref.read(mediaCacheProvider.notifier).populateCache(showcase);
+    ref.read(jellyCacheProvider.notifier).addAll(showcase);
 
     return HomeData(
       showcaseItem: showcase,

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/models/jelly_people.dart';
-import 'package:pudding/providers/media_cache_provider.dart';
+import 'package:pudding/providers/jelly_cache_provider.dart';
 import 'package:pudding/providers/series_detail_provider.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
@@ -26,8 +26,8 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
     final style = theme.style;
-    final mediaCache = ref.watch(mediaCacheProvider);
-    final series = mediaCache[widget.seriesId]!;
+    final jellyCache = ref.watch(jellyCacheProvider);
+    final series = jellyCache[widget.seriesId]!;
     final detAsync = ref.watch(seriesDetailProvider(widget.seriesId));
     final detNoti = ref.read(seriesDetailProvider(widget.seriesId).notifier);
 
@@ -37,8 +37,8 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
         child: Text(error.toString()),
       ),
       data: (data) {
-        final selectedSeason = mediaCache[data.selectedSeasonId]!;
-        final nextUpItem = mediaCache[data.nextUp];
+        final selectedSeason = jellyCache[data.selectedSeasonId]!;
+        final nextUpItem = jellyCache[data.nextUp];
 
         return Padding(
           padding: const EdgeInsets.all(20.0),

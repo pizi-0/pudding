@@ -1,7 +1,7 @@
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pudding/providers/episodes_list_cache_provider.dart';
-import 'package:pudding/providers/media_cache_provider.dart';
+import 'package:pudding/providers/jelly_cache_provider.dart';
 import 'package:pudding/services/di.dart';
 
 final episodeProvider = FutureProvider.family<List<String>, String>(
@@ -24,7 +24,7 @@ final episodeProvider = FutureProvider.family<List<String>, String>(
             seriesId: seasonId,
             episodesIds: ids,
           );
-      ref.read(mediaCacheProvider.notifier).populateCache(res.items);
+      ref.read(jellyCacheProvider.notifier).addAll(res.items);
     }
 
     return ids;

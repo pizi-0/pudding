@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pudding/models/series_detail_model.dart';
-import 'package:pudding/providers/media_cache_provider.dart';
+import 'package:pudding/providers/jelly_cache_provider.dart';
 import 'package:pudding/providers/season_list_cache_provider.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
@@ -20,17 +20,17 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   }
 
   Future<SeriesDetailModel> _populate({bool refresh = false}) async {
-    final mediaCache = ref.read(mediaCacheProvider);
+    final jellyCache = ref.read(jellyCacheProvider);
     final seasonCache = ref.read(seasonListCacheProvider);
 
-    bool hasSeries = mediaCache.containsKey(id);
+    bool hasSeries = jellyCache.containsKey(id);
     bool hasSeasons = seasonCache.containsKey(id);
 
     String? selectedSeason;
     final (series, seasons, nextUp) = await (
       (!hasSeries || refresh)
           ? _getSeriesDetail()
-          : Future.value(mediaCache[id]),
+          : Future.value(jellyCache[id]),
       (!hasSeasons || refresh) ? _getSeasons() : Future.value(seasonCache[id]!),
       _getNextUp(),
     ).wait;
@@ -78,7 +78,7 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
     }
 
     if (item != null) {
-      ref.read(mediaCacheProvider.notifier).updateItem(item);
+      ref.read(jellyCacheProvider.notifier).addSingle(item);
     }
 
     return item;
@@ -87,23 +87,23 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
   Future<String> _getSeriesDetail() async {
     final res = await client.items.byId(id);
 
-    ref.read(mediaCacheProvider.notifier).updateItem(res!);
+    ref.read(jellyCacheProvider.notifier).addSingle(res!);
 
     return id;
   }
 
   Future<void> _getSeasonDetail(String seasonId) async {
-    final mediaCache = ref.read(mediaCacheProvider);
+    final jellyCache = ref.read(jellyCacheProvider);
 
-    if (mediaCache.containsKey(seasonId)) {
-      if (mediaCache[seasonId]!.getPeoples().isNotEmpty) {
+    if (jellyCache.containsKey(seasonId)) {
+      if (jellyCache[seasonId]!.getPeoples().isNotEmpty) {
         return;
       }
     }
     final res = await client.items.byId(seasonId);
 
     if (res != null) {
-      ref.read(mediaCacheProvider.notifier).updateItem(res);
+      ref.read(jellyCacheProvider.notifier).addSingle(res);
     }
   }
 
@@ -122,7 +122,7 @@ class SeriesDetailNotifier extends AsyncNotifier<SeriesDetailModel> {
           seasons: seasonIds,
         );
 
-    ref.read(mediaCacheProvider.notifier).populateCache(res.items);
+    ref.read(jellyCacheProvider.notifier).addAll(res.items);
 
     return seasonIds;
   }

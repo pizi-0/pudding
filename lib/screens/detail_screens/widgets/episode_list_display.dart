@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/widgets/progress.dart';
-import 'package:pudding/providers/media_cache_provider.dart';
+import 'package:pudding/providers/jelly_cache_provider.dart';
 import 'package:pudding/providers/series_detail_provider.dart';
 import 'package:pudding/screens/detail_screens/providers/episode_provider.dart';
 import 'package:pudding/screens/detail_screens/widgets/episode_card.dart';
@@ -34,8 +34,8 @@ class _EpisodeListDisplayState extends ConsumerState<EpisodeListDisplay> {
   @override
   Widget build(BuildContext context) {
     final epAsync = ref.watch(episodeProvider(widget.seasonId));
-    final mediaCache = ref.watch(mediaCacheProvider);
-    final season = mediaCache[widget.seasonId];
+    final jellyCache = ref.watch(jellyCacheProvider);
+    final season = jellyCache[widget.seasonId];
     final seriesId = season!.seriesId!;
 
     final seriesDetail = ref.watch(seriesDetailProvider(seriesId)).value!;
@@ -71,7 +71,7 @@ class _EpisodeListDisplayState extends ConsumerState<EpisodeListDisplay> {
           separatorBuilder: (context, index) => SizedBox(height: 8),
           itemBuilder: (context, index) {
             final episodeId = data[index];
-            final episodeItem = mediaCache[episodeId]!;
+            final episodeItem = jellyCache[episodeId]!;
 
             return EpisodeCard(
               episode: episodeItem,
