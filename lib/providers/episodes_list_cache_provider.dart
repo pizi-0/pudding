@@ -1,20 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quiver/collection.dart';
 
-class EpisodesListCacheNotifier extends Notifier<Map<String, List<String>>> {
+class EpisodesCacheNotifier extends Notifier<LruMap<String, List<String>>> {
   @override
-  Map<String, List<String>> build() {
-    return {};
+  LruMap<String, List<String>> build() {
+    return LruMap(maximumSize: 1000);
   }
 
-  void addEpisodes({
-    required String seriesId,
-    required List<String> episodesIds,
-  }) {
-    state = {...state, seriesId: episodesIds};
+  void add(String seasonId, List<String> episodeIds) {
+    var newCache = LruMap<String, List<String>>(maximumSize: 1000);
+    newCache.addAll(state);
+    newCache[seasonId] = episodeIds;
+
+    state = newCache;
   }
 }
 
-final episodesListCacheProvider =
-    NotifierProvider<EpisodesListCacheNotifier, Map<String, List<String>>>(
-      () => EpisodesListCacheNotifier(),
+final episodesCacheProvider =
+    NotifierProvider<EpisodesCacheNotifier, LruMap<String, List<String>>>(
+      () => EpisodesCacheNotifier(),
     );
