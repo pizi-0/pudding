@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dart_jellyfin/dart_jellyfin.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pudding/data/local/secure_storage/secure_storage.dart';
 import 'package:pudding/models/jf_saved_session.dart';
@@ -15,22 +16,27 @@ class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
   }
 
   Future<JellyfinUser?> getUser() async {
-    final savedSession = await SecureStorage.getSession();
+    try {
+      final savedSession = await SecureStorage.getSession();
 
-    if (savedSession != null) {
-      client.setSession(
-        token: savedSession.token,
-        userId: savedSession.userId,
-      );
+      if (savedSession != null) {
+        client.setSession(
+          token: savedSession.token,
+          userId: savedSession.userId,
+        );
 
-      client.connect(savedSession.serverAddresss);
+        client.connect(savedSession.serverAddresss);
 
-      await ref.read(homeProvider.notifier).build();
+        await ref.read(homeProvider.notifier).build();
 
-      return await client.user.currentUser();
+        return await client.user.currentUser();
+      }
+
+      return null;
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+      rethrow;
     }
-
-    return null;
   }
 
   Future<void> signInWithCredential(String user, String password) async {
@@ -52,6 +58,7 @@ class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
         ),
       );
     } catch (e) {
+      debugPrint(e.toString());
       rethrow;
     }
   }
@@ -74,6 +81,7 @@ class AuthNotifier extends AsyncNotifier<JellyfinUser?> {
         ),
       );
     } catch (e) {
+      debugPrint(e.toString());
       rethrow;
     }
   }
