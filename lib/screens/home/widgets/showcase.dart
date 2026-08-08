@@ -193,21 +193,29 @@ class _ShowcaseState extends ConsumerState<Showcase> {
     _pageTimer = Timer.periodic(
       10.seconds,
       (timer) async {
-        final route = GoRouter.of(
-          context,
-        ).routeInformationProvider.value.uri.path;
-        if (pauseSlideshow || route != '/') return;
+        try {
+          final route = GoRouter.of(
+            context,
+          ).routeInformationProvider.value.uri.path;
+          if (pauseSlideshow || route != '/') return;
 
-        if (pageController.page == items.length - 1) {
-          ref.read(showcaseProvider.notifier).setItem(items[0]);
-          pageController.jumpTo(0);
-          return;
+          if (pageController.page == items.length - 1) {
+            ref.read(showcaseProvider.notifier).setItem(items[0]);
+            pageController.jumpTo(0);
+            return;
+          }
+          ref.read(showcaseProvider.notifier).setItem(items[currentPage + 1]);
+          await pageController.nextPage(
+            duration: 500.milliseconds,
+            curve: Curves.easeInOut,
+          );
+        } catch (e) {
+          debugPrint(
+            ref.read(homeProvider).value?.showcaseItem.length.toString(),
+          );
+          debugPrint(items.length.toString());
+          debugPrint(e.toString());
         }
-        ref.read(showcaseProvider.notifier).setItem(items[currentPage + 1]);
-        await pageController.nextPage(
-          duration: 500.milliseconds,
-          curve: Curves.easeInOut,
-        );
       },
     );
   }
