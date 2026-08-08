@@ -4,6 +4,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:pudding/const/const.dart';
 import 'package:pudding/models/jelly_people.dart';
 import 'package:pudding/providers/jelly_cache_provider.dart';
 import 'package:pudding/providers/series_detail_provider.dart';
@@ -238,21 +239,25 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
                     SectionSliver(
                       title: '${selectedSeason.name} Summary',
                       sliver: SliverToBoxAdapter(
-                        child: Column(
-                          crossAxisAlignment: .start,
-                          children: [
-                            if (selectedSeason.getOverview() != null &&
-                                (selectedSeason.getOverview()?.isNotEmpty ??
-                                    false))
-                              Text(selectedSeason.getOverview()!.trim())
-                            else
-                              Text(
-                                'No overview',
-                                style: theme.typography.body.sm.copyWith(
-                                  fontStyle: .italic,
+                        child: AnimatedSize(
+                          alignment: .topCenter,
+                          duration: kDefaultAnimationDuration,
+                          child: Column(
+                            crossAxisAlignment: .start,
+                            children: [
+                              if (selectedSeason.getOverview() != null &&
+                                  (selectedSeason.getOverview()?.isNotEmpty ??
+                                      false))
+                                Text(selectedSeason.getOverview()!.trim())
+                              else
+                                Text(
+                                  'No overview',
+                                  style: theme.typography.body.sm.copyWith(
+                                    fontStyle: .italic,
+                                  ),
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
