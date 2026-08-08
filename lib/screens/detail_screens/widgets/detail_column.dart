@@ -1,17 +1,16 @@
 import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
-import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/const/const.dart';
-import 'package:pudding/models/jelly_people.dart';
 import 'package:pudding/providers/jelly_cache_provider.dart';
 import 'package:pudding/providers/series_detail_provider.dart';
-import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/rating_container.dart';
 import 'package:pudding/widgets/star_rating_container.dart';
+
+import '../../../widgets/people_grid.dart';
 
 class DetailColumn extends ConsumerStatefulWidget {
   final String seriesId;
@@ -306,101 +305,6 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
                 ),
               ),
             ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class PeopleGrid extends StatelessWidget {
-  final List<JellyPeople> peoples;
-
-  const PeopleGrid({
-    super.key,
-    required this.peoples,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = FTheme.of(context);
-    final style = theme.style;
-    return SliverGrid.builder(
-      key: ValueKey(peoples.toString()),
-      itemCount: peoples.length,
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        childAspectRatio: 1 / 1.35,
-        maxCrossAxisExtent: 180,
-      ),
-      itemBuilder: (context, index) {
-        final people = peoples[index];
-
-        return FButton.raw(
-          variant: .outline,
-          onPress: () {},
-          child: Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: ClipRRect(
-              borderRadius: style.borderRadius.sm,
-              child: Stack(
-                fit: .expand,
-                children: [
-                  Positioned.fill(
-                    child: ShaderMask(
-                      shaderCallback: (rect) => LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          Colors.black,
-                        ],
-                        stops: [0.4, 1],
-                        begin: .topCenter,
-                        end: .bottomCenter,
-                      ).createShader(rect),
-                      blendMode: .darken,
-                      child: CachedNetworkImage(
-                        imageUrl: services<JellyfinClient>().images.url(
-                          itemId: people.Id,
-                        ),
-                        fit: .cover,
-                        height: 50,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.black,
-                          child: Icon(
-                            FLucideIcons.user,
-                            size: 50,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: .bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisSize: .min,
-                        children: [
-                          FittedBox(
-                            child: Text(
-                              people.Name,
-                              textAlign: .center,
-                              style: theme.typography.body.sm,
-                            ).bold(),
-                          ),
-                          Text(
-                            'as ${people.Role}',
-                            textAlign: .center,
-                            style: theme.typography.body.xs,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ),
         );
       },
