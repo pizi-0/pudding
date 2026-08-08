@@ -103,13 +103,13 @@ class _PeopleButtonState extends State<PeopleButton> {
                     child: Column(
                       mainAxisSize: .min,
                       children: [
-                        FittedBox(
-                          child: Text(
-                            widget.people.Name,
-                            textAlign: .center,
-                            style: theme.typography.body.sm,
-                          ).bold(),
-                        ),
+                        Text(
+                          widget.people.Name,
+                          maxLines: hover ? null : 1,
+                          overflow: hover ? null : .ellipsis,
+                          textAlign: .center,
+                          style: theme.typography.body.sm,
+                        ).bold(),
                         Text(
                           'as ${widget.people.Role}',
                           maxLines: hover ? null : 1,
