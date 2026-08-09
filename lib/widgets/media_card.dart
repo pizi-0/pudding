@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
@@ -273,6 +274,114 @@ class MediaCardState extends State<MediaCard> {
                   ),
                 ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class NewMediaCard extends StatefulWidget {
+  final JellyfinItem item;
+  final String imageType;
+  const NewMediaCard({
+    super.key,
+    required this.item,
+    this.imageType = JellyfinImagesApi.typePrimary,
+  });
+
+  @override
+  State<NewMediaCard> createState() => _NewMediaCardState();
+}
+
+class _NewMediaCardState extends State<NewMediaCard> {
+  bool hover = false;
+  @override
+  Widget build(BuildContext context) {
+    final theme = FTheme.of(context);
+    final style = theme.style;
+
+    return RepaintBoundary(
+      child: FButton.raw(
+        onHoverChange: (value) => setState(() => hover = !hover),
+        onFocusChange: (value) => setState(() => hover = !hover),
+        variant: .outline,
+        onPress: () => context.go('/show/${widget.item.id}'),
+        child: Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: ClipRRect(
+            borderRadius: style.borderRadius.sm,
+            child: Container(
+              color: Colors.black,
+              child: Stack(
+                fit: .expand,
+                children: [
+                  Positioned(
+                    left: -1,
+                    top: -1,
+                    right: -1,
+                    bottom: -1,
+                    child: ShaderMask(
+                      shaderCallback: (rect) => LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          Colors.black,
+                        ],
+                        begin: .center,
+                        end: .bottomCenter,
+                      ).createShader(rect),
+                      blendMode: .dstOut,
+                      child: AnimatedOpacity(
+                        duration: kDefaultAnimationDuration,
+                        opacity: hover ? 0.8 : 1,
+                        child: AnimatedScale(
+                          duration: kDefaultAnimationDuration,
+                          alignment: .bottomCenter,
+                          scale: hover ? 1.01 : 1,
+                          child: CachedNetworkImage(
+                            memCacheHeight: 700,
+                            fit: .cover,
+                            imageUrl: widget.item.getImage(
+                              type: widget.imageType,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: .bottomCenter,
+                    child: AnimatedSize(
+                      duration: kDefaultAnimationDuration,
+                      alignment: .bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          spacing: 4,
+                          crossAxisAlignment: .stretch,
+                          mainAxisSize: .min,
+                          children: [
+                            Text(
+                              widget.item.name,
+                              maxLines: hover ? null : 1,
+                              overflow: hover ? null : .ellipsis,
+                            ).bold(),
+                            Text(
+                              widget.item.getSeriesRunYears(),
+                              style: theme.typography.body.xs.copyWith(
+                                color: theme.colors.foreground.withAlpha(
+                                  200,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
