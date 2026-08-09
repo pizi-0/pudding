@@ -1,3 +1,4 @@
+import 'package:awesome_extensions/awesome_extensions.dart' show StyledText;
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +11,8 @@ import '../../widgets/media_card.dart';
 
 class LibraryDetail extends ConsumerStatefulWidget {
   final String? id;
-  final String? type;
-  const LibraryDetail({super.key, this.id, this.type});
+
+  const LibraryDetail({super.key, this.id});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _LibraryDetailState();
@@ -20,6 +21,7 @@ class LibraryDetail extends ConsumerStatefulWidget {
 class _LibraryDetailState extends ConsumerState<LibraryDetail> {
   @override
   Widget build(BuildContext context) {
+    final theme = FTheme.of(context);
     final libAsync = ref.watch(libraryProvider(widget.id!));
 
     return Listener(
@@ -43,24 +45,18 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
             return CustomScrollView(
               slivers: [
                 PinnedHeaderSliver(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.black, Colors.transparent],
-                        begin: .topCenter,
-                        end: .bottomCenter,
-                      ),
+                  child: Appbar(
+                    prefix: FButton.icon(
+                      onPress: context.pop,
+                      child: Icon(FLucideIcons.chevronLeft),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        children: [
-                          FButton.icon(
-                            onPress: context.pop,
-                            child: Icon(FLucideIcons.chevronLeft),
-                          ),
-                        ],
-                      ),
+                    title: Row(
+                      children: [
+                        Text(
+                          data.name,
+                          style: theme.typography.display.lg,
+                        ).bold(),
+                      ],
                     ),
                   ),
                 ),
@@ -79,6 +75,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                       final item = libs[index];
 
                       return NewMediaCard(
+                        key: ValueKey(item.id),
                         item: item,
                         imageType: JellyfinImagesApi.typePrimary,
                       );
@@ -88,6 +85,37 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class Appbar extends StatelessWidget {
+  final Widget? prefix;
+  final Widget? suffix;
+  final Widget? title;
+  const Appbar({super.key, this.prefix, this.title, this.suffix});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.black, Colors.transparent],
+          begin: .topCenter,
+          end: .bottomCenter,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Row(
+          spacing: 10,
+          children: [
+            ?prefix,
+            ?title,
+            ?suffix,
+          ],
         ),
       ),
     );
