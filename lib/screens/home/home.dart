@@ -109,9 +109,13 @@ class _HomeState extends ConsumerState<Home> {
                           itemBuilder: (context, index) => LibraryCard(
                             view: data.libraries[index],
                             onPress: () {
-                              context.go(
-                                '/library/${data.libraries[index].id}',
+                              final loc = Uri(
+                                path: '/library/${data.libraries[index].id}',
+                                queryParameters: {
+                                  'type': data.libraries[index].collectionType,
+                                },
                               );
+                              context.push(loc.toString());
                             },
                           ),
                         ),

@@ -6,7 +6,6 @@ import 'package:pudding/screens/auth/auth_provider.dart';
 import 'package:pudding/screens/auth/auth_screen.dart';
 import 'package:pudding/screens/detail_screens/movies_detail_screen.dart';
 import 'package:pudding/screens/home/home.dart';
-import 'package:pudding/screens/library/library.dart';
 import 'package:pudding/screens/library_detail/library_detail_screen.dart';
 import 'package:pudding/screens/settings/settings.dart';
 import 'package:pudding/screens/splash/splash.dart';
@@ -45,6 +44,32 @@ final routeProvider = Provider<GoRouter>(
         path: '/login',
         builder: (context, state) => AuthScreen(),
       ),
+      GoRoute(
+        path: '/library/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'];
+          final type = state.uri.queryParameters['type'];
+
+          return LibraryDetail(id: id, type: type);
+        },
+        pageBuilder: GoTransitions.fade.call,
+      ),
+      GoRoute(
+        name: 'TvShow details',
+        path: '/show/:showId',
+        builder: (context, state) => TvDetailScreen(
+          showId: state.pathParameters['showId'],
+        ),
+        pageBuilder: GoTransitions.fade.call,
+      ),
+      GoRoute(
+        name: 'Movie details',
+        path: '/movie/:movieId',
+        builder: (context, state) => MovieDetailScreen(
+          movieId: state.pathParameters['movieId'],
+        ),
+        pageBuilder: GoTransitions.fade.call,
+      ),
       StatefulShellRoute(
         builder: (context, state, navigationShell) => navigationShell,
         navigatorContainerBuilder: (context, navigationShell, children) =>
@@ -59,47 +84,30 @@ final routeProvider = Provider<GoRouter>(
                 name: 'Home',
                 path: '/',
                 builder: (context, state) => Home(),
-                routes: [
-                  GoRoute(
-                    name: 'TvShow details',
-                    path: 'show/:showId',
-                    builder: (context, state) => TvDetailScreen(
-                      showId: state.pathParameters['showId'],
-                    ),
-                    pageBuilder: GoTransitions.fade.call,
-                  ),
-                  GoRoute(
-                    name: 'Movie details',
-                    path: 'movie/:movieId',
-                    builder: (context, state) => MovieDetailScreen(
-                      movieId: state.pathParameters['movieId'],
-                    ),
-                    pageBuilder: GoTransitions.fade.call,
-                  ),
-                ],
+                routes: [],
               ),
             ],
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                name: 'Library',
-                path: '/library',
-                builder: (context, state) => Library(),
-                routes: [
-                  GoRoute(
-                    path: ':id',
-                    builder: (context, state) {
-                      final id = state.pathParameters['id'];
+          // StatefulShellBranch(
+          //   routes: [
+          //     GoRoute(
+          //       name: 'Library',
+          //       path: '/library',
+          //       builder: (context, state) => Library(),
+          //       routes: [
+          //         GoRoute(
+          //           path: ':id',
+          //           builder: (context, state) {
+          //             final id = state.pathParameters['id'];
 
-                      return LibraryDetail(id: id);
-                    },
-                    pageBuilder: GoTransitions.fade.call,
-                  ),
-                ],
-              ),
-            ],
-          ),
+          //             return LibraryDetail(id: id);
+          //           },
+          //           pageBuilder: GoTransitions.fade.call,
+          //         ),
+          //       ],
+          //     ),
+          //   ],
+          // ),
           StatefulShellBranch(
             routes: [
               GoRoute(
