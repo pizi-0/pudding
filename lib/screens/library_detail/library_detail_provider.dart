@@ -18,12 +18,27 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
   }
 
   Future<LibraryData> getLibrary() async {
+    final lib = ref.read(userviewsProvider)[id]!;
+
     final res = await client.items.list(
       parentId: id,
-      includeItemTypes: [JellyfinItemKind.series],
+      includeItemTypes: _includeItemTypes(lib),
     );
 
-    return LibraryData(items: res.items);
+    return LibraryData(
+      name: lib.name,
+      items: res.items,
+    );
+  }
+
+  List<String> _includeItemTypes(JellyfinView view) {
+    if (view.isTvShows) {
+      return [JellyfinItemKind.series];
+    } else if (view.isMovies) {
+      return [JellyfinItemKind.movie];
+    } else {
+      return [];
+    }
   }
 }
 
@@ -49,16 +64,20 @@ final userviewsProvider =
     );
 
 class LibraryData {
+  final String name;
   final List<JellyfinItem> items;
 
   LibraryData({
+    required this.name,
     this.items = const [],
   });
 
   LibraryData copyWith({
+    String? name,
     List<JellyfinItem>? items,
   }) {
     return LibraryData(
+      name: name ?? this.name,
       items: items ?? this.items,
     );
   }
@@ -67,9 +86,9 @@ class LibraryData {
   bool operator ==(covariant LibraryData other) {
     if (identical(this, other)) return true;
 
-    return listEquals(other.items, items);
+    return other.name == name && listEquals(other.items, items);
   }
 
   @override
-  int get hashCode => items.hashCode;
+  int get hashCode => name.hashCode ^ items.hashCode;
 }
