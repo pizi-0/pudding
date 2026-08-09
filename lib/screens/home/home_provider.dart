@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pudding/providers/jelly_cache_provider.dart';
 import 'package:pudding/screens/home/models/home_data_model.dart';
 import 'package:pudding/screens/home/providers/showcase_provider.dart';
+import 'package:pudding/screens/library_detail/library_detail_provider.dart';
 
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/list_extensions.dart';
@@ -101,6 +102,7 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
 
   Future<List<JellyfinView>> _getLibraries() async {
     final res = await client.userViews.list();
+    ref.read(userviewsProvider.notifier).addAll(res.items);
 
     return res.items;
   }
