@@ -48,9 +48,8 @@ final routeProvider = Provider<GoRouter>(
         path: '/library/:id',
         builder: (context, state) {
           final id = state.pathParameters['id'];
-          final type = state.uri.queryParameters['type'];
 
-          return LibraryDetail(id: id, type: type);
+          return LibraryDetail(id: id);
         },
         pageBuilder: GoTransitions.fade.call,
       ),
