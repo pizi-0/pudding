@@ -3,7 +3,8 @@ import 'package:forui/forui.dart';
 
 class StarRatingContainer extends StatelessWidget {
   final String rating;
-  const StarRatingContainer({super.key, required this.rating});
+  final TextStyle? style;
+  const StarRatingContainer({super.key, required this.rating, this.style});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,10 @@ class StarRatingContainer extends StatelessWidget {
           color: Colors.amber,
           size: theme.typography.body.sm.fontSize,
         ),
-        Text(rating),
+        Text(
+          rating,
+          style: style,
+        ),
       ],
     );
   }
