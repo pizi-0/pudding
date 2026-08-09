@@ -8,6 +8,7 @@ import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/widgets/star_rating_container.dart';
 
 class MediaCard extends StatefulWidget {
   final JellyfinItem item;
@@ -299,6 +300,8 @@ class _NewMediaCardState extends State<NewMediaCard> {
   bool hover = false;
   @override
   Widget build(BuildContext context) {
+    final item = widget.item;
+    final imageType = widget.imageType;
     final theme = FTheme.of(context);
     final style = theme.style;
 
@@ -307,7 +310,7 @@ class _NewMediaCardState extends State<NewMediaCard> {
         onHoverChange: (value) => setState(() => hover = !hover),
         onFocusChange: (value) => setState(() => hover = !hover),
         variant: .outline,
-        onPress: () => context.go('/show/${widget.item.id}'),
+        onPress: () => context.go('/show/${item.id}'),
         child: Padding(
           padding: const EdgeInsets.all(2.0),
           child: ClipRRect(
@@ -342,8 +345,8 @@ class _NewMediaCardState extends State<NewMediaCard> {
                           child: CachedNetworkImage(
                             memCacheHeight: 700,
                             fit: .cover,
-                            imageUrl: widget.item.getImage(
-                              type: widget.imageType,
+                            imageUrl: item.getImage(
+                              type: imageType,
                             ),
                           ),
                         ),
@@ -363,17 +366,33 @@ class _NewMediaCardState extends State<NewMediaCard> {
                           mainAxisSize: .min,
                           children: [
                             Text(
-                              widget.item.name,
+                              item.name,
                               maxLines: hover ? null : 1,
                               overflow: hover ? null : .ellipsis,
                             ).bold(),
-                            Text(
-                              widget.item.getSeriesRunYears(),
-                              style: theme.typography.body.xs.copyWith(
-                                color: theme.colors.foreground.withAlpha(
-                                  200,
+                            Row(
+                              mainAxisAlignment: .spaceBetween,
+                              children: [
+                                Text(
+                                  item.getSeriesRunYears(),
+                                  style: theme.typography.body.xs.copyWith(
+                                    color: theme.colors.foreground.withAlpha(
+                                      200,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                if (item.getCommunityRating() != null)
+                                  StarRatingContainer(
+                                    rating: item
+                                        .getCommunityRating()!
+                                        .toStringAsFixed(2),
+                                    style: theme.typography.body.xs.copyWith(
+                                      color: theme.colors.foreground.withAlpha(
+                                        200,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ],
                         ),
