@@ -22,6 +22,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
 
     final res = await client.items.list(
       parentId: id,
+      excludeItemTypes: [JellyfinItemKind.folder],
       includeItemTypes: _includeItemTypes(lib),
     );
 
