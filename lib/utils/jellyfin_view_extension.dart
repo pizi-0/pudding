@@ -5,4 +5,8 @@ extension JellyViewInfo on JellyfinView {
   String getPrimaryImage() {
     return services<JellyfinClient>().images.url(itemId: id);
   }
+
+  bool get isBoxsets => collectionType == 'boxsets';
+  bool get isPlaylists => collectionType == 'playlists';
+  bool get isBooks => collectionType == 'books';
 }
