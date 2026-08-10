@@ -1,4 +1,3 @@
-import 'package:awesome_extensions/awesome_extensions.dart' show StyledText;
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +20,6 @@ class LibraryDetail extends ConsumerStatefulWidget {
 class _LibraryDetailState extends ConsumerState<LibraryDetail> {
   @override
   Widget build(BuildContext context) {
-    final theme = FTheme.of(context);
     final libAsync = ref.watch(libraryProvider(widget.id!));
 
     return Listener(
@@ -50,14 +48,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                       onPress: context.pop,
                       child: Icon(FLucideIcons.chevronLeft),
                     ),
-                    title: Row(
-                      children: [
-                        Text(
-                          data.name,
-                          style: theme.typography.display.lg,
-                        ).bold(),
-                      ],
-                    ),
+                    title: Text(data.name),
                   ),
                 ),
                 SliverPadding(
@@ -95,10 +86,18 @@ class Appbar extends StatelessWidget {
   final Widget? prefix;
   final Widget? suffix;
   final Widget? title;
-  const Appbar({super.key, this.prefix, this.title, this.suffix});
+  final Widget? subtitle;
+  const Appbar({
+    super.key,
+    this.prefix,
+    this.title,
+    this.suffix,
+    this.subtitle,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = FTheme.of(context);
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -113,7 +112,21 @@ class Appbar extends StatelessWidget {
           spacing: 10,
           children: [
             ?prefix,
-            ?title,
+            Column(
+              children: [
+                DefaultTextStyle(
+                  style: theme.typography.body.lg.copyWith(fontWeight: .bold),
+                  child: title ?? SizedBox(),
+                ),
+                DefaultTextStyle(
+                  style: theme.typography.body.sm.copyWith(
+                    color: theme.colors.foreground.withAlpha(200),
+                  ),
+                  child: subtitle ?? SizedBox(),
+                ),
+              ],
+            ),
+
             ?suffix,
           ],
         ),
