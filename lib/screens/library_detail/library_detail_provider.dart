@@ -29,6 +29,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     return LibraryData(
       name: lib.name,
       items: res.items,
+      count: res.totalRecordCount,
     );
   }
 
@@ -66,19 +67,23 @@ final userviewsProvider =
 
 class LibraryData {
   final String name;
+  final int count;
   final List<JellyfinItem> items;
 
   LibraryData({
     required this.name,
+    required this.count,
     this.items = const [],
   });
 
   LibraryData copyWith({
     String? name,
+    int? count,
     List<JellyfinItem>? items,
   }) {
     return LibraryData(
       name: name ?? this.name,
+      count: count ?? this.count,
       items: items ?? this.items,
     );
   }
@@ -87,9 +92,11 @@ class LibraryData {
   bool operator ==(covariant LibraryData other) {
     if (identical(this, other)) return true;
 
-    return other.name == name && listEquals(other.items, items);
+    return other.name == name &&
+        other.count == count &&
+        listEquals(other.items, items);
   }
 
   @override
-  int get hashCode => name.hashCode ^ items.hashCode;
+  int get hashCode => name.hashCode ^ count.hashCode ^ items.hashCode;
 }

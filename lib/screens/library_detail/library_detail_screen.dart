@@ -119,27 +119,50 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
               data: (data) {
                 final libs = data.items;
 
-                return SliverPadding(
-                  padding: .fromLTRB(10, 0, 10, 10),
-                  sliver: SliverGrid.builder(
-                    key: ValueKey(widget.id),
-                    itemCount: libs.length,
-                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 200,
-                      childAspectRatio: 10 / 16,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
+                return SliverMainAxisGroup(
+                  slivers: [
+                    PinnedHeaderSliver(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                        child: Row(
+                          mainAxisSize: .min,
+                          mainAxisAlignment: .start,
+                          children: [
+                            FCard(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Showing ${libs.length} of ${data.count}',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    itemBuilder: (context, index) {
-                      final item = libs[index];
+                    SliverPadding(
+                      padding: .fromLTRB(10, 0, 10, 10),
+                      sliver: SliverGrid.builder(
+                        key: ValueKey(widget.id),
+                        itemCount: libs.length,
+                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 200,
+                          childAspectRatio: 10 / 16,
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                        ),
+                        itemBuilder: (context, index) {
+                          final item = libs[index];
 
-                      return NewMediaCard(
-                        key: ValueKey(item.id),
-                        item: item,
-                        imageType: JellyfinImagesApi.typePrimary,
-                      );
-                    },
-                  ),
+                          return NewMediaCard(
+                            key: ValueKey(item.id),
+                            item: item,
+                            imageType: JellyfinImagesApi.typePrimary,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 );
               },
             ),
