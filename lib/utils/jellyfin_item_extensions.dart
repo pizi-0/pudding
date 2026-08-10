@@ -119,6 +119,10 @@ extension JellyInfo on JellyfinItem {
     return (raw['PrimaryImageAspectRatio'] ?? 0.68);
   }
 
+  int? getUnplayed() {
+    return raw['UserData']?['UnplayedItemCount'];
+  }
+
   String getImage({
     String type = JellyfinImagesApi.typePrimary,
   }) {
