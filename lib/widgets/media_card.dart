@@ -305,6 +305,10 @@ class _NewMediaCardState extends State<NewMediaCard> {
     final theme = FTheme.of(context);
     final style = theme.style;
 
+    final year = _getYear();
+    final played = item.userData?.played ?? false;
+    final hasUnplayed = item.getUnplayed() != null;
+
     return RepaintBoundary(
       child: FButton.raw(
         onHoverChange: (value) => setState(() => hover = !hover),
@@ -365,22 +369,47 @@ class _NewMediaCardState extends State<NewMediaCard> {
                           crossAxisAlignment: .stretch,
                           mainAxisSize: .min,
                           children: [
-                            Text(
-                              item.name,
-                              maxLines: hover ? null : 1,
-                              overflow: hover ? null : .ellipsis,
-                            ).bold(),
+                            Row(
+                              spacing: 10,
+                              crossAxisAlignment: .end,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    item.name,
+                                    maxLines: hover ? null : 1,
+                                    overflow: hover ? null : .ellipsis,
+                                  ).bold(),
+                                ),
+                                if (hasUnplayed && !played)
+                                  Row(
+                                    spacing: 4,
+                                    children: [
+                                      Icon(
+                                        FLucideIcons.eye,
+                                        size: theme.typography.body.sm.fontSize,
+                                      ),
+                                      Text('${item.getUnplayed()}'),
+                                    ],
+                                  ),
+                                if (played)
+                                  Icon(
+                                    FLucideIcons.check,
+                                    color: Colors.green,
+                                  ),
+                              ],
+                            ),
                             Row(
                               mainAxisAlignment: .spaceBetween,
                               children: [
-                                Text(
-                                  item.getSeriesRunYears(),
-                                  style: theme.typography.body.xs.copyWith(
-                                    color: theme.colors.foreground.withAlpha(
-                                      200,
+                                if (year != null)
+                                  Text(
+                                    year,
+                                    style: theme.typography.body.xs.copyWith(
+                                      color: theme.colors.foreground.withAlpha(
+                                        200,
+                                      ),
                                     ),
                                   ),
-                                ),
                                 if (item.getCommunityRating() != null)
                                   StarRatingContainer(
                                     rating: item
@@ -406,5 +435,71 @@ class _NewMediaCardState extends State<NewMediaCard> {
         ),
       ),
     );
+  }
+
+  // Widget _playedStatusIndicator(
+  //   FThemeData theme,
+  //   FStyle style,
+  //   JellyfinItem item,
+  // ) {
+  //   bool hasUnplayedCount = item.isFolder || item.isSeries;
+  //   bool played = item.userData?.played ?? false;
+
+  //   Widget playedIcon = Icon(FLucideIcons.check, color: Colors.black);
+  //   Widget? unplayedCount = Text(
+  //     item.getUnplayed().toString(),
+  //     style: theme.typography.body.sm.copyWith(
+  //       color: theme.colors.primaryForeground,
+  //     ),
+  //     textAlign: .center,
+  //   );
+
+  //   Widget indicator() {
+  //     if (hasUnplayedCount) {
+  //       if (played) {
+  //         return playedIcon;
+  //       } else {
+  //         return unplayedCount;
+  //       }
+  //     } else {
+  //       if (played) {
+  //         return playedIcon;
+  //       } else {
+  //         return SizedBox();
+  //       }
+  //     }
+  //   }
+
+  //   return hasUnplayedCount || played
+  //       ? Container(
+  //           margin: .all(2),
+  //           decoration: BoxDecoration(
+  //             color: played ? Colors.green : theme.colors.primary,
+  //             borderRadius: style.borderRadius.sm,
+  //           ),
+  //           padding: .all(4),
+  //           child: ConstrainedBox(
+  //             constraints: BoxConstraints(
+  //               maxHeight: theme.typography.body.sm.fontSize! + 4,
+  //               minWidth: theme.typography.body.sm.fontSize! + 4,
+  //             ),
+  //             child: indicator(),
+  //           ),
+  //         )
+  //       : SizedBox();
+  // }
+
+  String? _getYear() {
+    final item = widget.item;
+
+    if (item.isSeries) {
+      return item.getSeriesRunYears();
+    }
+
+    if (item.isMovie) {
+      return item.productionYear?.toString();
+    }
+
+    return null;
   }
 }
