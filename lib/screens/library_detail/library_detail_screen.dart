@@ -1,3 +1,5 @@
+import 'package:awesome_extensions/awesome_extensions.dart'
+    show ListExtension, ShimmerEffect;
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
 
+import '../../utils/jellyfin_view_extension.dart';
 import '../../widgets/media_card.dart';
 
 class LibraryDetail extends ConsumerStatefulWidget {
@@ -21,6 +24,9 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
   @override
   Widget build(BuildContext context) {
     final libAsync = ref.watch(libraryProvider(widget.id!));
+    final userviews = ref.watch(userviewsProvider);
+
+    final theme = context.theme;
 
     return Listener(
       onPointerDown: (event) {
@@ -30,28 +36,90 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
       },
       child: FScaffold(
         childPad: false,
-        child: libAsync.when(
-          loading: () => Center(
-            child: FCircularProgress(),
-          ),
-          error: (error, stackTrace) => Center(
-            child: Text(error.toString()),
-          ),
-          data: (data) {
-            final libs = data.items;
-
-            return CustomScrollView(
-              slivers: [
-                PinnedHeaderSliver(
-                  child: Appbar(
-                    prefix: FButton.icon(
-                      onPress: context.pop,
-                      child: Icon(FLucideIcons.chevronLeft),
+        child: CustomScrollView(
+          slivers: [
+            PinnedHeaderSliver(
+              child: Appbar(
+                child: FCard(
+                  style: .delta(
+                    decoration: .boxDelta(
+                      color: theme.colors.background.withAlpha(200),
                     ),
-                    title: Text(data.name),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Row(
+                      children: [
+                        FButton.icon(
+                          onPress: context.pop,
+                          child: Icon(FLucideIcons.chevronLeft),
+                        ),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            scrollDirection: .horizontal,
+                            child: Row(
+                              spacing: 10,
+                              children: [
+                                ...userviews.values.map((v) {
+                                  return FButton(
+                                    variant: widget.id == v.id
+                                        ? .primary
+                                        : .outline,
+                                    onPress: () => context.pushReplacement(
+                                      '/library/${v.id}',
+                                    ),
+                                    prefix: _getButtonIcon(v),
+                                    child: Text(v.name),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ].separatedby(Icon(FLucideIcons.dot)),
+                    ),
                   ),
                 ),
-                SliverPadding(
+              ),
+            ),
+            libAsync.when(
+              loading: () => SliverPadding(
+                padding: .fromLTRB(10, 0, 10, 10),
+                sliver: SliverGrid.builder(
+                  key: ValueKey(widget.id),
+                  itemCount: 10,
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 200,
+                    childAspectRatio: 10 / 16,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                  ),
+                  itemBuilder: (context, index) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: .all(
+                          color: theme.colors.background,
+                          width: 2,
+                        ),
+                        color: theme.colors.foreground,
+                        borderRadius: theme.style.borderRadius.sm,
+                      ),
+                    ).applyShimmer(
+                      baseColor: theme.colors.background,
+                      highlightColor: theme.colors.muted,
+                    );
+                  },
+                ),
+              ),
+              error: (error, stackTrace) => SliverFillRemaining(
+                child: Center(
+                  child: Text(error.toString()),
+                ),
+              ),
+              data: (data) {
+                final libs = data.items;
+
+                return SliverPadding(
                   padding: .fromLTRB(10, 0, 10, 10),
                   sliver: SliverGrid.builder(
                     key: ValueKey(widget.id),
@@ -72,32 +140,54 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                       );
                     },
                   ),
-                ),
-              ],
-            );
-          },
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
   }
+
+  Widget? _getButtonIcon(JellyfinView view) {
+    if (view.isMovies) {
+      return Icon(FLucideIcons.film);
+    }
+
+    if (view.isTvShows) {
+      return Icon(FLucideIcons.tv);
+    }
+
+    if (view.isMusic) {
+      return Icon(FLucideIcons.music);
+    }
+
+    if (view.isPhotos) {
+      return Icon(FLucideIcons.image);
+    }
+
+    if (view.isBoxsets) {
+      return Icon(FLucideIcons.box);
+    }
+
+    if (view.isBooks) {
+      return Icon(FLucideIcons.book);
+    }
+
+    if (view.isPlaylists) {
+      return Icon(FLucideIcons.listVideo);
+    }
+
+    return Icon(FLucideIcons.fileQuestionMark);
+  }
 }
 
 class Appbar extends StatelessWidget {
-  final Widget? prefix;
-  final Widget? suffix;
-  final Widget? title;
-  final Widget? subtitle;
-  const Appbar({
-    super.key,
-    this.prefix,
-    this.title,
-    this.suffix,
-    this.subtitle,
-  });
+  final Widget? child;
+  const Appbar({super.key, this.child});
 
   @override
   Widget build(BuildContext context) {
-    final theme = FTheme.of(context);
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -108,28 +198,7 @@ class Appbar extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: Row(
-          spacing: 10,
-          children: [
-            ?prefix,
-            Column(
-              children: [
-                DefaultTextStyle(
-                  style: theme.typography.body.lg.copyWith(fontWeight: .bold),
-                  child: title ?? SizedBox(),
-                ),
-                DefaultTextStyle(
-                  style: theme.typography.body.sm.copyWith(
-                    color: theme.colors.foreground.withAlpha(200),
-                  ),
-                  child: subtitle ?? SizedBox(),
-                ),
-              ],
-            ),
-
-            ?suffix,
-          ],
-        ),
+        child: child,
       ),
     );
   }
