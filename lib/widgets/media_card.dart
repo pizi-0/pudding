@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:awesome_extensions/awesome_extensions.dart';
+import 'package:awesome_extensions/awesome_extensions.dart' show StyledText;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
@@ -312,10 +312,10 @@ class _NewMediaCardState extends State<NewMediaCard> {
 
     return RepaintBoundary(
       child: FButton.raw(
-        onHoverChange: (value) => setState(() => hover = !hover),
-        onFocusChange: (value) => setState(() => hover = !hover),
+        onHoverChange: (value) => setState(() => hover = value),
+        onFocusChange: (value) => setState(() => hover = value),
         variant: .outline,
-        onPress: () => context.go('/show/${item.id}'),
+        onPress: () => context.push('/show/${item.id}'),
         child: Padding(
           padding: const EdgeInsets.all(2.0),
           child: ClipRRect(
