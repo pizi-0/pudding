@@ -76,50 +76,6 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
               ),
             ),
           ),
-          PinnedHeaderSliver(
-            child: Appbar(
-              child: FCard(
-                style: .delta(
-                  decoration: .boxDelta(
-                    color: theme.colors.background.withAlpha(200),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Row(
-                    children: [
-                      FButton.icon(
-                        onPress: context.pop,
-                        child: Icon(FLucideIcons.chevronLeft),
-                      ),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: .horizontal,
-                          child: Row(
-                            spacing: 10,
-                            children: [
-                              ...userviews.values.map((v) {
-                                return FButton(
-                                  variant: widget.id == v.id
-                                      ? .primary
-                                      : .outline,
-                                  onPress: () => context.pushReplacement(
-                                    '/library/${v.id}',
-                                  ),
-                                  prefix: _getButtonIcon(v),
-                                  child: Text(v.name),
-                                );
-                              }),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ].separatedby(Icon(FLucideIcons.dot)),
-                  ),
-                ),
-              ),
-            ),
-          ),
           libAsync.when(
             loading: () => SliverPadding(
               padding: .fromLTRB(10, 0, 10, 10),
