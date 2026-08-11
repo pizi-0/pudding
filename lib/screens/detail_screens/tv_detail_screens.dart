@@ -10,6 +10,7 @@ import 'package:pudding/screens/detail_screens/widgets/episode_column.dart';
 import 'package:pudding/screens/detail_screens/widgets/detail_column.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/widgets/logo_shimmer.dart';
+import 'package:pudding/widgets/pudding_scaffold.dart';
 
 class TvDetailScreen extends ConsumerStatefulWidget {
   final String? showId;
@@ -29,64 +30,66 @@ class _ShowsDetailScreensState extends ConsumerState<TvDetailScreen> {
 
     final detAsync = ref.watch(seriesDetailProvider(widget.showId!));
 
-    return Stack(
-      fit: .expand,
-      children: [
-        Positioned.fill(
-          child: CachedNetworkImage(
-            imageUrl: services<JellyfinClient>().images.url(
-              itemId: widget.showId!,
-              type: JellyfinImagesApi.typeBackdrop,
-            ),
-            errorBuilder: (context, error, stackTrace) => Align(
-              alignment: .bottomRight,
-              child: Text(
-                'Backdrop error: ${error.toString()}',
-                style: theme.typography.body.xs2.copyWith(
-                  fontStyle: .italic,
-                  color: theme.colors.foreground.withAlpha(150),
-                ),
+    return PuddingScaffold(
+      child: Stack(
+        fit: .expand,
+        children: [
+          Positioned.fill(
+            child: CachedNetworkImage(
+              imageUrl: services<JellyfinClient>().images.url(
+                itemId: widget.showId!,
+                type: JellyfinImagesApi.typeBackdrop,
               ),
-            ),
-            fit: .cover,
-            color: Colors.black.withAlpha(220),
-            colorBlendMode: .darken,
-          ),
-        ),
-        detAsync.when(
-          skipLoadingOnRefresh: true,
-          skipLoadingOnReload: true,
-          loading: () => Center(
-            child: LogoShimmer(
-              id: widget.showId!,
-            ).fadeIn(delay: 100.milliseconds),
-          ),
-          error: (error, stackTrace) => Center(
-            child: Text(error.toString()),
-          ),
-          data: (data) {
-            return Stack(
-              fit: .expand,
-              children: [
-                Positioned.fill(
-                  top: kToolbarHeight + 8,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: DetailColumn(
-                          seriesId: widget.showId!,
-                        ),
-                      ),
-                      EpisodesColumn(seriesId: widget.showId!),
-                    ],
+              errorBuilder: (context, error, stackTrace) => Align(
+                alignment: .bottomRight,
+                child: Text(
+                  'Backdrop error: ${error.toString()}',
+                  style: theme.typography.body.xs2.copyWith(
+                    fontStyle: .italic,
+                    color: theme.colors.foreground.withAlpha(150),
                   ),
                 ),
-              ],
-            ).fadeIn();
-          },
-        ),
-      ],
+              ),
+              fit: .cover,
+              color: Colors.black.withAlpha(220),
+              colorBlendMode: .darken,
+            ),
+          ),
+          detAsync.when(
+            skipLoadingOnRefresh: true,
+            skipLoadingOnReload: true,
+            loading: () => Center(
+              child: LogoShimmer(
+                id: widget.showId!,
+              ).fadeIn(delay: 100.milliseconds),
+            ),
+            error: (error, stackTrace) => Center(
+              child: Text(error.toString()),
+            ),
+            data: (data) {
+              return Stack(
+                fit: .expand,
+                children: [
+                  Positioned.fill(
+                    top: kToolbarHeight + 8,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: DetailColumn(
+                            seriesId: widget.showId!,
+                          ),
+                        ),
+                        EpisodesColumn(seriesId: widget.showId!),
+                      ],
+                    ),
+                  ),
+                ],
+              ).fadeIn();
+            },
+          ),
+        ],
+      ),
     );
   }
 }
