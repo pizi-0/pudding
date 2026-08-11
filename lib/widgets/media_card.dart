@@ -308,6 +308,7 @@ class _NewMediaCardState extends State<NewMediaCard> {
     final year = _getYear();
     final played = item.userData?.played ?? false;
     final hasUnplayed = item.getUnplayed() != null;
+    final favorite = item.isFavorite;
 
     return RepaintBoundary(
       child: FButton.raw(
@@ -357,6 +358,17 @@ class _NewMediaCardState extends State<NewMediaCard> {
                       ),
                     ),
                   ),
+                  if (favorite)
+                    Align(
+                      alignment: .topRight,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.favorite,
+                          color: Colors.pink,
+                        ),
+                      ),
+                    ),
                   Align(
                     alignment: .bottomCenter,
                     child: AnimatedSize(
