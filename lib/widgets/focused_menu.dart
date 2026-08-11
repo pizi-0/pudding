@@ -5,7 +5,12 @@ import 'package:forui/forui.dart';
 
 class FocusedMenu extends StatefulWidget {
   final List<FItemGroupMixin>? menu;
-  final Widget Function(BuildContext, FPopoverController, Widget?) builder;
+  final Widget Function(
+    BuildContext context,
+    FPopoverController control,
+    Widget? child,
+  )
+  builder;
 
   const FocusedMenu({
     super.key,
