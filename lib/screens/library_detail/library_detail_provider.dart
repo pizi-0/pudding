@@ -34,6 +34,8 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
   }
 
   Future<void> getMore() async {
+    if (state is AsyncLoading) return;
+
     final current = state.value!;
     final lib = ref.read(userviewsProvider)[id]!;
 
