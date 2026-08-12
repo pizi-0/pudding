@@ -33,6 +33,25 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     );
   }
 
+  Future<void> getMore() async {
+    final current = state.value!;
+    final lib = ref.read(userviewsProvider)[id]!;
+
+    state = AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final items = current.items;
+      final res = await client.items.list(
+        parentId: id,
+        startIndex: current.items.length,
+        excludeItemTypes: [JellyfinItemKind.folder],
+        includeItemTypes: _includeItemTypes(lib),
+      );
+
+      return current.copyWith(items: [...items, ...res.items]);
+    });
+  }
+
   List<String> _includeItemTypes(JellyfinView view) {
     if (view.isTvShows) {
       return [JellyfinItemKind.series];

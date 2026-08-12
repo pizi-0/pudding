@@ -22,6 +22,32 @@ class LibraryDetail extends ConsumerStatefulWidget {
 }
 
 class _LibraryDetailState extends ConsumerState<LibraryDetail> {
+  final ScrollController scrollController = ScrollController();
+  bool all = false;
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController.addListener(_fetchMore);
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  void _fetchMore() {
+    final max = scrollController.position.maxScrollExtent;
+    final current = scrollController.offset;
+
+    if (!all) {
+      if ((current / max > 0.6) || max == 0) {
+        ref.read(libraryProvider(widget.id!).notifier).getMore();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final libAsync = ref.watch(libraryProvider(widget.id!));
@@ -31,6 +57,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
 
     return PuddingScaffold(
       child: CustomScrollView(
+        controller: scrollController,
         slivers: [
           PinnedHeaderSliver(
             child: Appbar(
@@ -77,6 +104,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
             ),
           ),
           libAsync.when(
+            skipLoadingOnReload: true,
             loading: () => SliverPadding(
               padding: .fromLTRB(10, 0, 10, 10),
               sliver: SliverGrid.builder(
@@ -113,10 +141,20 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
             data: (data) {
               final libs = data.items;
 
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (libs.length == data.count) {
+                  all = true;
+                }
+
+                if (!all && scrollController.position.maxScrollExtent == 0) {
+                  ref.read(libraryProvider(widget.id!).notifier).getMore();
+                }
+              });
+
               return SliverMainAxisGroup(
                 slivers: [
                   SliverPadding(
-                    padding: .fromLTRB(10, 0, 10, 50),
+                    padding: .fromLTRB(10, 0, 10, 10),
                     sliver: SliverGrid.builder(
                       key: ValueKey(widget.id),
                       itemCount: libs.length,
@@ -137,6 +175,26 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                       },
                     ),
                   ),
+                  if (libAsync.isLoading)
+                    SliverToBoxAdapter(
+                      child: Center(
+                        child: Padding(
+                          padding: .all(10),
+                          child: FCircularProgress(),
+                        ),
+                      ),
+                    ),
+                  if (libs.length == data.count)
+                    SliverToBoxAdapter(
+                      child: Center(
+                        child: Padding(
+                          padding: .all(10),
+                          child: Text(
+                            'Showing ${libs.length} of ${data.count}',
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               );
             },
