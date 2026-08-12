@@ -24,6 +24,7 @@ class LibraryDetail extends ConsumerStatefulWidget {
 class _LibraryDetailState extends ConsumerState<LibraryDetail> {
   final ScrollController scrollController = ScrollController();
   bool all = false;
+  bool manualRefresh = false;
 
   @override
   void initState() {
@@ -97,6 +98,16 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                           ),
                         ),
                       ),
+                      FButton.icon(
+                        onPress: () {
+                          manualRefresh = true;
+                          setState(() {});
+                          ref.invalidate(libraryProvider(widget.id!));
+                        },
+                        child: libAsync.isLoading && manualRefresh
+                            ? FCircularProgress()
+                            : Icon(FLucideIcons.refreshCcw),
+                      ),
                     ].separatedby(Icon(FLucideIcons.dot)),
                   ),
                 ),
@@ -142,6 +153,8 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
               final libs = data.items;
 
               WidgetsBinding.instance.addPostFrameCallback((_) {
+                manualRefresh = false;
+
                 if (libs.length == data.count) {
                   all = true;
                 }
@@ -175,26 +188,24 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                       },
                     ),
                   ),
-                  if (libAsync.isLoading)
-                    SliverToBoxAdapter(
-                      child: Center(
-                        child: Padding(
-                          padding: .all(10),
-                          child: FCircularProgress(),
+
+                  SliverToBoxAdapter(
+                    child: Center(
+                      child: Padding(
+                        padding: .only(bottom: 10),
+                        child: Row(
+                          spacing: 10,
+                          mainAxisAlignment: .center,
+                          children: [
+                            if (libAsync.isLoading) FCircularProgress(),
+                            Text(
+                              'Showing ${libs.length} of ${data.count}',
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  if (libs.length == data.count)
-                    SliverToBoxAdapter(
-                      child: Center(
-                        child: Padding(
-                          padding: .all(10),
-                          child: Text(
-                            'Showing ${libs.length} of ${data.count}',
-                          ),
-                        ),
-                      ),
-                    ),
+                  ),
                 ],
               );
             },
