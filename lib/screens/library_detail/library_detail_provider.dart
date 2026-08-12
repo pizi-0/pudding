@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:pudding/services/di.dart';
+import 'package:pudding/utils/jellyfin_display_prefs_extensions.dart';
 
 class LibraryNotifier extends AsyncNotifier<LibraryData> {
   final String id;
@@ -20,16 +21,47 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
   Future<LibraryData> getLibrary() async {
     final lib = ref.read(userviewsProvider)[id]!;
 
-    final res = await client.items.list(
-      parentId: id,
-      excludeItemTypes: [JellyfinItemKind.folder],
-      includeItemTypes: _includeItemTypes(lib),
-    );
+    final (res, displayPrefs) = await (
+      client.items.list(
+        parentId: id,
+        excludeItemTypes: [JellyfinItemKind.folder],
+        includeItemTypes: _includeItemTypes(lib),
+      ),
+      client.displayPreferences.get(
+        displayPreferencesId: lib.id,
+        client: 'pudding',
+      ),
+    ).wait;
 
     return LibraryData(
       name: lib.name,
       items: res.items,
       count: res.totalRecordCount,
+      displayPrefs: displayPrefs,
+    );
+  }
+
+  Future<void> updateDisplayPrefs() async {
+    state = await AsyncValue.guard(
+      () async {
+        final current = state.value!;
+
+        final currentCustom = current.displayPrefs.customPrefs;
+
+        currentCustom.remove('puddingLibraryView');
+
+        final newPrefs = current.displayPrefs.copyWith(
+          customPrefs: currentCustom,
+        );
+
+        await client.displayPreferences.update(
+          displayPreferencesId: current.displayPrefs.id!,
+          client: current.displayPrefs.client!,
+          preferences: newPrefs,
+        );
+
+        return current.copyWith(displayPrefs: newPrefs);
+      },
     );
   }
 
@@ -90,22 +122,26 @@ class LibraryData {
   final String name;
   final int count;
   final List<JellyfinItem> items;
+  final JellyfinDisplayPreferences displayPrefs;
 
   LibraryData({
     required this.name,
     required this.count,
     this.items = const [],
+    required this.displayPrefs,
   });
 
   LibraryData copyWith({
     String? name,
     int? count,
     List<JellyfinItem>? items,
+    JellyfinDisplayPreferences? displayPrefs,
   }) {
     return LibraryData(
       name: name ?? this.name,
       count: count ?? this.count,
       items: items ?? this.items,
+      displayPrefs: displayPrefs ?? this.displayPrefs,
     );
   }
 
@@ -115,9 +151,15 @@ class LibraryData {
 
     return other.name == name &&
         other.count == count &&
-        listEquals(other.items, items);
+        listEquals(other.items, items) &&
+        other.displayPrefs == displayPrefs;
   }
 
   @override
-  int get hashCode => name.hashCode ^ count.hashCode ^ items.hashCode;
+  int get hashCode {
+    return name.hashCode ^
+        count.hashCode ^
+        items.hashCode ^
+        displayPrefs.hashCode;
+  }
 }

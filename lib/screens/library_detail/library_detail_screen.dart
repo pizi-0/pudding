@@ -76,6 +76,13 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                         onPress: context.pop,
                         child: Icon(FLucideIcons.chevronLeft),
                       ),
+                      FButton.icon(
+                        onPress: ref
+                            .read(libraryProvider(widget.id!).notifier)
+                            .updateDisplayPrefs,
+                        child: Icon(FLucideIcons.factory),
+                      ),
+
                       Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: .horizontal,
@@ -94,6 +101,10 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                   child: Text(v.name),
                                 );
                               }),
+                              if (libAsync.hasValue && libAsync.value != null)
+                                Text(
+                                  '${libAsync.value!.displayPrefs.customPrefs}',
+                                ),
                             ],
                           ),
                         ),
