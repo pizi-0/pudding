@@ -96,10 +96,6 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                   child: Text(v.name),
                                 );
                               }),
-                              if (libAsync.hasValue && libAsync.value != null)
-                                Text(
-                                  '${libAsync.value!.displayPrefs.customPrefs}',
-                                ),
                             ],
                           ),
                         ),
@@ -177,7 +173,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: .only(bottom: 10),
+                      padding: .fromLTRB(14, 0, 14, 10),
                       child: Row(
                         mainAxisAlignment: .end,
                         crossAxisAlignment: .center,
@@ -197,7 +193,16 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                               children: [
                                 FButton.icon(
                                   variant: .ghost,
-                                  onPress: () {},
+                                  onPress: () {
+                                    libNotifier.updateDisplayPrefs(
+                                      puddingPrefs.copyWith(
+                                        puddingMaxImageWidth:
+                                            (puddingPrefs.maxImageWidth - 50)
+                                                .clamp(250, 500)
+                                                .toString(),
+                                      ),
+                                    );
+                                  },
                                   child: Icon(FLucideIcons.zoomOut),
                                 ),
                                 SizedBox(
@@ -208,7 +213,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                       initial: FSliderValue(
                                         max:
                                             (puddingPrefs.maxImageWidth - 250) /
-                                            500,
+                                            250,
                                       ),
                                       onChange: (value) {
                                         libNotifier.updateDisplayPrefs(
@@ -246,7 +251,16 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                 ),
                                 FButton.icon(
                                   variant: .ghost,
-                                  onPress: () {},
+                                  onPress: () {
+                                    libNotifier.updateDisplayPrefs(
+                                      puddingPrefs.copyWith(
+                                        puddingMaxImageWidth:
+                                            (puddingPrefs.maxImageWidth + 50)
+                                                .clamp(250, 500)
+                                                .toString(),
+                                      ),
+                                    );
+                                  },
                                   child: Icon(FLucideIcons.zoomIn),
                                 ),
                               ],
@@ -276,7 +290,6 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                             ),
                             child: Icon(FLucideIcons.rectangleHorizontal),
                           ),
-                          Text(puddingPrefs.puddingLibraryViewType),
                         ],
                       ),
                     ),
@@ -298,7 +311,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                         return NewMediaCard(
                           key: ValueKey(item.id),
                           item: item,
-                          imageType: JellyfinImagesApi.typePrimary,
+                          imageType: puddingPrefs.imageType,
                         );
                       },
                     ),
