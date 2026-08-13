@@ -12,6 +12,7 @@ class Pudding extends ConsumerWidget {
     final router = ref.watch(routeProvider);
 
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       title: 'Pudding',
       routerConfig: router,
       builder: (context, child) => FTheme(
