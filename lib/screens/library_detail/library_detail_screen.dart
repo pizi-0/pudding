@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pudding/models/pudding_display_prefs.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
 import 'package:pudding/widgets/pudding_scaffold.dart';
 
@@ -52,6 +53,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
   @override
   Widget build(BuildContext context) {
     final libAsync = ref.watch(libraryProvider(widget.id!));
+    final libNotifier = ref.read(libraryProvider(widget.id!).notifier);
     final userviews = ref.watch(userviewsProvider);
 
     final theme = context.theme;
@@ -76,13 +78,6 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                         onPress: context.pop,
                         child: Icon(FLucideIcons.chevronLeft),
                       ),
-                      FButton.icon(
-                        onPress: ref
-                            .read(libraryProvider(widget.id!).notifier)
-                            .updateDisplayPrefs,
-                        child: Icon(FLucideIcons.factory),
-                      ),
-
                       Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: .horizontal,
@@ -162,6 +157,9 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
             ),
             data: (data) {
               final libs = data.items;
+              final puddingPrefs = PuddingDisplayPrefs.fromMap(
+                data.displayPrefs.customPrefs,
+              );
 
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 manualRefresh = false;
@@ -177,14 +175,120 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
 
               return SliverMainAxisGroup(
                 slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: .only(bottom: 10),
+                      child: Row(
+                        mainAxisAlignment: .end,
+                        crossAxisAlignment: .center,
+                        spacing: 10,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              border: .all(
+                                color: theme.colors.border,
+                                width: 2,
+                              ),
+                              borderRadius: theme.style.borderRadius.md,
+                            ),
+                            height: 36,
+                            child: Row(
+                              spacing: 10,
+                              children: [
+                                FButton.icon(
+                                  variant: .ghost,
+                                  onPress: () {},
+                                  child: Icon(FLucideIcons.zoomOut),
+                                ),
+                                SizedBox(
+                                  width: 150,
+                                  child: FSlider(
+                                    control: .managedDiscrete(
+                                      interaction: .tapAndSlideThumb,
+                                      initial: FSliderValue(
+                                        max:
+                                            (puddingPrefs.maxImageWidth - 250) /
+                                            500,
+                                      ),
+                                      onChange: (value) {
+                                        libNotifier.updateDisplayPrefs(
+                                          puddingPrefs.copyWith(
+                                            puddingMaxImageWidth:
+                                                ((value.max * 250) + 250)
+                                                    .toString(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    marks: [
+                                      .mark(value: 0),
+                                      .mark(value: 0.2),
+                                      .mark(value: 0.4),
+                                      .mark(value: 0.6),
+                                      .mark(value: 0.8),
+                                      .mark(value: 1),
+                                    ],
+                                    style: .delta(
+                                      childPadding: .value(.zero),
+                                    ),
+                                    tooltipBuilder: (controller, value) {
+                                      if (value == 0) {
+                                        return Text('Default (250)');
+                                      } else {
+                                        return Text(
+                                          ((value * 250) + 250).toStringAsFixed(
+                                            0,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+                                FButton.icon(
+                                  variant: .ghost,
+                                  onPress: () {},
+                                  child: Icon(FLucideIcons.zoomIn),
+                                ),
+                              ],
+                            ),
+                          ),
+                          FButton.icon(
+                            variant:
+                                puddingPrefs.puddingLibraryViewType == 'poster'
+                                ? .primary
+                                : .outline,
+                            onPress: () => libNotifier.updateDisplayPrefs(
+                              puddingPrefs.copyWith(
+                                puddingLibraryViewType: 'poster',
+                              ),
+                            ),
+                            child: Icon(FLucideIcons.rectangleVertical),
+                          ),
+                          FButton.icon(
+                            variant:
+                                puddingPrefs.puddingLibraryViewType == 'thumb'
+                                ? .primary
+                                : .outline,
+                            onPress: () => libNotifier.updateDisplayPrefs(
+                              puddingPrefs.copyWith(
+                                puddingLibraryViewType: 'thumb',
+                              ),
+                            ),
+                            child: Icon(FLucideIcons.rectangleHorizontal),
+                          ),
+                          Text(puddingPrefs.puddingLibraryViewType),
+                        ],
+                      ),
+                    ),
+                  ),
                   SliverPadding(
                     padding: .fromLTRB(10, 0, 10, 10),
                     sliver: SliverGrid.builder(
                       key: ValueKey(widget.id),
                       itemCount: libs.length,
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 200,
-                        childAspectRatio: 10 / 16,
+                        maxCrossAxisExtent: puddingPrefs.maxImageWidth,
+                        childAspectRatio: puddingPrefs.aspectRatio,
                         mainAxisSpacing: 10,
                         crossAxisSpacing: 10,
                       ),

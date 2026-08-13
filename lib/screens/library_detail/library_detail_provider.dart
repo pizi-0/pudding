@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pudding/models/pudding_display_prefs.dart';
 
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_display_prefs_extensions.dart';
@@ -41,30 +42,6 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     );
   }
 
-  Future<void> updateDisplayPrefs() async {
-    state = await AsyncValue.guard(
-      () async {
-        final current = state.value!;
-
-        final currentCustom = current.displayPrefs.customPrefs;
-
-        currentCustom.remove('puddingLibraryView');
-
-        final newPrefs = current.displayPrefs.copyWith(
-          customPrefs: currentCustom,
-        );
-
-        await client.displayPreferences.update(
-          displayPreferencesId: current.displayPrefs.id!,
-          client: current.displayPrefs.client!,
-          preferences: newPrefs,
-        );
-
-        return current.copyWith(displayPrefs: newPrefs);
-      },
-    );
-  }
-
   Future<void> getMore() async {
     if (state is AsyncLoading) return;
 
@@ -83,6 +60,21 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
       );
 
       return current.copyWith(items: [...items, ...res.items]);
+    });
+  }
+
+  Future<void> updateDisplayPrefs(PuddingDisplayPrefs prefs) async {
+    state = await AsyncValue.guard(() async {
+      final current = state.value!;
+
+      final currentCustom = current.displayPrefs.customPrefs;
+      currentCustom.addAll(prefs.toMap());
+
+      final newPrefs = current.displayPrefs.copyWith(
+        customPrefs: currentCustom,
+      );
+
+      return current.copyWith(displayPrefs: newPrefs);
     });
   }
 
