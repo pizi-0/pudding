@@ -199,8 +199,8 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                     libNotifier
                                       ..setMaxImageWidth(
                                         (puddingPrefs.maxImageWidth - 50).clamp(
-                                          250,
-                                          500,
+                                          200,
+                                          700,
                                         ),
                                       )
                                       ..updateDisplayPrefs();
@@ -215,13 +215,15 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                       interaction: .tapAndSlideThumb,
                                       value: FSliderValue(
                                         max:
-                                            (puddingPrefs.maxImageWidth - 250) /
-                                            250,
+                                            ((puddingPrefs.maxImageWidth -
+                                                        200) /
+                                                    500)
+                                                .clamp(0, 1),
                                       ),
                                       onChange: (value) {
                                         if (libAsync.isLoading) return;
                                         libNotifier.setMaxImageWidth(
-                                          (value.max * 250) + 250,
+                                          (value.max * 500) + 200,
                                         );
                                       },
                                     ),
@@ -230,25 +232,26 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                     },
                                     marks: [
                                       .mark(value: 0),
+                                      .mark(value: 0.1),
                                       .mark(value: 0.2),
+                                      .mark(value: 0.3),
                                       .mark(value: 0.4),
+                                      .mark(value: 0.5),
                                       .mark(value: 0.6),
+                                      .mark(value: 0.7),
                                       .mark(value: 0.8),
+                                      .mark(value: 0.9),
                                       .mark(value: 1),
                                     ],
                                     style: .delta(
                                       childPadding: .value(.zero),
                                     ),
                                     tooltipBuilder: (controller, value) {
-                                      if (value == 0) {
-                                        return Text('Default (250)');
-                                      } else {
-                                        return Text(
-                                          ((value * 250) + 250).toStringAsFixed(
-                                            0,
-                                          ),
-                                        );
-                                      }
+                                      return Text(
+                                        ((value * 500) + 200).toStringAsFixed(
+                                          0,
+                                        ),
+                                      );
                                     },
                                   ),
                                 ),
@@ -260,8 +263,8 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                     libNotifier
                                       ..setMaxImageWidth(
                                         (puddingPrefs.maxImageWidth + 50).clamp(
-                                          250,
-                                          500,
+                                          200,
+                                          700,
                                         ),
                                       )
                                       ..updateDisplayPrefs();
