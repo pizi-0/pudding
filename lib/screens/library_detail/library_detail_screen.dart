@@ -211,9 +211,9 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                   width: 150,
                                   child: FSlider(
                                     enabled: !libAsync.isLoading,
-                                    control: .managedDiscrete(
+                                    control: .liftedDiscrete(
                                       interaction: .tapAndSlideThumb,
-                                      initial: FSliderValue(
+                                      value: FSliderValue(
                                         max:
                                             (puddingPrefs.maxImageWidth - 250) /
                                             250,
