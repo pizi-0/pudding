@@ -194,20 +194,23 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                 FButton.icon(
                                   variant: .ghost,
                                   onPress: () {
-                                    libNotifier.updateDisplayPrefs(
-                                      puddingPrefs.copyWith(
-                                        puddingMaxImageWidth:
-                                            (puddingPrefs.maxImageWidth - 50)
-                                                .clamp(250, 500)
-                                                .toString(),
-                                      ),
-                                    );
+                                    if (libAsync.isLoading) return;
+
+                                    libNotifier
+                                      ..setMaxImageWidth(
+                                        (puddingPrefs.maxImageWidth - 50).clamp(
+                                          250,
+                                          500,
+                                        ),
+                                      )
+                                      ..updateDisplayPrefs();
                                   },
                                   child: Icon(FLucideIcons.zoomOut),
                                 ),
                                 SizedBox(
                                   width: 150,
                                   child: FSlider(
+                                    enabled: !libAsync.isLoading,
                                     control: .managedDiscrete(
                                       interaction: .tapAndSlideThumb,
                                       initial: FSliderValue(
@@ -216,15 +219,15 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                             250,
                                       ),
                                       onChange: (value) {
-                                        libNotifier.updateDisplayPrefs(
-                                          puddingPrefs.copyWith(
-                                            puddingMaxImageWidth:
-                                                ((value.max * 250) + 250)
-                                                    .toString(),
-                                          ),
+                                        if (libAsync.isLoading) return;
+                                        libNotifier.setMaxImageWidth(
+                                          (value.max * 250) + 250,
                                         );
                                       },
                                     ),
+                                    onEnd: (value) {
+                                      libNotifier.updateDisplayPrefs();
+                                    },
                                     marks: [
                                       .mark(value: 0),
                                       .mark(value: 0.2),
@@ -252,14 +255,16 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                 FButton.icon(
                                   variant: .ghost,
                                   onPress: () {
-                                    libNotifier.updateDisplayPrefs(
-                                      puddingPrefs.copyWith(
-                                        puddingMaxImageWidth:
-                                            (puddingPrefs.maxImageWidth + 50)
-                                                .clamp(250, 500)
-                                                .toString(),
-                                      ),
-                                    );
+                                    if (libAsync.isLoading) return;
+
+                                    libNotifier
+                                      ..setMaxImageWidth(
+                                        (puddingPrefs.maxImageWidth + 50).clamp(
+                                          250,
+                                          500,
+                                        ),
+                                      )
+                                      ..updateDisplayPrefs();
                                   },
                                   child: Icon(FLucideIcons.zoomIn),
                                 ),
@@ -267,27 +272,17 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                             ),
                           ),
                           FButton.icon(
-                            variant:
-                                puddingPrefs.puddingLibraryViewType == 'poster'
+                            variant: puddingPrefs.isPoster
                                 ? .primary
                                 : .outline,
-                            onPress: () => libNotifier.updateDisplayPrefs(
-                              puddingPrefs.copyWith(
-                                puddingLibraryViewType: 'poster',
-                              ),
-                            ),
+                            onPress: () => libNotifier.setViewType('poster'),
                             child: Icon(FLucideIcons.rectangleVertical),
                           ),
                           FButton.icon(
-                            variant:
-                                puddingPrefs.puddingLibraryViewType == 'thumb'
+                            variant: !puddingPrefs.isPoster
                                 ? .primary
                                 : .outline,
-                            onPress: () => libNotifier.updateDisplayPrefs(
-                              puddingPrefs.copyWith(
-                                puddingLibraryViewType: 'thumb',
-                              ),
-                            ),
+                            onPress: () => libNotifier.setViewType('thumb'),
                             child: Icon(FLucideIcons.rectangleHorizontal),
                           ),
                         ],

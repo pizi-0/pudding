@@ -63,18 +63,56 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     });
   }
 
-  Future<void> updateDisplayPrefs(PuddingDisplayPrefs prefs) async {
+  void setMaxImageWidth(double width) {
+    final current = state.value!;
+    final currentDisplayPrefs = current.displayPrefs;
+    Map<String, String> currentCustom = currentDisplayPrefs.customPrefs;
+    PuddingDisplayPrefs puddingPrefs = PuddingDisplayPrefs.fromMap(
+      currentCustom,
+    );
+
+    puddingPrefs = puddingPrefs.setImageWidth(width);
+
+    currentCustom.addAll(puddingPrefs.toMap());
+
+    state = AsyncValue.data(
+      current.copyWith(
+        displayPrefs: currentDisplayPrefs.copyWith(customPrefs: currentCustom),
+      ),
+    );
+  }
+
+  void setViewType(String type) {
+    final current = state.value!;
+    final currentDisplayPrefs = current.displayPrefs;
+    final currentCustom = currentDisplayPrefs.customPrefs;
+    PuddingDisplayPrefs puddingPrefs = PuddingDisplayPrefs.fromMap(
+      currentCustom,
+    );
+
+    puddingPrefs = puddingPrefs.setViewType(type);
+
+    currentCustom.addAll(puddingPrefs.toMap());
+
+    state = AsyncValue.data(
+      current.copyWith(
+        displayPrefs: currentDisplayPrefs.copyWith(customPrefs: currentCustom),
+      ),
+    );
+  }
+
+  /// post to server
+  Future<void> updateDisplayPrefs() async {
     state = await AsyncValue.guard(() async {
       final current = state.value!;
 
-      final currentCustom = current.displayPrefs.customPrefs;
-      currentCustom.addAll(prefs.toMap());
-
-      final newPrefs = current.displayPrefs.copyWith(
-        customPrefs: currentCustom,
+      await client.displayPreferences.update(
+        displayPreferencesId: current.displayPrefs.id!,
+        client: current.displayPrefs.client!,
+        preferences: current.displayPrefs,
       );
 
-      return current.copyWith(displayPrefs: newPrefs);
+      return current;
     });
   }
 
