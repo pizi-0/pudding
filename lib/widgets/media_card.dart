@@ -353,6 +353,32 @@ class _NewMediaCardState extends State<NewMediaCard> {
                             imageUrl: item.getImage(
                               type: imageType,
                             ),
+                            errorBuilder: (context, error, stackTrace) =>
+                                CachedNetworkImage(
+                                  memCacheHeight: 700,
+                                  fit: .cover,
+                                  imageUrl: item.getImage(
+                                    type: JellyfinImagesApi.typeBanner,
+                                  ),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      CachedNetworkImage(
+                                        memCacheHeight: 700,
+                                        fit: .cover,
+                                        imageUrl: item.getImage(
+                                          type: JellyfinImagesApi.typePrimary,
+                                        ),
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                CachedNetworkImage(
+                                                  memCacheHeight: 700,
+                                                  fit: .cover,
+                                                  imageUrl: item.getImage(
+                                                    type: JellyfinImagesApi
+                                                        .typeBackdrop,
+                                                  ),
+                                                ),
+                                      ),
+                                ),
                           ),
                         ),
                       ),
