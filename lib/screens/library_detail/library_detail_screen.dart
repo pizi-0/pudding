@@ -64,55 +64,43 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
         slivers: [
           PinnedHeaderSliver(
             child: Appbar(
-              child: FCard(
-                style: .delta(
-                  decoration: .boxDelta(
-                    color: theme.colors.background.withAlpha(200),
+              child: Row(
+                children: [
+                  FButton.icon(
+                    onPress: context.pop,
+                    child: Icon(FLucideIcons.chevronLeft),
                   ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Row(
-                    children: [
-                      FButton.icon(
-                        onPress: context.pop,
-                        child: Icon(FLucideIcons.chevronLeft),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: .horizontal,
+                      child: Row(
+                        spacing: 10,
+                        children: [
+                          ...userviews.values.map((v) {
+                            return FButton(
+                              variant: widget.id == v.id ? .primary : .outline,
+                              onPress: () => context.pushReplacement(
+                                '/library/${v.id}',
+                              ),
+                              prefix: _getButtonIcon(v),
+                              child: Text(v.name),
+                            );
+                          }),
+                        ],
                       ),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: .horizontal,
-                          child: Row(
-                            spacing: 10,
-                            children: [
-                              ...userviews.values.map((v) {
-                                return FButton(
-                                  variant: widget.id == v.id
-                                      ? .primary
-                                      : .outline,
-                                  onPress: () => context.pushReplacement(
-                                    '/library/${v.id}',
-                                  ),
-                                  prefix: _getButtonIcon(v),
-                                  child: Text(v.name),
-                                );
-                              }),
-                            ],
-                          ),
-                        ),
-                      ),
-                      FButton.icon(
-                        onPress: () {
-                          manualRefresh = true;
-                          setState(() {});
-                          ref.invalidate(libraryProvider(widget.id!));
-                        },
-                        child: libAsync.isLoading && manualRefresh
-                            ? FCircularProgress()
-                            : Icon(FLucideIcons.refreshCcw),
-                      ),
-                    ].separatedby(Icon(FLucideIcons.dot)),
+                    ),
                   ),
-                ),
+                  FButton.icon(
+                    onPress: () {
+                      manualRefresh = true;
+                      setState(() {});
+                      ref.invalidate(libraryProvider(widget.id!));
+                    },
+                    child: libAsync.isLoading && manualRefresh
+                        ? FCircularProgress()
+                        : Icon(FLucideIcons.refreshCcw),
+                  ),
+                ].separatedby(Icon(FLucideIcons.dot)),
               ),
             ),
           ),
@@ -173,7 +161,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: .fromLTRB(14, 0, 14, 10),
+                      padding: .fromLTRB(10, 0, 10, 10),
                       child: Row(
                         mainAxisAlignment: .end,
                         crossAxisAlignment: .center,
@@ -376,20 +364,17 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
 
 class Appbar extends StatelessWidget {
   final Widget? child;
-  const Appbar({super.key, this.child});
+  final EdgeInsetsGeometry padding;
+  const Appbar({super.key, this.child, this.padding = const .all(10)});
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.theme;
+
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.black, Colors.transparent],
-          begin: .topCenter,
-          end: .bottomCenter,
-        ),
-      ),
+      decoration: BoxDecoration(color: theme.colors.background.withAlpha(200)),
       child: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: padding,
         child: child,
       ),
     );
