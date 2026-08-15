@@ -4,8 +4,8 @@ import 'dart:async';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pudding/models/pudding_display_prefs.dart';
 
+import 'package:pudding/models/pudding_display_prefs.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_display_prefs_extensions.dart';
 
@@ -22,7 +22,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
   Future<LibraryData> getLibrary() async {
     final lib = ref.read(userviewsProvider)[id]!;
 
-    final (res, displayPrefs) = await (
+    final (res, displayPrefs, next) = await (
       client.items.list(
         parentId: id,
         excludeItemTypes: [JellyfinItemKind.folder],
@@ -32,6 +32,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
         displayPreferencesId: lib.id,
         client: 'pudding',
       ),
+      _getSuggestions(),
     ).wait;
 
     return LibraryData(
@@ -39,6 +40,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
       items: res.items,
       count: res.totalRecordCount,
       displayPrefs: displayPrefs,
+      next: next,
     );
   }
 
@@ -61,6 +63,47 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
 
       return current.copyWith(items: [...items, ...res.items]);
     });
+  }
+
+  Future<List<JellyfinItem>> _getSuggestions() async {
+    List<JellyfinItem> items = [];
+    final lib = ref.read(userviewsProvider)[id]!;
+
+    if (lib.isTvShows) {
+      final (nextUp, resume) = await (
+        client.tvShows.nextUp(parentId: id, limit: 5),
+        client.items.resume(parentId: id, limit: 5),
+      ).wait;
+
+      items.addAll([...nextUp.items, ...resume.items]);
+    } else if (lib.isMovies) {
+      final (resume, latest) = await (
+        client.items.resume(parentId: id, limit: 5),
+        client.items.latest(parentId: id, limit: 5),
+      ).wait;
+
+      items.addAll([...resume.items, ...latest]);
+    }
+
+    items.sort(
+      (a, b) =>
+          ((b.userData?.lastPlayedDate ?? b.premiereDate)
+                      ?.microsecondsSinceEpoch ??
+                  0)
+              .compareTo(
+                (a.userData?.lastPlayedDate ?? a.premiereDate)
+                        ?.microsecondsSinceEpoch ??
+                    0,
+              ),
+    );
+
+    final map = <String, JellyfinItem>{};
+
+    for (final i in items) {
+      map[i.id] = i;
+    }
+
+    return map.values.toList();
   }
 
   void setMaxImageWidth(double width) {
@@ -152,12 +195,14 @@ class LibraryData {
   final String name;
   final int count;
   final List<JellyfinItem> items;
+  final List<JellyfinItem> next;
   final JellyfinDisplayPreferences displayPrefs;
 
   LibraryData({
     required this.name,
     required this.count,
     this.items = const [],
+    required this.next,
     required this.displayPrefs,
   });
 
@@ -165,12 +210,14 @@ class LibraryData {
     String? name,
     int? count,
     List<JellyfinItem>? items,
+    List<JellyfinItem>? next,
     JellyfinDisplayPreferences? displayPrefs,
   }) {
     return LibraryData(
       name: name ?? this.name,
       count: count ?? this.count,
       items: items ?? this.items,
+      next: next ?? this.next,
       displayPrefs: displayPrefs ?? this.displayPrefs,
     );
   }
@@ -182,6 +229,7 @@ class LibraryData {
     return other.name == name &&
         other.count == count &&
         listEquals(other.items, items) &&
+        listEquals(other.next, next) &&
         other.displayPrefs == displayPrefs;
   }
 
@@ -190,6 +238,7 @@ class LibraryData {
     return name.hashCode ^
         count.hashCode ^
         items.hashCode ^
+        next.hashCode ^
         displayPrefs.hashCode;
   }
 }
