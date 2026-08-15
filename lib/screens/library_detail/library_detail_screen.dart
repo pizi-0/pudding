@@ -12,6 +12,7 @@ import 'package:pudding/models/pudding_display_prefs.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/pudding_scaffold.dart';
+import 'package:silky_scroll/silky_scroll.dart';
 
 import '../../utils/jellyfin_view_extension.dart';
 import '../../widgets/media_card.dart';
@@ -68,7 +69,8 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
             behavior: ScrollBehavior().copyWith(
               dragDevices: {...PointerDeviceKind.values},
             ),
-            child: CustomScrollView(
+            child: SilkyCustomScrollView(
+              scrollSpeed: 2,
               controller: scrollController,
               slivers: [
                 PinnedHeaderSliver(
