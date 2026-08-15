@@ -52,6 +52,7 @@ dependencies:
   cached_network_image_ce: ^4.9.0
   go_transitions: ^0.8.3
   quiver: ^3.2.2
+  silky_scroll: ^2.6.4
 
 dev_dependencies:
   flutter_test:
