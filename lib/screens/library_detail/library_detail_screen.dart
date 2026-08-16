@@ -9,6 +9,7 @@ import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/models/pudding_display_prefs.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
+import 'package:pudding/screens/library_detail/user_views_provider.dart';
 import 'package:pudding/screens/library_detail/widget/library_carousel.dart';
 import 'package:pudding/widgets/pudding_scaffold.dart';
 import 'package:silky_scroll/silky_scroll.dart';
@@ -29,6 +30,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
   final ScrollController scrollController = ScrollController();
   bool all = false;
   bool manualRefresh = false;
+  bool retried = false;
 
   @override
   void initState() {
@@ -57,7 +59,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
   Widget build(BuildContext context) {
     final libAsync = ref.watch(libraryProvider(widget.id!));
     final libNotifier = ref.read(libraryProvider(widget.id!).notifier);
-    final userviews = ref.watch(userviewsProvider);
+    final userviewAsync = ref.watch(userviewsProvider);
 
     final theme = context.theme;
 
@@ -86,29 +88,25 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                             child: Row(
                               spacing: 10,
                               children: [
-                                ...userviews.values.map((v) {
-                                  return FButton(
-                                    variant: widget.id == v.id
-                                        ? .primary
-                                        : .outline,
-                                    onPress: () => context.pushReplacement(
-                                      '/library/${v.id}',
-                                    ),
-                                    prefix: _getButtonIcon(v),
-                                    child: Text(v.name),
-                                  );
-                                }),
+                                if (userviewAsync.hasValue)
+                                  ...userviewAsync.value!.values.map((v) {
+                                    return FButton(
+                                      variant: widget.id == v.id
+                                          ? .primary
+                                          : .outline,
+                                      onPress: () => context.pushReplacement(
+                                        '/library/${v.id}',
+                                      ),
+                                      prefix: _getButtonIcon(v),
+                                      child: Text(v.name),
+                                    );
+                                  }),
                               ],
                             ),
                           ),
                         ),
                         FButton.icon(
-                          onPress: () {
-                            manualRefresh = true;
-                            setState(() {});
-                            ref.invalidate(libraryProvider(widget.id!));
-                            scrollController.jumpTo(0);
-                          },
+                          onPress: _manualRefresh,
                           child: libAsync.isLoading && manualRefresh
                               ? FCircularProgress()
                               : Icon(FLucideIcons.refreshCcw),
@@ -155,6 +153,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                   data: (data) {
                     final libs = data.items;
                     all = libs.length == data.count;
+                    retried = false;
 
                     final puddingPrefs = PuddingDisplayPrefs.fromMap(
                       data.displayPrefs.customPrefs,
@@ -361,6 +360,27 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
         ],
       ),
     );
+  }
+
+  Future<void> _manualRefresh() async {
+    manualRefresh = true;
+    setState(() {});
+    final userviews = await ref.read(userviewsProvider.notifier).getUserviews();
+
+    if (!userviews.containsKey(widget.id)) {
+      if (mounted) {
+        if (userviews.isEmpty) {
+          context.pop();
+        }
+
+        context.pushReplacement(
+          '/library/${userviews.values.first.id}',
+        );
+      }
+    }
+
+    ref.invalidate(libraryProvider(widget.id!));
+    scrollController.jumpTo(0);
   }
 
   Widget? _getButtonIcon(JellyfinView view) {
