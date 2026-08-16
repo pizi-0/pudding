@@ -107,6 +107,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                             manualRefresh = true;
                             setState(() {});
                             ref.invalidate(libraryProvider(widget.id!));
+                            scrollController.jumpTo(0);
                           },
                           child: libAsync.isLoading && manualRefresh
                               ? FCircularProgress()
@@ -153,16 +154,14 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                   ),
                   data: (data) {
                     final libs = data.items;
+                    all = libs.length == data.count;
+
                     final puddingPrefs = PuddingDisplayPrefs.fromMap(
                       data.displayPrefs.customPrefs,
                     );
 
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       manualRefresh = false;
-
-                      if (libs.length == data.count) {
-                        all = true;
-                      }
 
                       if (!all &&
                           scrollController.position.maxScrollExtent == 0) {
