@@ -10,6 +10,7 @@ import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_display_prefs_extensions.dart';
 
 class LibraryNotifier extends AsyncNotifier<LibraryData> {
+  final limit = 50;
   final String id;
   LibraryNotifier({required this.id});
   final client = services<JellyfinClient>();
@@ -27,6 +28,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
         parentId: id,
         excludeItemTypes: [JellyfinItemKind.folder],
         includeItemTypes: _includeItemTypes(lib),
+        limit: limit,
       ),
       client.displayPreferences.get(
         displayPreferencesId: lib.id,
@@ -59,6 +61,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
         startIndex: current.items.length,
         excludeItemTypes: [JellyfinItemKind.folder],
         includeItemTypes: _includeItemTypes(lib),
+        limit: limit,
       );
 
       return current.copyWith(items: [...items, ...res.items]);
