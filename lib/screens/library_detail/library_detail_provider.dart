@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:pudding/models/pudding_display_prefs.dart';
+import 'package:pudding/screens/library_detail/user_views_provider.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_display_prefs_extensions.dart';
 
@@ -21,7 +22,10 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
   }
 
   Future<LibraryData> getLibrary() async {
-    final lib = ref.read(userviewsProvider)[id]!;
+    state = AsyncLoading();
+
+    final views = ref.read(userviewsProvider).value!;
+    final lib = views[id]!;
 
     final (res, displayPrefs, next) = await (
       client.items.list(
@@ -50,12 +54,13 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
   Future<void> getMore() async {
     if (state is AsyncLoading) return;
 
-    final current = state.value!;
-    final lib = ref.read(userviewsProvider)[id]!;
-
     state = AsyncLoading();
 
     state = await AsyncValue.guard(() async {
+      final current = state.value!;
+      final views = ref.read(userviewsProvider).value!;
+      final lib = views[id]!;
+
       final items = current.items;
       final res = await client.items.list(
         parentId: id,
@@ -75,7 +80,8 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
 
   Future<List<JellyfinItem>> _getSuggestions() async {
     List<JellyfinItem> items = [];
-    final lib = ref.read(userviewsProvider)[id]!;
+    final views = ref.read(userviewsProvider).value!;
+    final lib = views[id]!;
 
     if (lib.isTvShows) {
       final (nextUp, resume) = await (
@@ -181,22 +187,6 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
 final libraryProvider =
     AsyncNotifierProvider.family<LibraryNotifier, LibraryData, String>(
       (id) => LibraryNotifier(id: id),
-    );
-
-class UserviewsNotifier extends Notifier<Map<String, JellyfinView>> {
-  @override
-  Map<String, JellyfinView> build() {
-    return {};
-  }
-
-  void addAll(List<JellyfinView> libraries) {
-    state = {...state, for (final l in libraries) l.id: l};
-  }
-}
-
-final userviewsProvider =
-    NotifierProvider<UserviewsNotifier, Map<String, JellyfinView>>(
-      () => UserviewsNotifier(),
     );
 
 class LibraryData {
