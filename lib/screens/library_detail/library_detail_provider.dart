@@ -29,6 +29,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
         excludeItemTypes: [JellyfinItemKind.folder],
         includeItemTypes: _includeItemTypes(lib),
         limit: limit,
+        fields: [],
       ),
       client.displayPreferences.get(
         displayPreferencesId: lib.id,
@@ -62,9 +63,13 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
         excludeItemTypes: [JellyfinItemKind.folder],
         includeItemTypes: _includeItemTypes(lib),
         limit: limit,
+        fields: [],
       );
 
-      return current.copyWith(items: [...items, ...res.items]);
+      return current.copyWith(
+        items: [...items, ...res.items],
+        count: res.totalRecordCount,
+      );
     });
   }
 
