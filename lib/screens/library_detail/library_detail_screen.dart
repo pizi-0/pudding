@@ -60,6 +60,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
     final libAsync = ref.watch(libraryProvider(widget.id!));
     final libNotifier = ref.read(libraryProvider(widget.id!).notifier);
     final userviewAsync = ref.watch(userviewsProvider);
+    final List<double> flexWeight = List.generate(11, (index) => (index * 0.1));
 
     final theme = context.theme;
 
@@ -173,164 +174,208 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                     return SliverMainAxisGroup(
                       slivers: [
                         if (data.next.isNotEmpty)
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const .fromLTRB(10, 10, 0, 10),
-                              child: SizedBox(
-                                height: 250,
-                                child: LibraryCarousel(items: data.next),
-                              ),
-                            ),
-                          ),
-                        SliverToBoxAdapter(
-                          child: Padding(
-                            padding: .fromLTRB(10, 0, 10, 10),
-                            child: Row(
-                              mainAxisAlignment: .end,
-                              crossAxisAlignment: .center,
-                              spacing: 10,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    border: .all(
-                                      color: theme.colors.border,
-                                      width: 2,
-                                    ),
-                                    borderRadius: theme.style.borderRadius.md,
+                          SliverMainAxisGroup(
+                            slivers: [
+                              PinnedHeaderSliver(
+                                child: Appbar(
+                                  padding: .fromLTRB(10, 0, 10, 10),
+                                  child: SectionHeader(
+                                    title: Text('Continue watching'),
                                   ),
-                                  height: 36,
-                                  child: Row(
+                                ),
+                              ),
+                              SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: const .fromLTRB(10, 0, 0, 10),
+                                  child: SizedBox(
+                                    height: 250,
+                                    child: LibraryCarousel(items: data.next),
+                                  ),
+                                ),
+                              ),
+                              SliverPadding(padding: .only(bottom: 10)),
+                            ],
+                          ),
+                        SliverMainAxisGroup(
+                          slivers: [
+                            PinnedHeaderSliver(
+                              child: Appbar(
+                                padding: .fromLTRB(10, 0, 10, 0),
+                                child: SectionHeader(
+                                  title: Text('All'),
+                                  subtitle: Row(
                                     spacing: 10,
                                     children: [
-                                      FButton.icon(
-                                        variant: .ghost,
-                                        onPress: () {
-                                          if (libAsync.isLoading) return;
-
-                                          libNotifier
-                                            ..setMaxImageWidth(
-                                              (puddingPrefs.maxImageWidth - 50)
-                                                  .clamp(
-                                                    200,
-                                                    700,
-                                                  ),
-                                            )
-                                            ..updateDisplayPrefs();
-                                        },
-                                        child: Icon(FLucideIcons.zoomOut),
-                                      ),
-                                      SizedBox(
-                                        width: 150,
-                                        child: FSlider(
-                                          enabled: !libAsync.isLoading,
-                                          control: .liftedDiscrete(
-                                            interaction: .tapAndSlideThumb,
-                                            value: FSliderValue(
-                                              max:
-                                                  ((puddingPrefs.maxImageWidth -
-                                                              200) /
-                                                          500)
-                                                      .clamp(0, 1),
+                                      Text(
+                                        'Showing ${data.items.length} of ${data.count}',
+                                        style: theme.typography.body.xs
+                                            .copyWith(
+                                              color:
+                                                  theme.colors.mutedForeground,
                                             ),
-                                            onChange: (value) {
-                                              if (libAsync.isLoading) return;
-                                              libNotifier.setMaxImageWidth(
-                                                (value.max * 500) + 200,
-                                              );
-                                            },
-                                          ),
-                                          onEnd: (value) {
-                                            libNotifier.updateDisplayPrefs();
-                                          },
-                                          marks: [
-                                            .mark(value: 0),
-                                            .mark(value: 0.1),
-                                            .mark(value: 0.2),
-                                            .mark(value: 0.3),
-                                            .mark(value: 0.4),
-                                            .mark(value: 0.5),
-                                            .mark(value: 0.6),
-                                            .mark(value: 0.7),
-                                            .mark(value: 0.8),
-                                            .mark(value: 0.9),
-                                            .mark(value: 1),
-                                          ],
+                                      ),
+                                      if (libAsync.isLoading)
+                                        FCircularProgress(
                                           style: .delta(
-                                            childPadding: .value(.zero),
+                                            iconStyle: .delta(
+                                              color: theme.colors.primary,
+                                              size: theme
+                                                  .typography
+                                                  .body
+                                                  .xs
+                                                  .fontSize,
+                                            ),
                                           ),
-                                          tooltipBuilder: (controller, value) {
-                                            return Text(
-                                              ((value * 500) + 200)
-                                                  .toStringAsFixed(
-                                                    0,
-                                                  ),
-                                            );
-                                          },
                                         ),
-                                      ),
-                                      FButton.icon(
-                                        variant: .ghost,
-                                        onPress: () {
-                                          if (libAsync.isLoading) return;
-
-                                          libNotifier
-                                            ..setMaxImageWidth(
-                                              (puddingPrefs.maxImageWidth + 50)
-                                                  .clamp(
-                                                    200,
-                                                    700,
-                                                  ),
-                                            )
-                                            ..updateDisplayPrefs();
-                                        },
-                                        child: Icon(FLucideIcons.zoomIn),
-                                      ),
                                     ],
                                   ),
-                                ),
-                                FButton.icon(
-                                  variant: puddingPrefs.isPoster
-                                      ? .primary
-                                      : .outline,
-                                  onPress: () =>
-                                      libNotifier.setViewType('poster'),
-                                  child: Icon(FLucideIcons.rectangleVertical),
-                                ),
-                                FButton.icon(
-                                  variant: !puddingPrefs.isPoster
-                                      ? .primary
-                                      : .outline,
-                                  onPress: () =>
-                                      libNotifier.setViewType('thumb'),
-                                  child: Icon(FLucideIcons.rectangleHorizontal),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SliverPadding(
-                          padding: .fromLTRB(10, 0, 10, 10),
-                          sliver: SliverGrid.builder(
-                            key: ValueKey(widget.id),
-                            itemCount: libs.length,
-                            gridDelegate:
-                                SliverGridDelegateWithMaxCrossAxisExtent(
-                                  maxCrossAxisExtent:
-                                      puddingPrefs.maxImageWidth,
-                                  childAspectRatio: puddingPrefs.aspectRatio,
-                                  mainAxisSpacing: 10,
-                                  crossAxisSpacing: 10,
-                                ),
-                            itemBuilder: (context, index) {
-                              final item = libs[index];
+                                  trailings: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        border: .all(
+                                          color: theme.colors.border,
+                                          width: 2,
+                                        ),
+                                        borderRadius:
+                                            theme.style.borderRadius.md,
+                                      ),
+                                      height: 36,
+                                      child: Row(
+                                        spacing: 10,
+                                        children: [
+                                          FButton.icon(
+                                            variant: .ghost,
+                                            onPress: () {
+                                              if (libAsync.isLoading) return;
 
-                              return NewMediaCard(
-                                key: ValueKey(item.id),
-                                item: item,
-                                imageType: puddingPrefs.imageType,
-                              );
-                            },
-                          ),
+                                              libNotifier
+                                                ..setMaxImageWidth(
+                                                  (puddingPrefs.maxImageWidth -
+                                                          50)
+                                                      .clamp(
+                                                        200,
+                                                        700,
+                                                      ),
+                                                )
+                                                ..updateDisplayPrefs();
+                                            },
+                                            child: Icon(FLucideIcons.zoomOut),
+                                          ),
+                                          SizedBox(
+                                            width: 120,
+                                            child: FSlider(
+                                              enabled: !libAsync.isLoading,
+                                              control: .liftedDiscrete(
+                                                interaction: .tapAndSlideThumb,
+                                                value: FSliderValue(
+                                                  max:
+                                                      ((puddingPrefs.maxImageWidth -
+                                                                  200) /
+                                                              500)
+                                                          .clamp(
+                                                            0,
+                                                            1,
+                                                          ),
+                                                ),
+                                                onChange: (value) {
+                                                  if (libAsync.isLoading) {
+                                                    return;
+                                                  }
+                                                  libNotifier.setMaxImageWidth(
+                                                    (value.max * 500) + 200,
+                                                  );
+                                                },
+                                              ),
+                                              onEnd: (value) {
+                                                libNotifier
+                                                    .updateDisplayPrefs();
+                                              },
+                                              marks: flexWeight
+                                                  .map(
+                                                    (e) =>
+                                                        FSliderMark(value: e),
+                                                  )
+                                                  .toList(),
+                                              style: .delta(
+                                                childPadding: .value(.zero),
+                                              ),
+                                              tooltipBuilder:
+                                                  (controller, value) => Text(
+                                                    ((value * 500) + 200)
+                                                        .toStringAsFixed(0),
+                                                  ),
+                                            ),
+                                          ),
+                                          FButton.icon(
+                                            variant: .ghost,
+                                            onPress: () {
+                                              if (libAsync.isLoading) return;
+
+                                              final double maxWidth =
+                                                  (puddingPrefs.maxImageWidth +
+                                                          50)
+                                                      .clamp(200, 700);
+
+                                              libNotifier
+                                                ..setMaxImageWidth(maxWidth)
+                                                ..updateDisplayPrefs();
+                                            },
+                                            child: Icon(FLucideIcons.zoomIn),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    FButton.icon(
+                                      variant: puddingPrefs.isPoster
+                                          ? .primary
+                                          : .outline,
+                                      onPress: () =>
+                                          libNotifier.setViewType('poster'),
+                                      child: Icon(
+                                        FLucideIcons.rectangleVertical,
+                                      ),
+                                    ),
+                                    FButton.icon(
+                                      variant: !puddingPrefs.isPoster
+                                          ? .primary
+                                          : .outline,
+                                      onPress: () =>
+                                          libNotifier.setViewType('thumb'),
+                                      child: Icon(
+                                        FLucideIcons.rectangleHorizontal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            SliverPadding(
+                              padding: .fromLTRB(10, 0, 10, 10),
+                              sliver: SliverGrid.builder(
+                                key: ValueKey(widget.id),
+                                itemCount: libs.length,
+                                gridDelegate:
+                                    SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent:
+                                          puddingPrefs.maxImageWidth,
+                                      childAspectRatio:
+                                          puddingPrefs.aspectRatio,
+                                      mainAxisSpacing: 10,
+                                      crossAxisSpacing: 10,
+                                    ),
+                                itemBuilder: (context, index) {
+                                  final item = libs[index];
+
+                                  return NewMediaCard(
+                                    key: ValueKey(item.id),
+                                    item: item,
+                                    imageType: puddingPrefs.imageType,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ),
 
                         SliverToBoxAdapter(
@@ -416,6 +461,51 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
   }
 }
 
+class SectionHeader extends StatelessWidget {
+  final Widget title;
+  final Widget? subtitle;
+  final List<Widget> trailings;
+  const SectionHeader({
+    super.key,
+    required this.title,
+    this.trailings = const [],
+    this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.theme;
+
+    return Column(
+      spacing: 4,
+      children: [
+        Row(
+          spacing: 10,
+          children: [
+            Expanded(
+              child: DefaultTextStyle(
+                style: theme.typography.display.lg.copyWith(fontWeight: .bold),
+                child: title,
+              ),
+            ),
+            ...trailings,
+          ],
+        ),
+        if (subtitle != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10.0),
+            child: DefaultTextStyle(
+              style: theme.typography.display.xs.copyWith(
+                color: theme.colors.mutedForeground,
+              ),
+              child: subtitle!,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class Appbar extends StatelessWidget {
   final Widget? child;
   final EdgeInsetsGeometry padding;
@@ -426,7 +516,7 @@ class Appbar extends StatelessWidget {
     final theme = context.theme;
 
     return Container(
-      decoration: BoxDecoration(color: theme.colors.background.withAlpha(200)),
+      decoration: BoxDecoration(color: theme.colors.background.withAlpha(230)),
       child: Padding(
         padding: padding,
         child: child,
