@@ -23,6 +23,7 @@ class PuddingDisplayPrefs {
   String get imageType => _imageType();
 
   bool get isPoster => puddingLibraryViewType == 'poster';
+  bool get isThumb => puddingLibraryViewType == 'thumb';
 
   PuddingDisplayPrefs setImageWidth(double width) {
     if (isPoster) {
