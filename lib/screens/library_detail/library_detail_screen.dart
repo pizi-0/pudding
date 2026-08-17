@@ -112,7 +112,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                               ? FCircularProgress()
                               : Icon(FLucideIcons.refreshCcw),
                         ),
-                      ].separatedby(Icon(FLucideIcons.dot)),
+                      ].separatedBy(Icon(FLucideIcons.dot)),
                     ),
                   ),
                 ),

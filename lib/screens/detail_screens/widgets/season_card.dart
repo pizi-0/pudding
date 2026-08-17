@@ -97,7 +97,7 @@ class SeasonCard extends StatelessWidget {
                               : Text(
                                   '${season.getSeasonPlayPercentage()}%',
                                 ),
-                        ].separatedby(
+                        ].separatedBy(
                           Icon(
                             FLucideIcons.dot,
                           ),

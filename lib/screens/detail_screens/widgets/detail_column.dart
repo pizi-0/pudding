@@ -128,7 +128,7 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
                                         .getCommunityRating()!
                                         .toStringAsFixed(1),
                                   ),
-                              ].separatedby(Icon(FLucideIcons.dot)),
+                              ].separatedBy(Icon(FLucideIcons.dot)),
                             ),
                             if (nextUpItem != null)
                               Row(
@@ -143,7 +143,7 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
                                         Text(
                                           'Ends at ${nextUpItem.getEndsAt(context)}',
                                         ),
-                                      ].separatedby(Icon(FLucideIcons.dot)),
+                                      ].separatedBy(Icon(FLucideIcons.dot)),
                                     ),
                                   ),
                                   Row(
@@ -159,13 +159,13 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
                                       ),
                                     ],
                                   ),
-                                ].separatedby(Icon(FLucideIcons.dot)),
+                                ].separatedBy(Icon(FLucideIcons.dot)),
                               ),
 
                             // Row(
                             //   children: [
                             //     Text('${series.getSeasons().toString()} seasons'),
-                            //   ].separatedby(Icon(FLucideIcons.dot)),
+                            //   ].separatedBy(Icon(FLucideIcons.dot)),
                             // ),
                           ],
                         ),
@@ -301,7 +301,7 @@ class _DetailColumnState extends ConsumerState<DetailColumn>
                     //     series.getRaw(),
                     //   ),
                     // ),
-                  ].separatedby(SliverPadding(padding: .only(bottom: 20))),
+                  ].separatedBy(SliverPadding(padding: .only(bottom: 20))),
                 ),
               ),
             ],
@@ -339,7 +339,7 @@ class SectionSliver extends StatelessWidget {
           ).setOpacity(opacity: 0.5),
         ),
         sliver,
-      ].separatedby(SliverPadding(padding: .only(bottom: 4))),
+      ].separatedBy(SliverPadding(padding: .only(bottom: 4))),
     );
   }
 }

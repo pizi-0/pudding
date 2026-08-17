@@ -145,7 +145,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                       ),
                     ],
                   ),
-                ].separatedby(Icon(FLucideIcons.dot)),
+                ].separatedBy(Icon(FLucideIcons.dot)),
               ),
             ),
           ),
@@ -351,7 +351,7 @@ class ItemLg extends ConsumerWidget {
 
                             if (item.isSeries)
                               Text('${item.getSeasons()} season'),
-                          ].separatedby(Icon(FLucideIcons.dot)),
+                          ].separatedBy(Icon(FLucideIcons.dot)),
                         ),
                       ],
                     ),
@@ -401,7 +401,7 @@ class ItemLg extends ConsumerWidget {
                           Text('Play'),
                           if (item.showRuntime)
                             Text('Ends at ${item.getEndsAt(context)}'),
-                        ].separatedby(Icon(FLucideIcons.dot)),
+                        ].separatedBy(Icon(FLucideIcons.dot)),
                       ),
                     ),
                   ],
