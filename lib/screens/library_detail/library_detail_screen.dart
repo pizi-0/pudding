@@ -329,18 +329,32 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                       variant: puddingPrefs.isPoster
                                           ? .primary
                                           : .outline,
-                                      onPress: () =>
-                                          libNotifier.setViewType('poster'),
+                                      onPress: () {
+                                        if (libAsync.isLoading ||
+                                            puddingPrefs.isPoster) {
+                                          return;
+                                        }
+                                        libNotifier
+                                          ..setViewType('poster')
+                                          ..updateDisplayPrefs();
+                                      },
                                       child: Icon(
                                         FLucideIcons.rectangleVertical,
                                       ),
                                     ),
                                     FButton.icon(
-                                      variant: !puddingPrefs.isPoster
+                                      variant: puddingPrefs.isThumb
                                           ? .primary
                                           : .outline,
-                                      onPress: () =>
-                                          libNotifier.setViewType('thumb'),
+                                      onPress: () {
+                                        if (libAsync.isLoading ||
+                                            puddingPrefs.isThumb) {
+                                          return;
+                                        }
+                                        libNotifier
+                                          ..setViewType('thumb')
+                                          ..updateDisplayPrefs();
+                                      },
                                       child: Icon(
                                         FLucideIcons.rectangleHorizontal,
                                       ),
