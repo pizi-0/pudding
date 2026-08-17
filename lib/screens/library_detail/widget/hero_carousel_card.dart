@@ -47,6 +47,7 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
           borderRadius: theme.style.borderRadius.sm,
           child: Stack(
             alignment: .bottomStart,
+            fit: .expand,
             children: <Widget>[
               Positioned(
                 top: -1,
@@ -95,68 +96,84 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
                   child: Text('${widget.index + 1}/${widget.total}'),
                 ),
               ),
-              Padding(
-                padding: const .all(10.0),
-                child: Column(
-                  spacing: 4,
-                  crossAxisAlignment: .start,
-                  mainAxisSize: .min,
-                  children: <Widget>[
-                    if (resumable)
-                      Opacity(
-                        opacity: 0.8,
-                        child: FDeterminateProgress(
-                          style: .delta(motion: .delta(duration: .zero)),
-                          value: widget.item.getPlayProgress(),
+              Align(
+                alignment: .bottomCenter,
+                child: Padding(
+                  padding: const .all(10.0),
+                  child: Column(
+                    spacing: 4,
+                    crossAxisAlignment: .start,
+                    mainAxisSize: .min,
+                    children: <Widget>[
+                      if (widget.item.isEpisode)
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxHeight: 150),
+                          child: Opacity(
+                            opacity: 0.6,
+                            child: CachedNetworkImage(
+                              imageUrl: widget.item.getLogo(),
+                              width: 150,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  SizedBox.shrink(),
+                            ),
+                          ),
                         ),
-                      ),
-                    Text(
-                      widget.item.getTitle(),
-                      overflow: .clip,
-                      softWrap: false,
-                    ).bold(),
+                      if (resumable)
+                        Opacity(
+                          opacity: 0.8,
+                          child: FDeterminateProgress(
+                            style: .delta(motion: .delta(duration: .zero)),
+                            value: widget.item.getPlayProgress(),
+                          ),
+                        ),
+                      Text(
+                        widget.item.getTitle(),
+                        overflow: .clip,
+                        softWrap: false,
+                      ).bold(),
 
-                    DefaultTextStyle(
-                      style: theme.typography.display.sm.copyWith(
-                        color: theme.colors.mutedForeground,
-                      ),
-                      child: Row(
-                        children: [
-                          if (widget.item.seriesName != null)
-                            Expanded(
-                              flex: weight,
-                              child: Padding(
-                                padding: const EdgeInsetsGeometry.only(
-                                  right: 8,
+                      DefaultTextStyle(
+                        style: theme.typography.display.sm.copyWith(
+                          color: theme.colors.mutedForeground,
+                        ),
+                        child: Row(
+                          children: [
+                            if (widget.item.seriesName != null)
+                              Expanded(
+                                flex: weight,
+                                child: Padding(
+                                  padding: const EdgeInsetsGeometry.only(
+                                    right: 8,
+                                  ),
+                                  child: Text(
+                                    '${widget.item.seriesName!} (${widget.item.productionYear})',
+                                    overflow: .clip,
+                                    softWrap: false,
+                                  ),
                                 ),
+                              ),
+                            if (widget.item.isMovie)
+                              Expanded(
+                                flex: 3,
                                 child: Text(
-                                  '${widget.item.seriesName!} (${widget.item.productionYear})',
+                                  widget.item.productionYear.toString(),
                                   overflow: .clip,
                                   softWrap: false,
                                 ),
                               ),
-                            ),
-                          if (widget.item.isMovie)
                             Expanded(
-                              flex: 3,
                               child: Text(
-                                widget.item.productionYear.toString(),
+                                widget.item.getRemaining(),
+                                textAlign: .end,
                                 overflow: .clip,
-                                softWrap: false,
+                                maxLines: 1,
                               ),
                             ),
-                          Expanded(
-                            child: Text(
-                              widget.item.getRemaining(),
-                              textAlign: .end,
-                              overflow: .clip,
-                              maxLines: 1,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
