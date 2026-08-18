@@ -38,7 +38,7 @@ class SeasonSelector extends ConsumerWidget {
         builder: (context, constraints) => FPopover(
           overflow: .allow,
           style: .delta(
-            barrierFilter: (animation) => .compose(
+            barrierFilter: (context, animation) => .compose(
               outer: ImageFilter.blur(
                 sigmaX: animation * 5,
                 sigmaY: animation * 5,

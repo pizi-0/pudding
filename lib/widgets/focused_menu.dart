@@ -50,7 +50,7 @@ class _FocusedMenuState extends State<FocusedMenu>
           ]),
         ),
         barrierFilter: () =>
-            (animation) => ImageFilter.compose(
+            (context, animation) => ImageFilter.compose(
               outer: ImageFilter.blur(
                 sigmaX: animation * 0,
                 sigmaY: animation * 0,

@@ -154,7 +154,7 @@ class MediaCardState extends State<MediaCard> {
             ]),
           ),
           barrierFilter: () =>
-              (animation) => ImageFilter.compose(
+              (context, animation) => ImageFilter.compose(
                 outer: ImageFilter.blur(
                   sigmaX: animation * 5,
                   sigmaY: animation * 5,
