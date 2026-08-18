@@ -1,7 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
+
 import 'package:awesome_extensions/awesome_extensions.dart'
     show ListExtension, ShimmerEffect;
-import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,12 +11,14 @@ import 'package:go_router/go_router.dart';
 import 'package:pudding/models/pudding_display_prefs.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
 import 'package:pudding/screens/library_detail/user_views_provider.dart';
-import 'package:pudding/screens/library_detail/widget/library_carousel.dart';
+import 'package:pudding/screens/library_detail/widget/sliver_carousel.dart';
+import 'package:pudding/widgets/bar.dart';
 import 'package:pudding/widgets/pudding_scaffold.dart';
 import 'package:silky_scroll/silky_scroll.dart';
 
 import '../../utils/jellyfin_view_extension.dart';
 import '../../widgets/media_card.dart';
+import '../../widgets/section_header.dart';
 
 class LibraryDetail extends ConsumerStatefulWidget {
   final String? id;
@@ -76,7 +79,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
               controller: scrollController,
               slivers: [
                 PinnedHeaderSliver(
-                  child: Appbar(
+                  child: Bar(
                     child: Row(
                       children: [
                         FButton.icon(
@@ -98,7 +101,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                       onPress: () => context.pushReplacement(
                                         '/library/${v.id}',
                                       ),
-                                      prefix: _getButtonIcon(v),
+                                      prefix: v.getButtonIcon(),
                                       child: Text(v.name),
                                     );
                                   }),
@@ -174,32 +177,11 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                     return SliverMainAxisGroup(
                       slivers: [
                         if (data.next.isNotEmpty)
-                          SliverMainAxisGroup(
-                            slivers: [
-                              PinnedHeaderSliver(
-                                child: Appbar(
-                                  padding: .fromLTRB(10, 0, 10, 10),
-                                  child: SectionHeader(
-                                    title: Text('Continue watching'),
-                                  ),
-                                ),
-                              ),
-                              SliverToBoxAdapter(
-                                child: Padding(
-                                  padding: const .fromLTRB(10, 0, 0, 10),
-                                  child: SizedBox(
-                                    height: 250,
-                                    child: LibraryCarousel(items: data.next),
-                                  ),
-                                ),
-                              ),
-                              SliverPadding(padding: .only(bottom: 10)),
-                            ],
-                          ),
+                          SliverCarousel(items: data.next),
                         SliverMainAxisGroup(
                           slivers: [
                             PinnedHeaderSliver(
-                              child: Appbar(
+                              child: Bar(
                                 padding: .fromLTRB(10, 0, 10, 0),
                                 child: SectionHeader(
                                   title: Text('All'),
@@ -440,101 +422,5 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
 
     ref.invalidate(libraryProvider(widget.id!));
     scrollController.jumpTo(0);
-  }
-
-  Widget? _getButtonIcon(JellyfinView view) {
-    if (view.isMovies) {
-      return Icon(FLucideIcons.film);
-    }
-
-    if (view.isTvShows) {
-      return Icon(FLucideIcons.tv);
-    }
-
-    if (view.isMusic) {
-      return Icon(FLucideIcons.music);
-    }
-
-    if (view.isPhotos) {
-      return Icon(FLucideIcons.image);
-    }
-
-    if (view.isBoxsets) {
-      return Icon(FLucideIcons.box);
-    }
-
-    if (view.isBooks) {
-      return Icon(FLucideIcons.book);
-    }
-
-    if (view.isPlaylists) {
-      return Icon(FLucideIcons.listVideo);
-    }
-
-    return Icon(FLucideIcons.fileQuestionMark);
-  }
-}
-
-class SectionHeader extends StatelessWidget {
-  final Widget title;
-  final Widget? subtitle;
-  final List<Widget> trailings;
-  const SectionHeader({
-    super.key,
-    required this.title,
-    this.trailings = const [],
-    this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = context.theme;
-
-    return Column(
-      spacing: 4,
-      children: [
-        Row(
-          spacing: 10,
-          children: [
-            Expanded(
-              child: DefaultTextStyle(
-                style: theme.typography.display.lg.copyWith(fontWeight: .bold),
-                child: title,
-              ),
-            ),
-            ...trailings,
-          ],
-        ),
-        if (subtitle != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10.0),
-            child: DefaultTextStyle(
-              style: theme.typography.display.xs.copyWith(
-                color: theme.colors.mutedForeground,
-              ),
-              child: subtitle!,
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class Appbar extends StatelessWidget {
-  final Widget? child;
-  final EdgeInsetsGeometry padding;
-  const Appbar({super.key, this.child, this.padding = const .all(10)});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = context.theme;
-
-    return Container(
-      decoration: BoxDecoration(color: theme.colors.background.withAlpha(230)),
-      child: Padding(
-        padding: padding,
-        child: child,
-      ),
-    );
   }
 }
