@@ -226,7 +226,20 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                         spacing: 10,
                                         children: [
                                           FButton.icon(
+                                            size: .sm,
                                             variant: .ghost,
+                                            style: .delta(
+                                              decoration: .delta([
+                                                .all(
+                                                  .boxDelta(
+                                                    borderRadius: theme
+                                                        .style
+                                                        .borderRadius
+                                                        .sm,
+                                                  ),
+                                                ),
+                                              ]),
+                                            ),
                                             onPress: () {
                                               if (libAsync.isLoading) return;
 
@@ -289,6 +302,19 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                                             ),
                                           ),
                                           FButton.icon(
+                                            size: .sm,
+                                            style: .delta(
+                                              decoration: .delta([
+                                                .all(
+                                                  .boxDelta(
+                                                    borderRadius: theme
+                                                        .style
+                                                        .borderRadius
+                                                        .sm,
+                                                  ),
+                                                ),
+                                              ]),
+                                            ),
                                             variant: .ghost,
                                             onPress: () {
                                               if (libAsync.isLoading) return;
