@@ -165,7 +165,8 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
                         ),
                         child: Row(
                           children: [
-                            if (widget.item.seriesName != null)
+                            if (widget.item.seriesName != null ||
+                                widget.item.isSeries)
                               Expanded(
                                 flex: weight,
                                 child: Padding(
@@ -173,7 +174,7 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
                                     right: 8,
                                   ),
                                   child: Text(
-                                    '${widget.item.seriesName!} (${widget.item.productionYear})',
+                                    '${widget.item.seriesName ?? widget.item.name} (${widget.item.productionYear})',
                                     overflow: .clip,
                                     softWrap: false,
                                   ),

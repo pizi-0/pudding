@@ -84,12 +84,17 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     final lib = views[id]!;
 
     if (lib.isTvShows) {
-      final (nextUp, resume) = await (
+      final (nextUp, resume, latest) = await (
         client.tvShows.nextUp(parentId: id, limit: 5),
         client.items.resume(parentId: id, limit: 5),
+        client.items.latest(
+          parentId: id,
+          limit: 5,
+          includeItemTypes: [JellyfinItemKind.series],
+        ),
       ).wait;
 
-      items.addAll([...nextUp.items, ...resume.items]);
+      items.addAll([...nextUp.items, ...resume.items, ...latest]);
     } else if (lib.isMovies) {
       final (resume, latest) = await (
         client.items.resume(parentId: id, limit: 5),
