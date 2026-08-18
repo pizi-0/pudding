@@ -53,6 +53,7 @@ dependencies:
   go_transitions: ^0.8.3
   quiver: ^3.2.2
   silky_scroll: ^2.6.4
+  morphnext: ^0.5.0
 
 dev_dependencies:
   flutter_test:

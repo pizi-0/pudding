@@ -4,6 +4,7 @@ import 'package:awesome_extensions/awesome_extensions.dart' show NumExtension;
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:morphnext/morphnext.dart';
 import 'package:pudding/widgets/bar.dart';
 
 import '../../../widgets/section_header.dart';
@@ -21,6 +22,7 @@ class _SliverCarouselState extends State<SliverCarousel> {
   CarouselController carouselController = CarouselController();
   Timer? autoPlayTimer;
   int currentIndex = 0;
+  bool hover = false;
 
   @override
   void initState() {
@@ -72,7 +74,15 @@ class _SliverCarouselState extends State<SliverCarousel> {
           child: Bar(
             padding: .fromLTRB(10, 0, 10, 10),
             child: SectionHeader(
-              title: Text('Continue watching'),
+              title: Row(
+                spacing: 10,
+                children: [
+                  Text('Continue watching'),
+                  AnimatedMorphIcon(
+                    icon: hover ? FLucideIcons.pause : FLucideIcons.play,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -80,9 +90,13 @@ class _SliverCarouselState extends State<SliverCarousel> {
           child: MouseRegion(
             onEnter: (event) {
               autoPlayTimer?.cancel();
+              hover = true;
+              setState(() {});
             },
             onExit: (event) {
               _autoPlay();
+              hover = false;
+              setState(() {});
             },
             child: Padding(
               padding: const .fromLTRB(10, 0, 0, 10),
