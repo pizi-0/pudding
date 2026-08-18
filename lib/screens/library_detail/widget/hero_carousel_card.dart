@@ -82,6 +82,27 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
                                   : JellyfinImagesApi.typeThumb,
                             ),
                             fit: .cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                CachedNetworkImage(
+                                  imageUrl: widget.item.getImage(
+                                    type: JellyfinImagesApi.typeBackdrop,
+                                  ),
+                                  fit: .cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      CachedNetworkImage(
+                                        imageUrl: widget.item.getImage(
+                                          type: JellyfinImagesApi.typePrimary,
+                                        ),
+                                        fit: .cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                Center(
+                                                  child: Icon(
+                                                    FLucideIcons.imageOff,
+                                                  ),
+                                                ),
+                                      ),
+                                ),
                           ),
                         ),
                       ),
@@ -96,6 +117,25 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
                   child: Text('${widget.index + 1}/${widget.total}'),
                 ),
               ),
+              if (widget.item.isEpisode)
+                Align(
+                  alignment: AlignmentGeometry.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: 150),
+                      child: Opacity(
+                        opacity: 0.6,
+                        child: CachedNetworkImage(
+                          imageUrl: widget.item.getLogo(),
+                          width: 150,
+                          errorBuilder: (context, error, stackTrace) =>
+                              SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               Align(
                 alignment: .bottomCenter,
                 child: Padding(
@@ -105,19 +145,6 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
                     crossAxisAlignment: .start,
                     mainAxisSize: .min,
                     children: <Widget>[
-                      if (widget.item.isEpisode)
-                        ConstrainedBox(
-                          constraints: BoxConstraints(maxHeight: 150),
-                          child: Opacity(
-                            opacity: 0.6,
-                            child: CachedNetworkImage(
-                              imageUrl: widget.item.getLogo(),
-                              width: 150,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  SizedBox.shrink(),
-                            ),
-                          ),
-                        ),
                       if (resumable)
                         Opacity(
                           opacity: 0.8,
