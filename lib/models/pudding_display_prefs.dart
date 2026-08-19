@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:dart_jellyfin/dart_jellyfin.dart';
@@ -7,30 +8,37 @@ class PuddingDisplayPrefs {
   String puddingLibraryViewType;
 
   /// 'maxCrossAxisExtent' for 'poster'
-  String puddingMaxPosterWidth;
+  double puddingMaxPosterWidth;
 
   /// 'maxCrossAxisExtent' for 'thumb'
-  String puddingMaxThumbWidth;
+  double puddingMaxThumbWidth;
+
+  /// 'maxCrossAxisExtent' for 'square'
+  double puddingMaxSquareWidth;
 
   PuddingDisplayPrefs({
-    required this.puddingLibraryViewType,
-    required this.puddingMaxPosterWidth,
-    required this.puddingMaxThumbWidth,
+    this.puddingLibraryViewType = vtPoster,
+    this.puddingMaxPosterWidth = mwPoster,
+    this.puddingMaxThumbWidth = mwThumb,
+    this.puddingMaxSquareWidth = mwSquare,
   });
 
   double get aspectRatio => _aspectRatio();
   double get maxImageWidth => _maxImageWidth();
   String get imageType => _imageType();
 
-  bool get isPoster => puddingLibraryViewType == 'poster';
-  bool get isThumb => puddingLibraryViewType == 'thumb';
+  bool get isPoster => puddingLibraryViewType == vtPoster;
+  bool get isThumb => puddingLibraryViewType == vtThumb;
+  bool get isSquare => puddingLibraryViewType == vtSquare;
 
   PuddingDisplayPrefs setImageWidth(double width) {
     if (isPoster) {
-      return copyWith(puddingMaxPosterWidth: width.toString());
+      return copyWith(puddingMaxPosterWidth: width);
+    } else if (isSquare) {
+      return copyWith(puddingMaxSquareWidth: width);
     }
 
-    return copyWith(puddingMaxThumbWidth: width.toString());
+    return copyWith(puddingMaxThumbWidth: width);
   }
 
   PuddingDisplayPrefs setViewType(String type) {
@@ -39,8 +47,9 @@ class PuddingDisplayPrefs {
 
   PuddingDisplayPrefs copyWith({
     String? puddingLibraryViewType,
-    String? puddingMaxPosterWidth,
-    String? puddingMaxThumbWidth,
+    double? puddingMaxPosterWidth,
+    double? puddingMaxThumbWidth,
+    double? puddingMaxSquareWidth,
   }) {
     return PuddingDisplayPrefs(
       puddingLibraryViewType:
@@ -48,22 +57,29 @@ class PuddingDisplayPrefs {
       puddingMaxPosterWidth:
           puddingMaxPosterWidth ?? this.puddingMaxPosterWidth,
       puddingMaxThumbWidth: puddingMaxThumbWidth ?? this.puddingMaxThumbWidth,
+      puddingMaxSquareWidth:
+          puddingMaxSquareWidth ?? this.puddingMaxSquareWidth,
     );
   }
 
   Map<String, String> toMap() {
     return <String, String>{
       'puddingLibraryViewType': puddingLibraryViewType,
-      'puddingMaxPosterWidth': puddingMaxPosterWidth,
-      'puddingMaxThumbWidth': puddingMaxThumbWidth,
+      'puddingMaxPosterWidth': puddingMaxPosterWidth.toString(),
+      'puddingMaxThumbWidth': puddingMaxThumbWidth.toString(),
+      'puddingMaxSquareWidth': puddingMaxSquareWidth.toString(),
     };
   }
 
   factory PuddingDisplayPrefs.fromMap(Map<String, String> map) {
     return PuddingDisplayPrefs(
-      puddingLibraryViewType: map['puddingLibraryViewType'] ?? 'poster',
-      puddingMaxPosterWidth: map['puddingMaxPosterWidth'] ?? '250',
-      puddingMaxThumbWidth: map['puddingMaxThumbWidth'] ?? '350',
+      puddingLibraryViewType: map['puddingLibraryViewType'] ?? vtPoster,
+      puddingMaxPosterWidth:
+          double.tryParse(map['puddingMaxPosterWidth'] ?? 'null') ?? mwPoster,
+      puddingMaxThumbWidth:
+          double.tryParse(map['puddingMaxThumbWidth'] ?? 'null') ?? mwThumb,
+      puddingMaxSquareWidth:
+          double.tryParse(map['puddingMaxSquareWidth'] ?? 'null') ?? mwSquare,
     );
   }
 
@@ -76,14 +92,16 @@ class PuddingDisplayPrefs {
 
   double _maxImageWidth() {
     if (isPoster) {
-      return double.tryParse(puddingMaxPosterWidth) ?? 250;
+      return puddingMaxPosterWidth;
+    } else if (isSquare) {
+      return puddingMaxSquareWidth;
     }
 
-    return double.tryParse(puddingMaxThumbWidth) ?? 350;
+    return puddingMaxThumbWidth;
   }
 
   String _imageType() {
-    if (isPoster) {
+    if (isPoster || isSquare) {
       return JellyfinImagesApi.typePrimary;
     }
 
@@ -93,8 +111,36 @@ class PuddingDisplayPrefs {
   double _aspectRatio() {
     if (isPoster) {
       return 10 / 16;
+    } else if (isSquare) {
+      return 1;
     }
 
     return 16 / 10;
   }
+
+  @override
+  bool operator ==(covariant PuddingDisplayPrefs other) {
+    if (identical(this, other)) return true;
+
+    return other.puddingLibraryViewType == puddingLibraryViewType &&
+        other.puddingMaxPosterWidth == puddingMaxPosterWidth &&
+        other.puddingMaxThumbWidth == puddingMaxThumbWidth &&
+        other.puddingMaxSquareWidth == puddingMaxSquareWidth;
+  }
+
+  @override
+  int get hashCode {
+    return puddingLibraryViewType.hashCode ^
+        puddingMaxPosterWidth.hashCode ^
+        puddingMaxThumbWidth.hashCode ^
+        puddingMaxSquareWidth.hashCode;
+  }
 }
+
+const String vtPoster = 'poster';
+const String vtThumb = 'thumb';
+const String vtSquare = 'square';
+
+const double mwPoster = 250;
+const double mwThumb = 350;
+const double mwSquare = 300;

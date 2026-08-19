@@ -1,6 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:morphnext/morphnext.dart';
 import 'package:pudding/models/pudding_display_prefs.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
 import 'package:pudding/widgets/bar.dart';
@@ -33,7 +36,16 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
           child: Bar(
             padding: .fromLTRB(10, 0, 10, 0),
             child: SectionHeader(
-              title: Text('All'),
+              title: Row(
+                spacing: 10,
+                children: [
+                  Text('All'),
+                  FButton.icon(
+                    onPress: () {},
+                    child: Icon(FLucideIcons.filter),
+                  ),
+                ],
+              ),
               subtitle: Row(
                 spacing: 10,
                 children: [
@@ -154,33 +166,67 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                     ],
                   ),
                 ),
-                FButton.icon(
-                  variant: prefs.isPoster ? .primary : .outline,
-                  onPress: () {
-                    if (libAsync.isLoading || prefs.isPoster) {
-                      return;
-                    }
-                    libNotifier
-                      ..setViewType('poster')
-                      ..updateDisplayPrefs();
-                  },
-                  child: Icon(
-                    FLucideIcons.rectangleVertical,
+                FPopover(
+                  style: .delta(
+                    barrierFilter: (context, animation) => ImageFilter.compose(
+                      outer: ImageFilter.blur(),
+                      inner: ColorFilter.mode(
+                        Color.lerp(
+                          const Color(0x00000000),
+                          Colors.black.withAlpha(200),
+                          animation,
+                        )!,
+                        BlendMode.srcOver,
+                      ),
+                    ),
                   ),
-                ),
-                FButton.icon(
-                  variant: prefs.isThumb ? .primary : .outline,
-                  onPress: () {
-                    if (libAsync.isLoading || prefs.isThumb) {
-                      return;
-                    }
-                    libNotifier
-                      ..setViewType('thumb')
-                      ..updateDisplayPrefs();
-                  },
-                  child: Icon(
-                    FLucideIcons.rectangleHorizontal,
+                  builder: (context, controller, child) => FButton.icon(
+                    onPress: controller.toggle,
+                    child: AnimatedMorphIcon(
+                      icon: prefs.isPoster
+                          ? FLucideIcons.rectangleVertical
+                          : prefs.isThumb
+                          ? FLucideIcons.rectangleHorizontal
+                          : FLucideIcons.square,
+                    ),
                   ),
+                  popoverBuilder: (context, controller) {
+                    final viewList = [vtPoster, vtThumb, vtSquare];
+
+                    return FCard(
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Column(
+                          spacing: 4,
+                          children: viewList
+                              .map(
+                                (e) => FButton(
+                                  variant: e == prefs.puddingLibraryViewType
+                                      ? .primary
+                                      : .outline,
+                                  prefix: Icon(
+                                    e == vtPoster
+                                        ? FLucideIcons.rectangleVertical
+                                        : e == vtThumb
+                                        ? FLucideIcons.rectangleHorizontal
+                                        : FLucideIcons.square,
+                                  ),
+                                  onPress: () {
+                                    controller.hide();
+                                    if (libAsync.isLoading) return;
+
+                                    libNotifier
+                                      ..setViewType(e)
+                                      ..updateDisplayPrefs();
+                                  },
+                                  child: Text(e),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
