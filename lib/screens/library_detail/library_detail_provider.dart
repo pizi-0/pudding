@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:pudding/models/pudding_display_prefs.dart';
+import 'package:pudding/models/pudding_filters.dart';
 import 'package:pudding/screens/library_detail/user_views_provider.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_display_prefs_extensions.dart';
@@ -42,12 +43,19 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     final views = ref.read(userviewsProvider).value!;
     final lib = views[id]!;
 
+    final applied = state.value?.filters ?? PuddingFilters();
+
     final (res, displayPrefs, next) = await (
       client.items.list(
         parentId: id,
         excludeItemTypes: [JellyfinItemKind.folder],
         includeItemTypes: _includeItemTypes(lib),
         limit: limit ?? this.limit,
+        officialRatings: applied.parentalRating,
+        filters: applied.filters,
+        genres: applied.genres,
+        years: applied.years,
+        tags: applied.tags,
         fields: [],
       ),
       client.displayPreferences.get(
@@ -63,7 +71,29 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
       count: res.totalRecordCount,
       displayPrefs: displayPrefs,
       next: next,
+      filters: applied,
     );
+  }
+
+  void applyFilter({
+    List<String>? filters,
+    List<String>? genres,
+    List<String>? parentalRating,
+  }) {
+    final current = state.value!;
+    final currentFilters = current.filters;
+
+    state = AsyncData(
+      current.copyWith(
+        filters: currentFilters.copyWith(
+          filters: filters ?? currentFilters.filters,
+          genres: genres ?? currentFilters.genres,
+          parentalRating: parentalRating ?? currentFilters.parentalRating,
+        ),
+      ),
+    );
+
+    print(state.value!.filters.filters);
   }
 
   Future<void> getMore() async {
@@ -76,12 +106,19 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
       final views = ref.read(userviewsProvider).value!;
       final lib = views[id]!;
 
+      final applied = state.value?.filters ?? PuddingFilters();
+
       final items = current.items;
       final res = await client.items.list(
         parentId: id,
         startIndex: current.items.length,
         excludeItemTypes: [JellyfinItemKind.folder],
         includeItemTypes: _includeItemTypes(lib),
+        officialRatings: applied.parentalRating,
+        filters: applied.filters,
+        genres: applied.genres,
+        years: applied.years,
+        tags: applied.tags,
         limit: limit,
         fields: [],
       );
@@ -138,6 +175,18 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     }
 
     return map.values.toList();
+  }
+
+  // Future getFilters() async {
+  //   final res = await client.filter.facets(parentId: id);
+
+  //   return res;
+  // }
+
+  Future<PuddingFilters> getLegacyFilters() async {
+    final res = await client.filter.legacy(parentId: id);
+
+    return PuddingFilters.fromLegacyJelly(res);
   }
 
   void setMaxImageWidth(double width) {
@@ -215,6 +264,7 @@ class LibraryData {
   final List<JellyfinItem> items;
   final List<JellyfinItem> next;
   final JellyfinDisplayPreferences displayPrefs;
+  final PuddingFilters filters;
 
   LibraryData({
     required this.name,
@@ -222,6 +272,7 @@ class LibraryData {
     this.items = const [],
     required this.next,
     required this.displayPrefs,
+    required this.filters,
   });
 
   LibraryData copyWith({
@@ -230,6 +281,7 @@ class LibraryData {
     List<JellyfinItem>? items,
     List<JellyfinItem>? next,
     JellyfinDisplayPreferences? displayPrefs,
+    PuddingFilters? filters,
   }) {
     return LibraryData(
       name: name ?? this.name,
@@ -237,6 +289,7 @@ class LibraryData {
       items: items ?? this.items,
       next: next ?? this.next,
       displayPrefs: displayPrefs ?? this.displayPrefs,
+      filters: filters ?? this.filters,
     );
   }
 
@@ -248,7 +301,8 @@ class LibraryData {
         other.count == count &&
         listEquals(other.items, items) &&
         listEquals(other.next, next) &&
-        other.displayPrefs == displayPrefs;
+        other.displayPrefs == displayPrefs &&
+        other.filters == filters;
   }
 
   @override
@@ -257,6 +311,15 @@ class LibraryData {
         count.hashCode ^
         items.hashCode ^
         next.hashCode ^
-        displayPrefs.hashCode;
+        displayPrefs.hashCode ^
+        filters.hashCode;
   }
 }
+
+final filterProvider = FutureProvider.family<PuddingFilters, String>(
+  (ref, id) async {
+    final res = await services<JellyfinClient>().filter.legacy(parentId: id);
+
+    return PuddingFilters.fromLegacyJelly(res);
+  },
+);
