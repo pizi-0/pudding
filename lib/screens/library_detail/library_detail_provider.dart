@@ -21,7 +21,22 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     return getLibrary();
   }
 
-  Future<LibraryData> getLibrary() async {
+  Future<void> refresh() async {
+    if (state.hasValue) {
+      state = AsyncLoading();
+      state = await AsyncValue.guard(() async {
+        final currentState = state.value;
+
+        final res = await getLibrary(
+          limit: currentState?.items.length ?? limit,
+        );
+
+        return res;
+      });
+    }
+  }
+
+  Future<LibraryData> getLibrary({int? limit}) async {
     state = AsyncLoading();
 
     final views = ref.read(userviewsProvider).value!;
@@ -32,7 +47,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
         parentId: id,
         excludeItemTypes: [JellyfinItemKind.folder],
         includeItemTypes: _includeItemTypes(lib),
-        limit: limit,
+        limit: limit ?? this.limit,
         fields: [],
       ),
       client.displayPreferences.get(

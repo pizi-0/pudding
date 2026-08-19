@@ -39,6 +39,9 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
   void initState() {
     super.initState();
     scrollController.addListener(_fetchMore);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(libraryProvider(widget.id!).notifier).refresh();
+    });
   }
 
   @override
