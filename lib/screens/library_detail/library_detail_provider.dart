@@ -79,6 +79,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     List<String>? filters,
     List<String>? genres,
     List<String>? parentalRating,
+    List<int>? years,
   }) {
     final current = state.value!;
     final currentFilters = current.filters;
@@ -89,11 +90,10 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
           filters: filters ?? currentFilters.filters,
           genres: genres ?? currentFilters.genres,
           parentalRating: parentalRating ?? currentFilters.parentalRating,
+          years: years ?? currentFilters.years,
         ),
       ),
     );
-
-    print(state.value!.filters.filters);
   }
 
   Future<void> getMore() async {
