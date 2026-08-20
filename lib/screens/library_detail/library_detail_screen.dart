@@ -79,6 +79,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
               slivers: [
                 PinnedHeaderSliver(
                   child: Bar(
+                    padding: .all(20),
                     child: Row(
                       children: [
                         FButton.icon(
@@ -178,7 +179,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                         SliverToBoxAdapter(
                           child: Center(
                             child: Padding(
-                              padding: .only(bottom: 10),
+                              padding: .only(bottom: 20),
                               child: Row(
                                 spacing: 10,
                                 mainAxisAlignment: .center,

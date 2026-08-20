@@ -37,13 +37,14 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
       slivers: [
         PinnedHeaderSliver(
           child: Bar(
-            padding: .fromLTRB(10, 0, 10, 0),
+            padding: .fromLTRB(20, 0, 20, 0),
             child: SectionHeader(
               title: Row(
-                spacing: 10,
+                spacing: 4,
                 children: [
                   Text('All'),
                   FButton.icon(
+                    variant: .ghost,
                     onPress: () {
                       showFSheet(
                         context: context,
@@ -51,7 +52,16 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                         side: .ltr,
                       );
                     },
-                    child: Icon(FLucideIcons.filter),
+                    onSecondaryPress: () {
+                      libNotifier
+                        ..resetFilter()
+                        ..refresh();
+                    },
+                    child: Icon(
+                      data.filters.isEmpty
+                          ? FLucideIcons.filter
+                          : FLucideIcons.filterX,
+                    ),
                   ),
                 ],
               ),
@@ -64,6 +74,7 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                       color: theme.colors.mutedForeground,
                     ),
                   ),
+                  if (!data.filters.isEmpty) Text('[Filtered]'),
                   if (libAsync.isLoading)
                     FCircularProgress(
                       style: .delta(
@@ -243,7 +254,7 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
         ),
 
         SliverPadding(
-          padding: .fromLTRB(10, 0, 10, 10),
+          padding: .fromLTRB(20, 0, 20, 20),
           sliver: SliverGrid.builder(
             key: ValueKey(widget.id),
             itemCount: data.items.length,
@@ -335,13 +346,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                                   variant: .destructive,
                                   onPress: () {
                                     libNotifier
-                                      ..applyFilter(
-                                        filters: [],
-                                        genres: [],
-                                        parentalRating: [],
-                                        years: [],
-                                        tags: [],
-                                      )
+                                      ..resetFilter()
                                       ..refresh();
                                   },
                                   prefix: Icon(FLucideIcons.filterX),

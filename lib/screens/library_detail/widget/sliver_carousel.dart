@@ -72,7 +72,7 @@ class _SliverCarouselState extends State<SliverCarousel> {
       slivers: [
         PinnedHeaderSliver(
           child: Bar(
-            padding: .fromLTRB(10, 0, 10, 10),
+            padding: .fromLTRB(20, 0, 20, 10),
             child: SectionHeader(
               title: Row(
                 spacing: 10,
@@ -99,7 +99,7 @@ class _SliverCarouselState extends State<SliverCarousel> {
               setState(() {});
             },
             child: Padding(
-              padding: const .fromLTRB(10, 0, 0, 10),
+              padding: const .fromLTRB(20, 0, 10, 10),
               child: SizedBox(
                 height: 250,
                 child: LayoutBuilder(
