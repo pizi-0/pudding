@@ -19,6 +19,13 @@ class PuddingFilters {
     this.parentalRating = const [],
   });
 
+  bool get isEmpty =>
+      genres.isEmpty &&
+      tags.isEmpty &&
+      years.isEmpty &&
+      filters.isEmpty &&
+      parentalRating.isEmpty;
+
   PuddingFilters copyWith({
     List<String>? genres,
     List<String>? tags,
