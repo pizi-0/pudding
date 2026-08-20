@@ -80,6 +80,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     List<String>? genres,
     List<String>? parentalRating,
     List<int>? years,
+    List<String>? tags,
   }) {
     final current = state.value!;
     final currentFilters = current.filters;
@@ -91,6 +92,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
           genres: genres ?? currentFilters.genres,
           parentalRating: parentalRating ?? currentFilters.parentalRating,
           years: years ?? currentFilters.years,
+          tags: tags ?? currentFilters.tags,
         ),
       ),
     );
