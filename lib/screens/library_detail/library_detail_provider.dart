@@ -98,6 +98,11 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     );
   }
 
+  void resetFilter() {
+    final current = state.value!;
+    state = AsyncData(current.copyWith(filters: PuddingFilters()));
+  }
+
   Future<void> getMore() async {
     if (state is AsyncLoading) return;
 
