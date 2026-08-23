@@ -5,7 +5,14 @@ import 'package:go_router/go_router.dart';
 
 class PuddingScaffold extends StatefulWidget {
   final Widget child;
-  const PuddingScaffold({super.key, required this.child});
+  final Widget? header;
+  final Widget? backdrop;
+  const PuddingScaffold({
+    super.key,
+    required this.child,
+    this.header,
+    this.backdrop,
+  });
 
   @override
   State<PuddingScaffold> createState() => _PuddingScaffoldState();
@@ -22,6 +29,8 @@ class _PuddingScaffoldState extends State<PuddingScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.theme;
+
     return TapRegion(
       onTapInside: (event) {
         final primary = FocusManager.instance.primaryFocus;
@@ -42,7 +51,26 @@ class _PuddingScaffoldState extends State<PuddingScaffold> {
           },
           child: FScaffold(
             childPad: false,
-            child: widget.child,
+            child: Stack(
+              children: [
+                if (widget.backdrop != null)
+                  Positioned.fill(
+                    child: ClipRRect(
+                      child: widget.backdrop,
+                    ),
+                  ),
+                widget.child,
+                if (widget.header != null)
+                  FTheme(
+                    data: theme.copyWith(
+                      headerStyles: .delta([
+                        .all(.delta(padding: .value(.all(20)))),
+                      ]),
+                    ),
+                    child: widget.header!,
+                  ),
+              ],
+            ),
           ),
         ),
       ),
