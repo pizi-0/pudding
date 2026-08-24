@@ -9,8 +9,7 @@ import 'package:pudding/screens/home/home.dart';
 import 'package:pudding/screens/library_detail/library_detail_screen.dart';
 import 'package:pudding/screens/settings/settings.dart';
 import 'package:pudding/screens/splash/splash.dart';
-
-import '../screens/detail_screens/tv_detail_screens.dart';
+import 'package:pudding/screens/tvshow_detail/tvshow_detail.dart';
 
 final routeProvider = Provider<GoRouter>(
   (ref) => GoRouter(
@@ -56,8 +55,8 @@ final routeProvider = Provider<GoRouter>(
       GoRoute(
         name: 'TvShow details',
         path: '/show/:showId',
-        builder: (context, state) => TvDetailScreen(
-          showId: state.pathParameters['showId'],
+        builder: (context, state) => TvshowDetail(
+          id: state.pathParameters['showId']!,
         ),
         pageBuilder: GoTransitions.fade.call,
       ),
