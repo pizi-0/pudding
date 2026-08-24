@@ -7,7 +7,7 @@ class SliverHeader extends SliverPersistentHeaderDelegate {
   final Widget? title;
   final Widget? suffix;
   final Widget? bar;
-  final ValueChanged<double>? onScroll;
+  final void Function(double percent)? onScroll;
   final Widget? child;
   final bool shouldRefresh;
 
@@ -32,7 +32,9 @@ class SliverHeader extends SliverPersistentHeaderDelegate {
     final theme = context.theme;
 
     if (onScroll != null) {
-      onScroll!(percent);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        onScroll!(percent);
+      });
     }
 
     return Stack(
@@ -80,6 +82,7 @@ class SliverHeader extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(covariant SliverHeader oldDelegate) {
     return maxExtentHeight != oldDelegate.maxExtentHeight ||
         minExtentHeight != oldDelegate.minExtentHeight ||
-        shouldRefresh != oldDelegate.shouldRefresh;
+        shouldRefresh != oldDelegate.shouldRefresh ||
+        child != oldDelegate.child;
   }
 }

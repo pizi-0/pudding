@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:dart_jellyfin/dart_jellyfin.dart';
@@ -34,21 +35,24 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
     final style = theme.style;
+    final size = MediaQuery.sizeOf(context);
 
     double maxwidth() {
-      if (widget.seasonItems.length * 200 > 5 * 200) {
-        return 5 * 200;
-      } else {
-        return widget.seasonItems.length * 200;
+      final seasons = widget.seasonItems;
+      if (seasons.length * 210 > size.width) {
+        return size.width - 40;
       }
+
+      return seasons.length * 210;
     }
 
     double maxHeight() {
       final itemHeight = 16 / 10 * 200;
-      final maxRow = (widget.seasonItems.length / 5).ceil();
+      final maxColumn = max(1, ((size.width) / 200)).floor();
+      final maxRow = (widget.seasonItems.length / maxColumn).ceil();
 
-      if (maxRow * itemHeight > 2 * itemHeight - (maxRow * 10)) {
-        return 2 * itemHeight - (maxRow * 10);
+      if (maxRow * itemHeight > 3 * itemHeight - (maxRow * 10)) {
+        return 3 * itemHeight - (maxRow * 10);
       } else {
         return itemHeight;
       }

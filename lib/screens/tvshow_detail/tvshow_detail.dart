@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pudding/const/const.dart';
 import 'package:pudding/screens/detail_screens/widgets/season_selector.dart';
 import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
 import 'package:pudding/services/di.dart';
@@ -63,18 +62,26 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
         : CrossAxisAlignment.start;
 
     return PuddingScaffold(
-      backdrop: CachedNetworkImage(
-        imageUrl: client.images.url(
-          itemId: widget.id,
-          type: JellyfinImagesApi.typeBackdrop,
-        ),
-        fit: .cover,
-        errorBuilder: (context, error, stackTrace) => CachedNetworkImage(
-          imageUrl: client.images.url(
-            itemId: widget.id,
-            type: JellyfinImagesApi.typePrimary,
-          ),
-        ),
+      backdrop: ValueListenableBuilder(
+        valueListenable: scrollOffset,
+        builder: (context, value, child) {
+          return ImageFiltered(
+            imageFilter: .blur(sigmaX: value * 10, sigmaY: value * 10),
+            child: CachedNetworkImage(
+              imageUrl: client.images.url(
+                itemId: widget.id,
+                type: JellyfinImagesApi.typeBackdrop,
+              ),
+              fit: .cover,
+              errorBuilder: (context, error, stackTrace) => CachedNetworkImage(
+                imageUrl: client.images.url(
+                  itemId: widget.id,
+                  type: JellyfinImagesApi.typePrimary,
+                ),
+              ),
+            ),
+          );
+        },
       ),
       child: SilkyCustomScrollView(
         physics: ClampingScrollPhysics(),
@@ -129,6 +136,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
               final runYears = tv.getSeriesRunYears();
               final seasonCount = tv.childCount;
               final int? episodeCount = tv.raw['RecursiveItemCount'];
+              final unplayed = tv.getUnplayed();
 
               return SliverMainAxisGroup(
                 slivers: [
@@ -254,6 +262,8 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                           Text('$seasonCount seasons'),
                                         if (episodeCount != null)
                                           Text('$episodeCount episodes'),
+                                        if (unplayed != null)
+                                          Text('$unplayed unplayed'),
                                       ].separatedBy(Icon(FLucideIcons.dot)),
                                     ),
                                   ],
@@ -298,32 +308,6 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                       )
                                       .onSeasonChanged(s.id);
                                 },
-                              ),
-                              IntrinsicWidth(
-                                child: FSelect<JellyfinItem>.rich(
-                                  control: .managed(
-                                    initial: state.selectedSeason,
-                                    onChange: (s) => ref
-                                        .read(
-                                          tvshowStateProvider(
-                                            widget.id,
-                                          ).notifier,
-                                        )
-                                        .onSeasonChanged(s!.id),
-                                  ),
-                                  hint: 'Select season',
-                                  format: (value) => value.name,
-                                  children: state.seasons
-                                      .map(
-                                        (s) => FSelectItem.raw(
-                                          value: s,
-                                          child: CachedNetworkImage(
-                                            imageUrl: s.getImage(),
-                                          ),
-                                        ),
-                                      )
-                                      .toList(),
-                                ),
                               ),
                             ],
                           ),
@@ -404,85 +388,5 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
     } finally {
       playedLoading = false;
     }
-  }
-}
-
-class MyCustomHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final double maxExtentHeight;
-  final double minExtentHeight;
-  final Widget? flexibleSpace;
-  final Widget? title;
-  final Widget? suffix;
-
-  MyCustomHeaderDelegate({
-    required this.maxExtentHeight,
-    required this.minExtentHeight,
-    this.flexibleSpace,
-    this.title,
-    this.suffix,
-  });
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    final percent = shrinkOffset / maxExtent;
-
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        if (flexibleSpace != null)
-          Positioned(
-            bottom: Tween<double>(
-              begin: 0,
-              end: 40,
-            ).transform(percent),
-            child: flexibleSpace!,
-          ),
-
-        Positioned(
-          top: 20,
-          left: 20,
-          right: 20,
-          child: Row(
-            spacing: 10,
-            children: [
-              FButton.icon(
-                onPress: context.pop,
-                child: Icon(FLucideIcons.chevronLeft),
-              ),
-              if (title != null)
-                Expanded(
-                  child: Row(
-                    spacing: 10,
-                    children: [
-                      AnimatedOpacity(
-                        duration: kDefaultAnimationDuration,
-                        opacity: percent > 0.9 ? 1 : 0,
-                        child: title,
-                      ),
-                    ],
-                  ),
-                ),
-              ?suffix,
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  @override
-  double get maxExtent => maxExtentHeight;
-
-  @override
-  double get minExtent => minExtentHeight;
-
-  @override
-  bool shouldRebuild(covariant MyCustomHeaderDelegate oldDelegate) {
-    return maxExtentHeight != oldDelegate.maxExtentHeight ||
-        minExtentHeight != oldDelegate.minExtentHeight;
   }
 }
