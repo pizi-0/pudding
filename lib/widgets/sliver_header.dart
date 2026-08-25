@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:forui/forui.dart';
 
 class SliverHeader extends SliverPersistentHeaderDelegate {
   final double maxExtentHeight;
@@ -29,7 +28,6 @@ class SliverHeader extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     final percent = shrinkOffset / maxExtent;
-    final theme = context.theme;
 
     if (onScroll != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -46,7 +44,10 @@ class SliverHeader extends SliverPersistentHeaderDelegate {
               begin: 0,
               end: 40,
             ).transform(percent),
-            child: child!,
+            child: Opacity(
+              opacity: Tween<double>(begin: 1, end: 0).transform(percent),
+              child: child!,
+            ),
           ),
 
         if (bar != null)
@@ -54,19 +55,7 @@ class SliverHeader extends SliverPersistentHeaderDelegate {
             top: 0,
             left: 0,
             right: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colors.background.withAlpha(220),
-                    Colors.transparent,
-                  ],
-                  begin: .topCenter,
-                  end: .bottomCenter,
-                ),
-              ),
-              child: bar!,
-            ),
+            child: bar!,
           ),
       ],
     );

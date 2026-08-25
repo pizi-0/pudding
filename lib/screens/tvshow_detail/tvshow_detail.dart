@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pudding/const/const.dart';
 import 'package:pudding/screens/detail_screens/widgets/season_selector.dart';
 import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
 import 'package:pudding/services/di.dart';
@@ -14,6 +15,8 @@ import 'package:pudding/widgets/media_card.dart';
 import 'package:pudding/widgets/pudding_scaffold.dart';
 import 'package:pudding/widgets/sliver_header.dart';
 import 'package:silky_scroll/silky_scroll.dart';
+
+import '../../widgets/sliver_section.dart';
 
 final client = services<JellyfinClient>();
 
@@ -27,6 +30,7 @@ class TvshowDetail extends ConsumerStatefulWidget {
 }
 
 class _TvshowDetailState extends ConsumerState<TvshowDetail> {
+  final GlobalKey seasonKey = GlobalKey(debugLabel: 'season-sliver-header');
   bool favoriteLoading = false;
   bool playedLoading = false;
   ValueNotifier<double> scrollOffset = ValueNotifier(0);
@@ -52,6 +56,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
     final size = MediaQuery.sizeOf(context);
 
     final tvAsync = ref.watch(tvshowStateProvider((widget.id)));
+    final tvNotifier = ref.read(tvshowStateProvider(widget.id).notifier);
 
     final max = size.width < theme.breakpoints.md;
 
@@ -144,8 +149,8 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                     pinned: true,
                     delegate: SliverHeader(
                       onScroll: (value) => scrollOffset.value = value,
-                      maxExtentHeight: size.height - 56,
-                      minExtentHeight: 76,
+                      maxExtentHeight: size.height - 76,
+                      minExtentHeight: 56,
                       shouldRefresh: tvAsync.isLoading,
                       bar: FHeader.nested(
                         style: .delta(
@@ -157,9 +162,42 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                             child: Icon(FLucideIcons.chevronLeft),
                           ),
                         ],
+                        titleAlignment: .centerStart,
+                        title: ValueListenableBuilder(
+                          valueListenable: scrollOffset,
+                          builder: (context, value, child) {
+                            return Opacity(
+                              opacity: Tween<double>(
+                                begin: 0,
+                                end: 1,
+                              ).transform(value),
+                              child: IntrinsicWidth(
+                                child: Container(
+                                  height: 36,
+                                  padding: .symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: theme.colors.card,
+                                    borderRadius: theme.style.borderRadius.md,
+                                    border: .all(color: theme.colors.border),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      tv.name,
+                                      style: theme.typography.display.md,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                       child: SizedBox(
                         height: size.height,
+                        width: size.width,
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(40, 0, 40, 40),
                           child: Column(
@@ -198,7 +236,9 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                                 Text('Trailer'),
                                             child: FButton.icon(
                                               onPress: () {},
-                                              child: Icon(FLucideIcons.film),
+                                              child: Icon(
+                                                FLucideIcons.film,
+                                              ),
                                             ),
                                           ),
                                           Icon(FLucideIcons.dot),
@@ -243,7 +283,9 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                                 tvAsync.isLoading &&
                                                     playedLoading
                                                 ? null
-                                                : () => _togglePlayed(isPlayed),
+                                                : () => _togglePlayed(
+                                                    isPlayed,
+                                                  ),
                                             child: Icon(
                                               FLucideIcons.check,
                                               color: isPlayed
@@ -288,31 +330,32 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                       ),
                     ),
                   ),
-                  SliverMainAxisGroup(
-                    slivers: [
-                      PinnedHeaderSliver(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                          child: Row(
-                            children: [
-                              SeasonSelector(
-                                seriesId: widget.id,
-                                selectedSeasonItem: state.selectedSeason,
-                                seasonItems: state.seasons,
-                                onSeasonChange: (s) {
-                                  ref
-                                      .read(
-                                        tvshowStateProvider(
-                                          widget.id,
-                                        ).notifier,
-                                      )
-                                      .onSeasonChanged(s.id);
-                                },
-                              ),
-                            ],
+                  SliverSection(
+                    key: seasonKey,
+                    header: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Row(
+                        children: [
+                          SeasonSelector(
+                            seriesId: widget.id,
+                            selectedSeasonItem: state.selectedSeason,
+                            seasonItems: state.seasons,
+                            onSeasonChange: (s) {
+                              tvNotifier.onSeasonChanged(s.id).then((_) {
+                                if (seasonKey.currentContext != null) {
+                                  Scrollable.ensureVisible(
+                                    seasonKey.currentContext!,
+                                    alignment: 0,
+                                    duration: kDefaultAnimationDuration,
+                                  );
+                                }
+                              });
+                            },
                           ),
-                        ),
+                        ],
                       ),
+                    ),
+                    slivers: [
                       SliverPadding(
                         padding: .fromLTRB(20, 0, 20, 20),
                         sliver: SliverGrid.builder(

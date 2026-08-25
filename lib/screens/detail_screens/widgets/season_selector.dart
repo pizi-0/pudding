@@ -5,6 +5,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:morphnext/morphnext.dart';
 import 'package:pudding/screens/detail_screens/widgets/season_card.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
@@ -30,6 +31,7 @@ class SeasonSelector extends ConsumerStatefulWidget {
 
 class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
   final GlobalKey buttonKey = GlobalKey();
+  bool popup = false;
 
   @override
   Widget build(BuildContext context) {
@@ -85,20 +87,33 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
           style.borderRadius.md.bottomLeft,
         ),
       ), //
+      onTapHide: () {
+        setState(() {
+          popup = false;
+        });
+      },
       constraints: FPortalConstraints(
         maxWidth: maxwidth(),
         maxHeight: maxHeight(),
       ),
       builder: (context, controller, child) => FButton(
+        style: .delta(contentStyle: .delta(spacing: 20)),
         key: buttonKey,
         variant: .outline,
         mainAxisAlignment: .spaceBetween,
         onPress: () {
-          // _findwidget();
-          controller.toggle();
+          if (popup) {
+            controller.hide();
+            popup = false;
+          } else {
+            controller.show();
+            popup = true;
+          }
+
+          setState(() {});
         },
-        suffix: Icon(
-          FLucideIcons.chevronDown,
+        suffix: AnimatedMorphIcon(
+          icon: popup ? FLucideIcons.chevronUp : FLucideIcons.chevronDown,
         ),
         child: Text(
           widget.selectedSeasonItem!.name,
@@ -128,6 +143,8 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
               onPress: () {
                 widget.onSeasonChange(season);
                 controller.hide();
+                popup = false;
+                setState(() {});
               },
             );
           },
