@@ -12,6 +12,7 @@ import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/logo_shimmer.dart';
 import 'package:pudding/widgets/media_card.dart';
+import 'package:pudding/widgets/people_grid.dart';
 import 'package:pudding/widgets/pudding_scaffold.dart';
 import 'package:pudding/widgets/sliver_header.dart';
 import 'package:silky_scroll/silky_scroll.dart';
@@ -31,6 +32,7 @@ class TvshowDetail extends ConsumerStatefulWidget {
 
 class _TvshowDetailState extends ConsumerState<TvshowDetail> {
   final GlobalKey seasonKey = GlobalKey(debugLabel: 'season-sliver-header');
+  final GlobalKey castsKey = GlobalKey(debugLabel: 'cast-sliver-header');
   bool favoriteLoading = false;
   bool playedLoading = false;
   ValueNotifier<double> scrollOffset = ValueNotifier(0);
@@ -355,21 +357,9 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                             seriesId: widget.id,
                             selectedSeasonItem: state.selectedSeason,
                             seasonItems: state.seasons,
-                            onSeasonChange: (s) {
-                              tvNotifier.onSeasonChanged(s.id).then(
-                                (
-                                  _,
-                                ) {
-                                  if (seasonKey.currentContext != null) {
-                                    Scrollable.ensureVisible(
-                                      seasonKey.currentContext!,
-                                      alignment: 0,
-                                      duration: kDefaultAnimationDuration,
-                                    );
-                                  }
-                                },
-                              );
-                            },
+                            onSeasonChange: (s) => tvNotifier
+                                .onSeasonChanged(s.id)
+                                .then((_) => _scrollToKey(seasonKey)),
                           ),
                         ],
                       ),
@@ -395,6 +385,22 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                       ),
                     ],
                   ),
+                  SliverSection(
+                    key: castsKey,
+                    header: FButton(
+                      variant: .outline,
+                      onPress: () {
+                        _scrollToKey(castsKey);
+                      },
+                      child: Text('Cast & Crew'),
+                    ),
+                    slivers: [
+                      SliverPadding(
+                        padding: .fromLTRB(20, 0, 20, 20),
+                        sliver: PeopleGrid(peoples: tv.getPeoples()),
+                      ),
+                    ],
+                  ),
                 ],
               );
             },
@@ -402,6 +408,16 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
         ],
       ),
     );
+  }
+
+  void _scrollToKey(GlobalKey key) {
+    if (key.currentContext != null) {
+      Scrollable.ensureVisible(
+        key.currentContext!,
+        alignment: 0,
+        duration: kDefaultAnimationDuration,
+      );
+    }
   }
 
   Future<void> _toggleFavorite(bool isFavorite) async {

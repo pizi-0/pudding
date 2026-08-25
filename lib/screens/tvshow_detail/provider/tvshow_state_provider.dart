@@ -19,6 +19,7 @@ final defaultField = [
   'Overview',
   'RecursiveItemCount',
   'SeasonUserData',
+  'People',
 ];
 
 class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
