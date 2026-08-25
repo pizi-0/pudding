@@ -150,50 +150,63 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                     delegate: SliverHeader(
                       onScroll: (value) => scrollOffset.value = value,
                       maxExtentHeight: size.height - 76,
-                      minExtentHeight: 56,
+                      minExtentHeight: 76,
                       shouldRefresh: tvAsync.isLoading,
-                      bar: FHeader.nested(
-                        style: .delta(
-                          padding: .value(.all(20)),
-                        ),
-                        prefixes: [
-                          FButton.icon(
-                            onPress: context.pop,
-                            child: Icon(FLucideIcons.chevronLeft),
-                          ),
-                        ],
-                        titleAlignment: .centerStart,
-                        title: ValueListenableBuilder(
-                          valueListenable: scrollOffset,
-                          builder: (context, value, child) {
-                            return Opacity(
-                              opacity: Tween<double>(
-                                begin: 0,
-                                end: 1,
-                              ).transform(value),
-                              child: IntrinsicWidth(
-                                child: Container(
-                                  height: 36,
-                                  padding: .symmetric(
-                                    horizontal: 10,
-                                    vertical: 5,
+                      bar: ValueListenableBuilder(
+                        valueListenable: scrollOffset,
+                        builder: (context, value, child) {
+                          final shadow = BoxShadow(
+                            color: theme.colors.background,
+                            spreadRadius: 10 * value,
+                            blurRadius: 10,
+                          );
+
+                          return Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Row(
+                              children: [
+                                FButton.icon(
+                                  style: .delta(
+                                    decoration: .delta([
+                                      .all(.boxDelta(boxShadow: [shadow])),
+                                    ]),
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: theme.colors.card,
-                                    borderRadius: theme.style.borderRadius.md,
-                                    border: .all(color: theme.colors.border),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      tv.name,
-                                      style: theme.typography.display.md,
-                                    ),
+                                  onPress: context.pop,
+                                  child: Icon(FLucideIcons.chevronLeft),
+                                ),
+                                Icon(FLucideIcons.dot),
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      FButton(
+                                        style: .delta(
+                                          decoration: .delta([
+                                            .all(
+                                              .boxDelta(boxShadow: [shadow]),
+                                            ),
+                                          ]),
+                                        ),
+                                        variant: .outline,
+                                        onPress: () {},
+                                        child: Text(tv.name),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
+                                Icon(FLucideIcons.dot),
+                                FButton.icon(
+                                  style: .delta(
+                                    decoration: .delta([
+                                      .all(.boxDelta(boxShadow: [shadow])),
+                                    ]),
+                                  ),
+                                  onPress: context.pop,
+                                  child: Icon(FLucideIcons.refreshCcw),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                       child: SizedBox(
                         height: size.height,
@@ -332,24 +345,30 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                   ),
                   SliverSection(
                     key: seasonKey,
-                    header: Padding(
-                      padding: const EdgeInsets.all(20),
+                    header: Align(
+                      alignment: .centerStart,
                       child: Row(
+                        spacing: 20,
+                        mainAxisSize: .min,
                         children: [
                           SeasonSelector(
                             seriesId: widget.id,
                             selectedSeasonItem: state.selectedSeason,
                             seasonItems: state.seasons,
                             onSeasonChange: (s) {
-                              tvNotifier.onSeasonChanged(s.id).then((_) {
-                                if (seasonKey.currentContext != null) {
-                                  Scrollable.ensureVisible(
-                                    seasonKey.currentContext!,
-                                    alignment: 0,
-                                    duration: kDefaultAnimationDuration,
-                                  );
-                                }
-                              });
+                              tvNotifier.onSeasonChanged(s.id).then(
+                                (
+                                  _,
+                                ) {
+                                  if (seasonKey.currentContext != null) {
+                                    Scrollable.ensureVisible(
+                                      seasonKey.currentContext!,
+                                      alignment: 0,
+                                      duration: kDefaultAnimationDuration,
+                                    );
+                                  }
+                                },
+                              );
                             },
                           ),
                         ],

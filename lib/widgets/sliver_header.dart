@@ -36,6 +36,7 @@ class SliverHeader extends SliverPersistentHeaderDelegate {
     }
 
     return Stack(
+      clipBehavior: .none,
       fit: StackFit.expand,
       children: [
         if (child != null)
