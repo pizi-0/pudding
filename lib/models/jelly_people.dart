@@ -41,4 +41,19 @@ class JellyPeople {
   String toString() {
     return 'JellyPeople(Name: $Name, Id: $Id, Role: $Role, Type: $Type)';
   }
+
+  @override
+  bool operator ==(covariant JellyPeople other) {
+    if (identical(this, other)) return true;
+
+    return other.Name == Name &&
+        other.Id == Id &&
+        other.Role == Role &&
+        other.Type == Type;
+  }
+
+  @override
+  int get hashCode {
+    return Name.hashCode ^ Id.hashCode ^ Role.hashCode ^ Type.hashCode;
+  }
 }
