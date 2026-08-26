@@ -34,9 +34,13 @@ class _SliverSectionState extends State<SliverSection> {
                           borderRadius: theme.style.borderRadius.md,
                           boxShadow: [
                             BoxShadow(
-                              color: theme.colors.background,
-                              spreadRadius: 15 * percent,
-                              blurRadius: 15,
+                              color: Color.lerp(
+                                Colors.transparent,
+                                theme.colors.background,
+                                percent,
+                              )!,
+                              spreadRadius: 10 * percent,
+                              blurRadius: 10,
                             ),
                           ],
                         ),
