@@ -131,6 +131,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
             ),
             data: (state) {
               final tv = state.tvshow;
+              final season = state.selectedSeason;
               final logo = tv.imageTags[JellyfinImagesApi.typeLogo];
               final genres = tv.genres.sublist(
                 0,
@@ -158,7 +159,11 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                         valueListenable: scrollOffset,
                         builder: (context, value, child) {
                           final shadow = BoxShadow(
-                            color: theme.colors.background,
+                            color: Color.lerp(
+                              Colors.transparent,
+                              theme.colors.background,
+                              value,
+                            )!,
                             spreadRadius: 10 * value,
                             blurRadius: 10,
                           );
@@ -385,22 +390,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                       ),
                     ],
                   ),
-                  SliverSection(
-                    key: castsKey,
-                    header: FButton(
-                      variant: .outline,
-                      onPress: () {
-                        _scrollToKey(castsKey);
-                      },
-                      child: Text('Cast & Crew'),
-                    ),
-                    slivers: [
-                      SliverPadding(
-                        padding: .fromLTRB(20, 0, 20, 20),
-                        sliver: PeopleGrid(peoples: tv.getPeoples()),
-                      ),
-                    ],
-                  ),
+                  SliverPeople(key: castsKey, tv: tv, season: season),
                 ],
               );
             },

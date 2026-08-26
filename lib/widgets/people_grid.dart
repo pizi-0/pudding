@@ -1,8 +1,12 @@
 import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:morphnext/morphnext.dart';
+import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/widgets/sliver_section.dart';
 
 import '../const/const.dart';
 import '../models/jelly_people.dart';
@@ -10,10 +14,12 @@ import '../services/di.dart';
 
 class PeopleGrid extends StatelessWidget {
   final List<JellyPeople> peoples;
+  final List<JellyPeople> seasonPeoples;
 
   const PeopleGrid({
     super.key,
     required this.peoples,
+    this.seasonPeoples = const [],
   });
 
   @override
@@ -22,8 +28,8 @@ class PeopleGrid extends StatelessWidget {
       key: ValueKey(peoples.toString()),
       itemCount: peoples.length,
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
         childAspectRatio: 1 / 1.35,
         maxCrossAxisExtent: 180,
       ),
@@ -33,6 +39,102 @@ class PeopleGrid extends StatelessWidget {
         return PeopleButton(people: people);
       },
     );
+  }
+}
+
+class SliverPeople extends StatefulWidget {
+  final JellyfinItem tv;
+  final JellyfinItem? season;
+  const SliverPeople({
+    super.key,
+    required this.tv,
+    this.season,
+  });
+
+  @override
+  State<SliverPeople> createState() => _SliverPeopleState();
+}
+
+class _SliverPeopleState extends State<SliverPeople> {
+  bool showAll = false;
+  late List<JellyPeople> selectedList = widget.tv.getPeoples();
+
+  @override
+  Widget build(BuildContext context) {
+    final isSeasonList = listEquals(selectedList, widget.season?.getPeoples());
+
+    return SliverSection(
+      header: Row(
+        spacing: 10,
+        children: [
+          Row(
+            spacing: 10,
+            children: [
+              FButton.icon(
+                variant: .outline,
+                onPress: () => setState(() {
+                  if (isSeasonList) {
+                    selectedList = widget.tv.getPeoples();
+                  } else {
+                    selectedList = widget.season?.getPeoples() ?? [];
+                  }
+                }),
+                child: Icon(FLucideIcons.arrowLeftRight),
+              ),
+              FButton(
+                variant: .outline,
+                onPress: () {
+                  _scrollToKey(widget.key as GlobalKey);
+                },
+
+                child: Text(
+                  '${isSeasonList ? widget.season?.name : 'Series'} Cast & Crew',
+                ),
+              ),
+            ],
+          ),
+          if (selectedList.length > 15)
+            FButton(
+              variant: .ghost,
+              onPress: () => setState(() => showAll = !showAll),
+              suffix: AnimatedMorphIcon(
+                icon: showAll ? FLucideIcons.minus : FLucideIcons.plus,
+              ),
+              child: showAll
+                  ? Text('Show less')
+                  : Text('Show all (${selectedList.length})'),
+            ),
+        ],
+      ),
+      slivers: [
+        SliverPadding(
+          padding: .fromLTRB(20, 0, 20, 20),
+          sliver: PeopleGrid(peoples: peeps()),
+        ),
+      ],
+    );
+  }
+
+  List<JellyPeople> peeps() {
+    if (showAll) {
+      return selectedList;
+    } else {
+      if (selectedList.length > 15) {
+        return selectedList.sublist(0, 15);
+      } else {
+        return selectedList;
+      }
+    }
+  }
+
+  void _scrollToKey(GlobalKey key) {
+    if (key.currentContext != null) {
+      Scrollable.ensureVisible(
+        key.currentContext!,
+        alignment: 0,
+        duration: kDefaultAnimationDuration,
+      );
+    }
   }
 }
 
@@ -77,17 +179,22 @@ class _PeopleButtonState extends State<PeopleButton> {
                     end: .bottomCenter,
                   ).createShader(rect),
                   blendMode: .darken,
-                  child: CachedNetworkImage(
-                    imageUrl: services<JellyfinClient>().images.url(
-                      itemId: widget.people.Id,
-                    ),
-                    fit: .cover,
-                    height: 50,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.black,
-                      child: Icon(
-                        FLucideIcons.user,
-                        size: 50,
+                  child: AnimatedScale(
+                    duration: kDefaultAnimationDuration,
+                    scale: hover ? 1.02 : 1,
+                    alignment: .bottomCenter,
+                    child: CachedNetworkImage(
+                      imageUrl: services<JellyfinClient>().images.url(
+                        itemId: widget.people.Id,
+                      ),
+                      fit: .cover,
+                      memCacheHeight: 400,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.black,
+                        child: Icon(
+                          FLucideIcons.user,
+                          size: 50,
+                        ),
                       ),
                     ),
                   ),

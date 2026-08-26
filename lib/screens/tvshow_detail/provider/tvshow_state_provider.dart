@@ -110,7 +110,7 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
     try {
       final res = await client.tvShows.seasons(
         seriesId: id,
-        fields: ['Overview'],
+        fields: ['Overview', 'People'],
       );
 
       return res.items;
