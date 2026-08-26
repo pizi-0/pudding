@@ -287,10 +287,12 @@ class MediaCardState extends State<MediaCard> {
 class NewMediaCard extends StatefulWidget {
   final JellyfinItem item;
   final String imageType;
+  final bool dimPlayed;
   const NewMediaCard({
     super.key,
     required this.item,
     this.imageType = JellyfinImagesApi.typePrimary,
+    this.dimPlayed = false,
   });
 
   @override
@@ -343,7 +345,11 @@ class _NewMediaCardState extends State<NewMediaCard> {
                       blendMode: .dstOut,
                       child: AnimatedOpacity(
                         duration: kDefaultAnimationDuration,
-                        opacity: hover ? 0.8 : 1,
+                        opacity: widget.dimPlayed && !hover
+                            ? 0.4
+                            : hover
+                            ? 0.8
+                            : 1,
                         child: AnimatedScale(
                           duration: kDefaultAnimationDuration,
                           alignment: .bottomCenter,

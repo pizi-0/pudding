@@ -384,7 +384,10 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                           itemBuilder: (context, index) {
                             final ep = state.episodes[index];
 
-                            return NewMediaCard(item: ep);
+                            return NewMediaCard(
+                              item: ep,
+                              dimPlayed: ep.userData?.played ?? false,
+                            );
                           },
                         ),
                       ),
