@@ -6,6 +6,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/star_rating_container.dart';
@@ -413,7 +414,7 @@ class _NewMediaCardState extends State<NewMediaCard> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    item.name,
+                                    item.getTitle(),
                                     maxLines: hover ? null : 1,
                                     overflow: hover ? null : .ellipsis,
                                   ).bold(),
@@ -428,38 +429,49 @@ class _NewMediaCardState extends State<NewMediaCard> {
                                       ),
                                       Text('${item.getUnplayed()}'),
                                     ],
-                                  ),
-                                if (played)
-                                  Icon(
-                                    FLucideIcons.check,
-                                    color: Colors.green,
+                                  )
+                                else if (played)
+                                  Icon(FLucideIcons.check, color: Colors.green)
+                                else
+                                  Row(
+                                    spacing: 4,
+                                    children: [
+                                      Icon(
+                                        FLucideIcons.clock,
+                                        size: theme.typography.body.sm.fontSize,
+                                      ),
+                                      Text(
+                                        '${item.getRuntime()}',
+                                        style: theme.typography.body.xs
+                                            .copyWith(
+                                              color: theme.colors.foreground
+                                                  .withAlpha(
+                                                    200,
+                                                  ),
+                                            ),
+                                      ),
+                                    ],
                                   ),
                               ],
                             ),
-                            Row(
-                              mainAxisAlignment: .spaceBetween,
-                              children: [
-                                if (year != null)
-                                  Text(
-                                    year,
-                                    style: theme.typography.body.xs.copyWith(
-                                      color: theme.colors.foreground.withAlpha(
-                                        200,
-                                      ),
+                            DefaultTextStyle(
+                              style: theme.typography.body.xs.copyWith(
+                                color: theme.colors.foreground.withAlpha(
+                                  200,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: .spaceBetween,
+                                children: [
+                                  if (year != null) Text(year),
+                                  if (item.getCommunityRating() != null)
+                                    StarRatingContainer(
+                                      rating: item
+                                          .getCommunityRating()!
+                                          .toStringAsFixed(2),
                                     ),
-                                  ),
-                                if (item.getCommunityRating() != null)
-                                  StarRatingContainer(
-                                    rating: item
-                                        .getCommunityRating()!
-                                        .toStringAsFixed(2),
-                                    style: theme.typography.body.xs.copyWith(
-                                      color: theme.colors.foreground.withAlpha(
-                                        200,
-                                      ),
-                                    ),
-                                  ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -475,58 +487,6 @@ class _NewMediaCardState extends State<NewMediaCard> {
     );
   }
 
-  // Widget _playedStatusIndicator(
-  //   FThemeData theme,
-  //   FStyle style,
-  //   JellyfinItem item,
-  // ) {
-  //   bool hasUnplayedCount = item.isFolder || item.isSeries;
-  //   bool played = item.userData?.played ?? false;
-
-  //   Widget playedIcon = Icon(FLucideIcons.check, color: Colors.black);
-  //   Widget? unplayedCount = Text(
-  //     item.getUnplayed().toString(),
-  //     style: theme.typography.body.sm.copyWith(
-  //       color: theme.colors.primaryForeground,
-  //     ),
-  //     textAlign: .center,
-  //   );
-
-  //   Widget indicator() {
-  //     if (hasUnplayedCount) {
-  //       if (played) {
-  //         return playedIcon;
-  //       } else {
-  //         return unplayedCount;
-  //       }
-  //     } else {
-  //       if (played) {
-  //         return playedIcon;
-  //       } else {
-  //         return SizedBox();
-  //       }
-  //     }
-  //   }
-
-  //   return hasUnplayedCount || played
-  //       ? Container(
-  //           margin: .all(2),
-  //           decoration: BoxDecoration(
-  //             color: played ? Colors.green : theme.colors.primary,
-  //             borderRadius: style.borderRadius.sm,
-  //           ),
-  //           padding: .all(4),
-  //           child: ConstrainedBox(
-  //             constraints: BoxConstraints(
-  //               maxHeight: theme.typography.body.sm.fontSize! + 4,
-  //               minWidth: theme.typography.body.sm.fontSize! + 4,
-  //             ),
-  //             child: indicator(),
-  //           ),
-  //         )
-  //       : SizedBox();
-  // }
-
   String? _getYear() {
     final item = widget.item;
 
@@ -536,6 +496,16 @@ class _NewMediaCardState extends State<NewMediaCard> {
 
     if (item.isMovie) {
       return item.productionYear?.toString();
+    }
+
+    if (item.isEpisode) {
+      final locale = Localizations.localeOf(context).toLanguageTag();
+      final fmt = DateFormat.yMMMEd(locale);
+      final date = item.premiereDate;
+
+      if (date != null) {
+        return fmt.format(date);
+      }
     }
 
     return null;
