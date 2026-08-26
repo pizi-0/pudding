@@ -1,4 +1,5 @@
-import 'package:awesome_extensions/awesome_extensions.dart' show ListExtension;
+import 'package:awesome_extensions/awesome_extensions.dart'
+    show ListExtension, WidgetCommonExtension;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
@@ -195,6 +196,9 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                         ),
                                         variant: .outline,
                                         onPress: () {},
+                                        suffix: FCircularProgress().showIf(
+                                          tvAsync.isLoading,
+                                        ),
                                         child: Text(tv.name),
                                       ),
                                     ],
