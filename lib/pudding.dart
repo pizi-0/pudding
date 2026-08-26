@@ -15,6 +15,7 @@ class Pudding extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       title: 'Pudding',
       routerConfig: router,
+      supportedLocales: [Locale('en', 'US'), Locale('en', 'GB')],
       builder: (context, child) => FTheme(
         data: FThemeData(
           colors: darkCustom(primary: Colors.pink),
