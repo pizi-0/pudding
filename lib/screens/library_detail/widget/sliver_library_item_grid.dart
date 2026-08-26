@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:go_router/go_router.dart';
 import 'package:morphnext/morphnext.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/models/jelly_filter.dart';
@@ -271,6 +272,7 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                 key: ValueKey(item.id),
                 item: item,
                 imageType: prefs.imageType,
+                onPressed: () => context.push('/show/${item.id}'),
               );
             },
           ),

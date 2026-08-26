@@ -288,11 +288,15 @@ class NewMediaCard extends StatefulWidget {
   final JellyfinItem item;
   final String imageType;
   final bool dimPlayed;
+  final Function()? onPressed;
+  final bool selected;
   const NewMediaCard({
     super.key,
     required this.item,
     this.imageType = JellyfinImagesApi.typePrimary,
     this.dimPlayed = false,
+    this.onPressed,
+    this.selected = false,
   });
 
   @override
@@ -317,8 +321,8 @@ class _NewMediaCardState extends State<NewMediaCard> {
       child: FButton.raw(
         onHoverChange: (value) => setState(() => hover = value),
         onFocusChange: (value) => setState(() => hover = value),
-        variant: .outline,
-        onPress: () => context.push('/show/${item.id}'),
+        variant: widget.selected ? .primary : .outline,
+        onPress: widget.onPressed,
         child: Padding(
           padding: const EdgeInsets.all(2.0),
           child: ClipRRect(
@@ -500,7 +504,7 @@ class _NewMediaCardState extends State<NewMediaCard> {
       return item.getSeriesRunYears();
     }
 
-    if (item.isMovie) {
+    if (item.isMovie || item.isSeason) {
       return item.productionYear?.toString();
     }
 

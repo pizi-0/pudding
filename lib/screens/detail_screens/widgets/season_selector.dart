@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:morphnext/morphnext.dart';
-import 'package:pudding/screens/detail_screens/widgets/season_card.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/widgets/media_card.dart';
 
 class SeasonSelector extends ConsumerStatefulWidget {
   final String seriesId;
@@ -137,10 +137,10 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
           itemBuilder: (context, index) {
             final season = widget.seasonItems.elementAt(index)!;
 
-            return SeasonCard(
-              season: season,
+            return NewMediaCard(
+              item: season,
               selected: season.id == widget.selectedSeasonItem?.id,
-              onPress: () {
+              onPressed: () {
                 widget.onSeasonChange(season);
                 controller.hide();
                 popup = false;
@@ -152,13 +152,4 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
       },
     );
   }
-
-  // _findwidget() {
-  //   final size = MediaQuery.sizeOf(context);
-
-  //   final renderbox = buttonKey.currentContext?.findRenderObject() as RenderBox;
-
-  //   print(renderbox.localToGlobal(.zero));
-  //   print(size);
-  // }
 }
