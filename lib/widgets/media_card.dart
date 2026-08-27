@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:animate_do/animate_do.dart';
 import 'package:awesome_extensions/awesome_extensions.dart' show StyledText;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
@@ -290,6 +291,7 @@ class NewMediaCard extends StatefulWidget {
   final bool dimPlayed;
   final Function()? onPressed;
   final bool selected;
+  final bool isNext;
   const NewMediaCard({
     super.key,
     required this.item,
@@ -297,6 +299,7 @@ class NewMediaCard extends StatefulWidget {
     this.dimPlayed = false,
     this.onPressed,
     this.selected = false,
+    this.isNext = false,
   });
 
   @override
@@ -405,7 +408,11 @@ class _NewMediaCardState extends State<NewMediaCard> {
                     ),
                   Align(
                     alignment: .bottomCenter,
-                    child: BottomData(item: item, hover: hover),
+                    child: BottomData(
+                      item: item,
+                      hover: hover,
+                      isNext: widget.isNext,
+                    ),
                   ),
                 ],
               ),
@@ -442,6 +449,10 @@ class BottomData extends StatelessWidget {
           crossAxisAlignment: .stretch,
           mainAxisSize: .min,
           children: [
+            if (item.isResumable)
+              FDeterminateProgress(
+                value: item.getPlayProgress(),
+              ).fadeOut(animate: hover, duration: kDefaultAnimationDuration),
             Row(
               spacing: 10,
               crossAxisAlignment: .end,
@@ -511,7 +522,8 @@ class BottomData extends StatelessWidget {
         spacing: 4,
         children: [
           Icon(
-            FLucideIcons.eye,
+            isNext ? FLucideIcons.play : FLucideIcons.eye,
+            color: isNext ? theme.colors.primary : null,
             size: theme.typography.body.sm.fontSize,
           ),
           Text('${item.getUnplayed()}'),
@@ -522,8 +534,9 @@ class BottomData extends StatelessWidget {
         spacing: 4,
         children: [
           Icon(
-            FLucideIcons.clock,
+            isNext ? FLucideIcons.play : FLucideIcons.clock,
             size: theme.typography.body.sm.fontSize,
+            color: isNext ? theme.colors.primary : null,
           ),
           Text(
             '${item.getRuntime()}',
