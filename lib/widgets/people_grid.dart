@@ -31,7 +31,7 @@ class PeopleGrid extends StatelessWidget {
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
         childAspectRatio: 1 / 1.35,
-        maxCrossAxisExtent: 180,
+        maxCrossAxisExtent: 160,
       ),
       itemBuilder: (context, index) {
         final people = peoples[index];
