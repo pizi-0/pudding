@@ -312,9 +312,6 @@ class _NewMediaCardState extends State<NewMediaCard> {
     final theme = FTheme.of(context);
     final style = theme.style;
 
-    final year = _getYear();
-    final played = item.userData?.played ?? false;
-    final hasUnplayed = item.getUnplayed() != null;
     final favorite = item.isFavorite;
 
     return RepaintBoundary(
@@ -408,85 +405,7 @@ class _NewMediaCardState extends State<NewMediaCard> {
                     ),
                   Align(
                     alignment: .bottomCenter,
-                    child: AnimatedSize(
-                      duration: kDefaultAnimationDuration,
-                      alignment: .bottomCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          spacing: 4,
-                          crossAxisAlignment: .stretch,
-                          mainAxisSize: .min,
-                          children: [
-                            Row(
-                              spacing: 10,
-                              crossAxisAlignment: .end,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    item.getTitle(),
-                                    maxLines: hover ? null : 1,
-                                    overflow: hover ? null : .ellipsis,
-                                  ).bold(),
-                                ),
-                                if (hasUnplayed && !played)
-                                  Row(
-                                    spacing: 4,
-                                    children: [
-                                      Icon(
-                                        FLucideIcons.eye,
-                                        size: theme.typography.body.sm.fontSize,
-                                      ),
-                                      Text('${item.getUnplayed()}'),
-                                    ],
-                                  )
-                                else if (played)
-                                  Icon(FLucideIcons.check, color: Colors.green)
-                                else
-                                  Row(
-                                    spacing: 4,
-                                    children: [
-                                      Icon(
-                                        FLucideIcons.clock,
-                                        size: theme.typography.body.sm.fontSize,
-                                      ),
-                                      Text(
-                                        '${item.getRuntime()}',
-                                        style: theme.typography.body.xs
-                                            .copyWith(
-                                              color: theme.colors.foreground
-                                                  .withAlpha(
-                                                    200,
-                                                  ),
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                              ],
-                            ),
-                            DefaultTextStyle(
-                              style: theme.typography.body.xs.copyWith(
-                                color: theme.colors.foreground.withAlpha(
-                                  200,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: .spaceBetween,
-                                children: [
-                                  if (year != null) Text(year),
-                                  if (item.getCommunityRating() != null)
-                                    StarRatingContainer(
-                                      rating: item
-                                          .getCommunityRating()!
-                                          .toStringAsFixed(2),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    child: BottomData(item: item, hover: hover),
                   ),
                 ],
               ),
@@ -496,10 +415,65 @@ class _NewMediaCardState extends State<NewMediaCard> {
       ),
     );
   }
+}
 
-  String? _getYear() {
-    final item = widget.item;
+class BottomData extends StatelessWidget {
+  final JellyfinItem item;
+  final bool hover;
+  const BottomData({super.key, required this.item, this.hover = false});
 
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.theme;
+
+    return AnimatedSize(
+      duration: kDefaultAnimationDuration,
+      alignment: .bottomCenter,
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          spacing: 4,
+          crossAxisAlignment: .stretch,
+          mainAxisSize: .min,
+          children: [
+            Row(
+              spacing: 10,
+              crossAxisAlignment: .end,
+              children: [
+                Expanded(
+                  child: Text(
+                    item.getTitle(),
+                    maxLines: hover ? null : 1,
+                    overflow: hover ? null : .ellipsis,
+                  ).bold(),
+                ),
+                _playStatusIndicator(theme),
+              ],
+            ),
+            DefaultTextStyle(
+              style: theme.typography.body.xs.copyWith(
+                color: theme.colors.foreground.withAlpha(
+                  200,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: .spaceBetween,
+                children: [
+                  if (_getYear(context) != null) Text(_getYear(context)!),
+                  if (item.getCommunityRating() != null)
+                    StarRatingContainer(
+                      rating: item.getCommunityRating()!.toStringAsFixed(2),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String? _getYear(BuildContext context) {
     if (item.isSeries) {
       return item.getSeriesRunYears();
     }
@@ -519,5 +493,44 @@ class _NewMediaCardState extends State<NewMediaCard> {
     }
 
     return null;
+  }
+
+  Widget _playStatusIndicator(FThemeData theme) {
+    if (item.userData?.played ?? false) {
+      return Icon(FLucideIcons.check, color: Colors.green);
+    }
+
+    if (item.isSeries) {
+      return Row(
+        spacing: 4,
+        children: [
+          Icon(
+            FLucideIcons.eye,
+            size: theme.typography.body.sm.fontSize,
+          ),
+          Text('${item.getUnplayed()}'),
+        ],
+      );
+    } else if (item.isMovie || item.isEpisode) {
+      return Row(
+        spacing: 4,
+        children: [
+          Icon(
+            FLucideIcons.clock,
+            size: theme.typography.body.sm.fontSize,
+          ),
+          Text(
+            '${item.getRuntime()}',
+            style: theme.typography.body.xs.copyWith(
+              color: theme.colors.foreground.withAlpha(
+                200,
+              ),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return SizedBox();
+    }
   }
 }
