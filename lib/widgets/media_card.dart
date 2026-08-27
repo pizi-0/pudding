@@ -419,8 +419,14 @@ class _NewMediaCardState extends State<NewMediaCard> {
 
 class BottomData extends StatelessWidget {
   final JellyfinItem item;
+  final bool isNext;
   final bool hover;
-  const BottomData({super.key, required this.item, this.hover = false});
+  const BottomData({
+    super.key,
+    required this.item,
+    this.hover = false,
+    this.isNext = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -500,7 +506,7 @@ class BottomData extends StatelessWidget {
       return Icon(FLucideIcons.check, color: Colors.green);
     }
 
-    if (item.isSeries) {
+    if (item.isSeries || item.isSeason) {
       return Row(
         spacing: 4,
         children: [
