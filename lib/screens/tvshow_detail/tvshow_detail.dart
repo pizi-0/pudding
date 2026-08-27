@@ -391,6 +391,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                             return NewMediaCard(
                               item: ep,
                               dimPlayed: ep.userData?.played ?? false,
+                              selected: ep.id == state.nextup.id,
                             );
                           },
                         ),
