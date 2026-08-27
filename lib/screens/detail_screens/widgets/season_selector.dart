@@ -11,6 +11,7 @@ import 'package:pudding/widgets/media_card.dart';
 
 class SeasonSelector extends ConsumerStatefulWidget {
   final String seriesId;
+  final JellyfinItem? next;
   final JellyfinItem? selectedSeasonItem;
   final Iterable<JellyfinItem?> seasonItems;
   final double maxHeight;
@@ -18,6 +19,7 @@ class SeasonSelector extends ConsumerStatefulWidget {
 
   const SeasonSelector({
     super.key,
+    this.next,
     required this.seriesId,
     required this.selectedSeasonItem,
     required this.seasonItems,
@@ -140,6 +142,7 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
             return NewMediaCard(
               item: season,
               selected: season.id == widget.selectedSeasonItem?.id,
+              isNext: widget.next?.seasonId == season.id,
               onPressed: () {
                 widget.onSeasonChange(season);
                 controller.hide();

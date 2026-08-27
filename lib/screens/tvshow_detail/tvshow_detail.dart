@@ -132,6 +132,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
             ),
             data: (state) {
               final tv = state.tvshow;
+              final next = state.nextup;
               final season = state.selectedSeason;
               final logo = tv.imageTags[JellyfinImagesApi.typeLogo];
               final genres = tv.genres.sublist(
@@ -363,6 +364,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                         mainAxisSize: .min,
                         children: [
                           SeasonSelector(
+                            next: next,
                             seriesId: widget.id,
                             selectedSeasonItem: state.selectedSeason,
                             seasonItems: state.seasons,
@@ -392,6 +394,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                               item: ep,
                               dimPlayed: ep.userData?.played ?? false,
                               selected: ep.id == state.nextup.id,
+                              isNext: ep.id == next.id,
                             );
                           },
                         ),
