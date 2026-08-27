@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:morphnext/morphnext.dart';
+import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/media_card.dart';
 
@@ -16,7 +17,7 @@ class SeasonSelector extends ConsumerStatefulWidget {
   final JellyfinItem? selectedSeasonItem;
   final Iterable<JellyfinItem?> seasonItems;
   final double maxHeight;
-  final void Function(JellyfinItem season) onSeasonChange;
+  final Future Function(JellyfinItem season) onSeasonChange;
 
   const SeasonSelector({
     super.key,
@@ -34,6 +35,7 @@ class SeasonSelector extends ConsumerStatefulWidget {
 
 class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
   final GlobalKey buttonKey = GlobalKey();
+  String? selected;
   bool popup = false;
 
   @override
@@ -41,6 +43,7 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
     final theme = FTheme.of(context);
     final style = theme.style;
     final size = MediaQuery.sizeOf(context);
+    final tvAsync = ref.watch(tvshowStateProvider(widget.seriesId));
 
     double maxwidth() {
       final seasons = widget.seasonItems;
@@ -142,16 +145,38 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
           itemBuilder: (context, index) {
             final season = widget.seasonItems.elementAt(index)!;
 
-            return NewMediaCard(
-              item: season,
-              selected: season.id == widget.selectedSeasonItem?.id,
-              isNext: widget.next?.seasonId == season.id,
-              onPressed: () {
-                widget.onSeasonChange(season);
-                controller.hide();
-                popup = false;
-                setState(() {});
-              },
+            return Stack(
+              children: [
+                NewMediaCard(
+                  item: season,
+                  selected: season.id == widget.selectedSeasonItem?.id,
+                  isNext: widget.next?.seasonId == season.id,
+                  onPressed: () async {
+                    selected = season.id;
+                    setState(() {});
+
+                    await widget.onSeasonChange(season);
+                    controller.hide();
+
+                    popup = false;
+                    setState(() {});
+                  },
+                ),
+                if (tvAsync.isLoading && selected == season.id)
+                  Positioned.fill(
+                    bottom: 2,
+                    right: 2,
+                    left: 2,
+                    top: 2,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: theme.colors.background.withAlpha(200),
+                        borderRadius: style.borderRadius.sm,
+                      ),
+                      child: FCircularProgress(),
+                    ),
+                  ),
+              ],
             );
           },
         );
