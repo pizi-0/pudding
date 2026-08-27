@@ -6,6 +6,7 @@ import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:pudding/const/const.dart';
@@ -40,12 +41,12 @@ class MediaCardState extends State<MediaCard> {
           .group(
             children: [
               .item(
-                prefix: Icon(FLucideIcons.play),
+                prefix: Icon(FPhosphorBoldIcons.play),
                 title: Text('Play'),
                 onPress: () {},
               ),
               .item(
-                prefix: Icon(FLucideIcons.play),
+                prefix: Icon(FPhosphorBoldIcons.play),
                 title: Text('Play all from here'),
                 onPress: () {},
               ),
@@ -56,19 +57,19 @@ class MediaCardState extends State<MediaCard> {
               ),
               // if (!(item.userData?.played ?? true))
               .item(
-                prefix: Icon(FLucideIcons.eye),
+                prefix: Icon(FPhosphorBoldIcons.eye),
                 title: Text('Mark as watched'),
                 onPress: () {},
               ),
               // if (item.userData?.played ?? false)
               .item(
-                prefix: Icon(FLucideIcons.eyeOff),
+                prefix: Icon(FPhosphorBoldIcons.eyeClosed),
                 title: Text('Mark as unwatched'),
                 onPress: () {},
               ),
               .submenu(
                 menuStyle: .delta(barrierFilter: () => null),
-                prefix: Icon(FLucideIcons.edit),
+                prefix: Icon(FPhosphorBoldIcons.pencil),
                 title: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 3.5),
                   child: Text('Add to'),
@@ -78,12 +79,12 @@ class MediaCardState extends State<MediaCard> {
                     children: [
                       .item(
                         title: Text('Collection'),
-                        prefix: Icon(FLucideIcons.packagePlus),
+                        prefix: Icon(FPhosphorBoldIcons.package),
                         onPress: () {},
                       ),
                       .item(
                         title: Text('Playlist'),
-                        prefix: Icon(FLucideIcons.listPlus),
+                        prefix: Icon(FPhosphorBoldIcons.listPlus),
                         onPress: () {},
                       ),
                     ],
@@ -96,13 +97,13 @@ class MediaCardState extends State<MediaCard> {
                 ),
               ),
               .item(
-                prefix: Icon(FLucideIcons.info),
+                prefix: Icon(FPhosphorBoldIcons.info),
                 title: Text('Info'),
                 onPress: () {},
               ),
               .submenu(
                 menuStyle: .delta(barrierFilter: () => null),
-                prefix: Icon(FLucideIcons.edit),
+                prefix: Icon(FPhosphorBoldIcons.pencil),
                 title: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 3.5),
                   child: Text('Edit'),
@@ -112,12 +113,12 @@ class MediaCardState extends State<MediaCard> {
                     children: [
                       .item(
                         title: Text('Metadata'),
-                        prefix: Icon(FLucideIcons.braces),
+                        prefix: Icon(FPhosphorBoldIcons.bracketsCurly),
                         onPress: () {},
                       ),
                       .item(
                         title: Text('Images'),
-                        prefix: Icon(FLucideIcons.image),
+                        prefix: Icon(FPhosphorBoldIcons.image),
                         onPress: () {},
                       ),
                     ],
@@ -130,7 +131,7 @@ class MediaCardState extends State<MediaCard> {
                 ),
               ),
               .item(
-                prefix: Icon(FLucideIcons.trash2),
+                prefix: Icon(FPhosphorBoldIcons.trash),
                 title: Text('Delete'),
                 onPress: () {},
               ),
@@ -401,7 +402,7 @@ class _NewMediaCardState extends State<NewMediaCard> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Icon(
-                          Icons.favorite,
+                          FPhosphorFillIcons.heart,
                           color: Colors.pink,
                         ),
                       ),
@@ -514,7 +515,7 @@ class BottomData extends StatelessWidget {
 
   Widget _playStatusIndicator(FThemeData theme) {
     if (item.userData?.played ?? false) {
-      return Icon(FLucideIcons.check, color: Colors.green);
+      return Icon(FPhosphorBoldIcons.check, color: Colors.green);
     }
 
     if (item.isSeries || item.isSeason) {
@@ -522,7 +523,7 @@ class BottomData extends StatelessWidget {
         spacing: 4,
         children: [
           Icon(
-            isNext ? FLucideIcons.play : FLucideIcons.eye,
+            isNext ? FPhosphorBoldIcons.play : FPhosphorBoldIcons.eye,
             color: isNext ? theme.colors.primary : null,
             size: theme.typography.body.sm.fontSize,
           ),
@@ -534,7 +535,7 @@ class BottomData extends StatelessWidget {
         spacing: 4,
         children: [
           Icon(
-            isNext ? FLucideIcons.play : FLucideIcons.clock,
+            isNext ? FPhosphorBoldIcons.play : FPhosphorBoldIcons.clock,
             size: theme.typography.body.sm.fontSize,
             color: isNext ? theme.colors.primary : null,
           ),

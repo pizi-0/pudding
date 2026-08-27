@@ -5,6 +5,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/screens/detail_screens/widgets/season_selector.dart';
@@ -115,13 +116,13 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                         children: [
                           FButton.icon(
                             onPress: context.pop,
-                            child: Icon(FLucideIcons.chevronLeft),
+                            child: Icon(FPhosphorBoldIcons.caretLeft),
                           ),
 
                           FButton.icon(
                             onPress: () =>
                                 ref.invalidate(tvshowStateProvider(widget.id)),
-                            child: Icon(FLucideIcons.chevronLeft),
+                            child: Icon(FPhosphorBoldIcons.caretLeft),
                           ),
                         ],
                       ),
@@ -181,9 +182,9 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                     ]),
                                   ),
                                   onPress: context.pop,
-                                  child: Icon(FLucideIcons.chevronLeft),
+                                  child: Icon(FPhosphorBoldIcons.caretLeft),
                                 ),
-                                Icon(FLucideIcons.dot),
+                                Icon(FPhosphorBoldIcons.dot),
                                 Expanded(
                                   child: Row(
                                     children: [
@@ -205,7 +206,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                     ],
                                   ),
                                 ),
-                                Icon(FLucideIcons.dot),
+                                Icon(FPhosphorBoldIcons.dot),
                                 FButton.icon(
                                   style: .delta(
                                     decoration: .delta([
@@ -213,7 +214,9 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                     ]),
                                   ),
                                   onPress: context.pop,
-                                  child: Icon(FLucideIcons.refreshCcw),
+                                  child: Icon(
+                                    FPhosphorBoldIcons.arrowClockwise,
+                                  ),
                                 ),
                               ],
                             ),
@@ -248,7 +251,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                             )
                                             .toList()
                                             .separatedBy(
-                                              Icon(FLucideIcons.dot),
+                                              Icon(FPhosphorBoldIcons.dot),
                                             ),
                                       ),
                                     FittedBox(
@@ -262,11 +265,11 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                             child: FButton.icon(
                                               onPress: () {},
                                               child: Icon(
-                                                FLucideIcons.film,
+                                                FPhosphorBoldIcons.filmStrip,
                                               ),
                                             ),
                                           ),
-                                          Icon(FLucideIcons.dot),
+                                          Icon(FPhosphorBoldIcons.dot),
                                           FButton(
                                             style: .delta(
                                               contentStyle: .delta(
@@ -276,10 +279,12 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                               ),
                                             ),
                                             onPress: () {},
-                                            prefix: Icon(FLucideIcons.play),
+                                            prefix: Icon(
+                                              FPhosphorIcons.play,
+                                            ),
                                             child: Text('Play'),
                                           ),
-                                          Icon(FLucideIcons.dot),
+                                          Icon(FPhosphorBoldIcons.dot),
                                           FTooltip(
                                             tipBuilder: (context, controller) =>
                                                 Text(
@@ -296,7 +301,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                                       isFavorite,
                                                     ),
                                               child: Icon(
-                                                FLucideIcons.heart,
+                                                FPhosphorBoldIcons.heart,
                                                 color: isFavorite
                                                     ? Colors.pink
                                                     : null,
@@ -312,7 +317,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                                     isPlayed,
                                                   ),
                                             child: Icon(
-                                              FLucideIcons.check,
+                                              FPhosphorBoldIcons.check,
                                               color: isPlayed
                                                   ? Colors.green
                                                   : null,
@@ -323,15 +328,18 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                     ),
                                     Row(
                                       mainAxisAlignment: .center,
-                                      children: [
-                                        Text(runYears),
-                                        if (seasonCount != null)
-                                          Text('$seasonCount seasons'),
-                                        if (episodeCount != null)
-                                          Text('$episodeCount episodes'),
-                                        if (unplayed != null)
-                                          Text('$unplayed unplayed'),
-                                      ].separatedBy(Icon(FLucideIcons.dot)),
+                                      children:
+                                          [
+                                            Text(runYears),
+                                            if (seasonCount != null)
+                                              Text('$seasonCount seasons'),
+                                            if (episodeCount != null)
+                                              Text('$episodeCount episodes'),
+                                            if (unplayed != null)
+                                              Text('$unplayed unplayed'),
+                                          ].separatedBy(
+                                            Icon(FPhosphorBoldIcons.dot),
+                                          ),
                                     ),
                                   ],
                                 ),

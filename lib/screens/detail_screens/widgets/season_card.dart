@@ -91,7 +91,7 @@
 //                           ),
 //                           isPlayed
 //                               ? Icon(
-//                                   FLucideIcons.check,
+//                                   FPhosphorBoldIcons.check,
 //                                   color: Colors.green,
 //                                 )
 //                               : Text(
@@ -99,7 +99,7 @@
 //                                 ),
 //                         ].separatedBy(
 //                           Icon(
-//                             FLucideIcons.dot,
+//                             FPhosphorBoldIcons.dot,
 //                           ),
 //                         ),
 //                   ),

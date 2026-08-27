@@ -3,6 +3,7 @@ import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
@@ -95,12 +96,15 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
                                         ),
                                         fit: .cover,
                                         errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                Center(
-                                                  child: Icon(
-                                                    FLucideIcons.imageOff,
-                                                  ),
-                                                ),
+                                            (
+                                              context,
+                                              error,
+                                              stackTrace,
+                                            ) => Center(
+                                              child: Icon(
+                                                FPhosphorBoldIcons.imageBroken,
+                                              ),
+                                            ),
                                       ),
                                 ),
                           ),

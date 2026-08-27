@@ -3,6 +3,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:pudding/const/const.dart';
@@ -92,7 +93,7 @@ class _AuthWidgetState extends ConsumerState<AuthWidget> {
                             serverField.clear();
                             _resetForm();
                           },
-                          child: Icon(FLucideIcons.x),
+                          child: Icon(FPhosphorBoldIcons.x),
                         ),
                       );
                     }

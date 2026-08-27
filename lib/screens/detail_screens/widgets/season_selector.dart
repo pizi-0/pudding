@@ -5,6 +5,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:morphnext/morphnext.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/media_card.dart';
@@ -115,7 +116,9 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
           setState(() {});
         },
         suffix: AnimatedMorphIcon(
-          icon: popup ? FLucideIcons.chevronUp : FLucideIcons.chevronDown,
+          icon: popup
+              ? FPhosphorBoldIcons.caretUp
+              : FPhosphorBoldIcons.caretDown,
         ),
         child: Text(
           widget.selectedSeasonItem!.name,

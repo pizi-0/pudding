@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 
 class StarRatingContainer extends StatelessWidget {
   final String rating;
@@ -14,7 +15,7 @@ class StarRatingContainer extends StatelessWidget {
       spacing: 4,
       children: [
         Icon(
-          FLucideIcons.star,
+          FPhosphorFillIcons.star,
           color: Colors.amber,
           size: theme.typography.body.sm.fontSize,
         ),

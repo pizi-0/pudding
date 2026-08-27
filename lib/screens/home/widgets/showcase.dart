@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/screens/home/home_provider.dart';
@@ -105,7 +106,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                     onPress: () => ref.refresh(homeProvider),
                     child: ref.read(homeProvider).isLoading
                         ? FCircularProgress()
-                        : Icon(FLucideIcons.rotateCcw),
+                        : Icon(FPhosphorBoldIcons.arrowClockwise),
                   ),
                   Row(
                     mainAxisSize: .min,
@@ -119,7 +120,7 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                           onPress: currentPage == 0
                               ? null
                               : () => _previousPage(data.showcaseItem),
-                          child: Icon(FLucideIcons.chevronLeft),
+                          child: Icon(FPhosphorBoldIcons.caretLeft),
                         ),
                       ),
                       SizedBox(
@@ -140,12 +141,12 @@ class _ShowcaseState extends ConsumerState<Showcase> {
                           variant: .ghost,
                           size: .lg,
                           onPress: () => _nextPage(data.showcaseItem),
-                          child: Icon(FLucideIcons.chevronRight),
+                          child: Icon(FPhosphorBoldIcons.caretRight),
                         ),
                       ),
                     ],
                   ),
-                ].separatedBy(Icon(FLucideIcons.dot)),
+                ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
               ),
             ),
           ),
@@ -351,7 +352,7 @@ class ItemLg extends ConsumerWidget {
 
                             if (item.isSeries)
                               Text('${item.getSeasons()} season'),
-                          ].separatedBy(Icon(FLucideIcons.dot)),
+                          ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
                         ),
                       ],
                     ),
@@ -382,26 +383,26 @@ class ItemLg extends ConsumerWidget {
                           context.go('/show/${item.id}');
                         }
                       },
-                      child: Icon(FLucideIcons.info),
+                      child: Icon(FPhosphorBoldIcons.info),
                     ),
                     FButton.icon(
                       onPress: () {},
-                      child: Icon(FLucideIcons.heart),
+                      child: Icon(FPhosphorBoldIcons.heart),
                     ),
                     FButton.icon(
                       onPress: () {},
-                      child: Icon(FLucideIcons.check),
+                      child: Icon(FPhosphorBoldIcons.check),
                     ),
-                    Icon(FLucideIcons.dot),
+                    Icon(FPhosphorBoldIcons.dot),
                     FButton(
                       onPress: () {},
-                      prefix: Icon(FLucideIcons.play),
+                      prefix: Icon(FPhosphorBoldIcons.play),
                       child: Row(
                         children: [
                           Text('Play'),
                           if (item.showRuntime)
                             Text('Ends at ${item.getEndsAt(context)}'),
-                        ].separatedBy(Icon(FLucideIcons.dot)),
+                        ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
                       ),
                     ),
                   ],

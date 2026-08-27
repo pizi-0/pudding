@@ -4,6 +4,7 @@ import 'package:awesome_extensions/awesome_extensions.dart' show NumExtension;
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:morphnext/morphnext.dart';
 import 'package:pudding/widgets/bar.dart';
 
@@ -79,7 +80,9 @@ class _SliverCarouselState extends State<SliverCarousel> {
                 children: [
                   Text('Continue watching'),
                   AnimatedMorphIcon(
-                    icon: hover ? FLucideIcons.pause : FLucideIcons.play,
+                    icon: hover
+                        ? FPhosphorBoldIcons.pause
+                        : FPhosphorBoldIcons.play,
                   ),
                 ],
               ),

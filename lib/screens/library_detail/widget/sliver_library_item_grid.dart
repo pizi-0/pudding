@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
 import 'package:morphnext/morphnext.dart';
 import 'package:pudding/const/const.dart';
@@ -60,8 +61,8 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                     },
                     child: Icon(
                       data.filters.isEmpty
-                          ? FLucideIcons.filter
-                          : FLucideIcons.filterX,
+                          ? FPhosphorBoldIcons.funnel
+                          : FPhosphorBoldIcons.funnelX,
                     ),
                   ),
                 ],
@@ -121,7 +122,7 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                             )
                             ..updateDisplayPrefs();
                         },
-                        child: Icon(FLucideIcons.zoomOut),
+                        child: Icon(FPhosphorBoldIcons.magnifyingGlassMinus),
                       ),
                       SizedBox(
                         width: 120,
@@ -182,7 +183,7 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                             ..setMaxImageWidth(maxWidth)
                             ..updateDisplayPrefs();
                         },
-                        child: Icon(FLucideIcons.zoomIn),
+                        child: Icon(FPhosphorBoldIcons.magnifyingGlassPlus),
                       ),
                     ],
                   ),
@@ -351,7 +352,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                                       ..resetFilter()
                                       ..refresh();
                                   },
-                                  prefix: Icon(FLucideIcons.filterX),
+                                  prefix: Icon(FPhosphorBoldIcons.funnelX),
                                   child: Text('Clear all'),
                                 ),
                             ],
@@ -506,7 +507,7 @@ class SliverRadioState<T> extends State<SliverRadio<T>> {
 
                               widget.onChanged(filterList);
                             },
-                            child: Icon(FLucideIcons.x),
+                            child: Icon(FPhosphorBoldIcons.x),
                           ),
                       ],
                     ),

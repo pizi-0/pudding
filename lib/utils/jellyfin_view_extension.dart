@@ -1,6 +1,6 @@
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
-import 'package:forui_assets/forui_assets.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:pudding/services/di.dart';
 
 extension JellyViewInfo on JellyfinView {
@@ -10,34 +10,34 @@ extension JellyViewInfo on JellyfinView {
 
   Widget getButtonIcon() {
     if (isMovies) {
-      return Icon(FLucideIcons.film);
+      return Icon(FPhosphorBoldIcons.filmSlate);
     }
 
     if (isTvShows) {
-      return Icon(FLucideIcons.tv);
+      return Icon(FPhosphorBoldIcons.television);
     }
 
     if (isMusic) {
-      return Icon(FLucideIcons.music);
+      return Icon(FPhosphorBoldIcons.musicNote);
     }
 
     if (isPhotos) {
-      return Icon(FLucideIcons.image);
+      return Icon(FPhosphorBoldIcons.image);
     }
 
     if (isBoxsets) {
-      return Icon(FLucideIcons.box);
+      return Icon(FPhosphorBoldIcons.package);
     }
 
     if (isBooks) {
-      return Icon(FLucideIcons.book);
+      return Icon(FPhosphorBoldIcons.book);
     }
 
     if (isPlaylists) {
-      return Icon(FLucideIcons.listVideo);
+      return Icon(FPhosphorBoldIcons.playlist);
     }
 
-    return Icon(FLucideIcons.fileQuestionMark);
+    return Icon(FPhosphorBoldIcons.questionMark);
   }
 
   bool get isBoxsets => collectionType == 'boxsets';

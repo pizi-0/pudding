@@ -3,6 +3,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
@@ -96,7 +97,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
               duration: kDefaultAnimationDuration,
               child: isPlayed
                   ? Icon(
-                      FLucideIcons.check,
+                      FPhosphorBoldIcons.check,
                       color: Colors.green,
                     )
                   : SizedBox.shrink(),

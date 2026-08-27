@@ -4,6 +4,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:morphnext/morphnext.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/sliver_section.dart';
@@ -79,7 +80,7 @@ class _SliverPeopleState extends State<SliverPeople> {
                     selectedList = widget.season?.getPeoples() ?? [];
                   }
                 }),
-                child: Icon(FLucideIcons.arrowLeftRight),
+                child: Icon(FPhosphorBoldIcons.arrowsLeftRight),
               ),
               FButton(
                 variant: .outline,
@@ -98,7 +99,9 @@ class _SliverPeopleState extends State<SliverPeople> {
               variant: .ghost,
               onPress: () => setState(() => showAll = !showAll),
               suffix: AnimatedMorphIcon(
-                icon: showAll ? FLucideIcons.minus : FLucideIcons.plus,
+                icon: showAll
+                    ? FPhosphorBoldIcons.minus
+                    : FPhosphorBoldIcons.plus,
               ),
               child: showAll
                   ? Text('Show less')
@@ -192,7 +195,7 @@ class _PeopleButtonState extends State<PeopleButton> {
                       errorBuilder: (context, error, stackTrace) => Container(
                         color: Colors.black,
                         child: Icon(
-                          FLucideIcons.user,
+                          FPhosphorBoldIcons.user,
                           size: 50,
                         ),
                       ),

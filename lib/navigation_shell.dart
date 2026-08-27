@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/const/const.dart';
 
@@ -57,16 +58,16 @@ class MainNavigationShell extends ConsumerWidget {
                           },
                           children: [
                             FBottomNavigationBarItem(
-                              icon: Icon(FLucideIcons.home),
+                              icon: Icon(FPhosphorBoldIcons.house),
                             ),
                             FBottomNavigationBarItem(
-                              icon: Icon(FLucideIcons.library),
+                              icon: Icon(FPhosphorBoldIcons.books),
                             ),
                             FBottomNavigationBarItem(
-                              icon: Icon(FLucideIcons.settings),
+                              icon: Icon(FPhosphorBoldIcons.gear),
                             ),
                             FBottomNavigationBarItem(
-                              icon: Icon(FLucideIcons.user),
+                              icon: Icon(FPhosphorBoldIcons.user),
                             ),
                           ],
                         )
@@ -104,7 +105,7 @@ class MainNavigationShell extends ConsumerWidget {
                                   navigationShell.currentIndex == 0,
                             );
                           },
-                          prefix: Icon(FLucideIcons.home),
+                          prefix: Icon(FPhosphorBoldIcons.house),
                           child: Text('Home'),
                         ),
                         FButton(
@@ -117,7 +118,7 @@ class MainNavigationShell extends ConsumerWidget {
                                   navigationShell.currentIndex == 1,
                             );
                           },
-                          prefix: Icon(FLucideIcons.library),
+                          prefix: Icon(FPhosphorBoldIcons.books),
                           child: Text('Libraries'),
                         ),
                       ],

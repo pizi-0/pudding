@@ -7,6 +7,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
 import 'package:pudding/screens/library_detail/user_views_provider.dart';
@@ -84,7 +85,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                       children: [
                         FButton.icon(
                           onPress: context.pop,
-                          child: Icon(FLucideIcons.chevronLeft),
+                          child: Icon(FPhosphorBoldIcons.caretLeft),
                         ),
                         Expanded(
                           child: SingleChildScrollView(
@@ -113,9 +114,9 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                           onPress: _manualRefresh,
                           child: libAsync.isLoading && manualRefresh
                               ? FCircularProgress()
-                              : Icon(FLucideIcons.refreshCcw),
+                              : Icon(FPhosphorBoldIcons.arrowClockwise),
                         ),
-                      ].separatedBy(Icon(FLucideIcons.dot)),
+                      ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
                     ),
                   ),
                 ),
