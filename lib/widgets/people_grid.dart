@@ -111,8 +111,10 @@ class _SliverPeopleState extends State<SliverPeople> {
       ),
       slivers: [
         SliverPadding(
-          padding: .fromLTRB(20, 0, 20, 20),
-          sliver: PeopleGrid(peoples: peeps()),
+          padding: .fromSTEB(28, 0, 20, 20),
+          sliver: peeps().isEmpty
+              ? SliverToBoxAdapter(child: Text('Hello, there.').italic())
+              : PeopleGrid(peoples: peeps()),
         ),
       ],
     );

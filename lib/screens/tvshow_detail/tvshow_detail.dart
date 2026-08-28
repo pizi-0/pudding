@@ -1,5 +1,5 @@
 import 'package:awesome_extensions/awesome_extensions.dart'
-    show ListExtension, WidgetCommonExtension;
+    show ListExtension, StyledText, WidgetCommonExtension;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
@@ -278,11 +278,13 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                                 ),
                                               ),
                                             ),
-                                            onPress: () {},
+                                            onPress: tvAsync.isLoading
+                                                ? null
+                                                : () {},
                                             prefix: Icon(
-                                              FPhosphorIcons.play,
+                                              FPhosphorFillIcons.play,
                                             ),
-                                            child: Text('Play'),
+                                            child: _playButtonLabel(tv, next),
                                           ),
                                           Icon(FPhosphorBoldIcons.dot),
                                           FTooltip(
@@ -384,29 +386,41 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                       ),
                     ),
                     slivers: [
-                      SliverPadding(
-                        padding: .fromLTRB(20, 0, 20, 20),
-                        sliver: SliverGrid.builder(
-                          itemCount: state.episodes.length,
-                          gridDelegate:
-                              SliverGridDelegateWithMaxCrossAxisExtent(
-                                maxCrossAxisExtent: 350,
-                                childAspectRatio: 16 / 10,
-                                mainAxisSpacing: 10,
-                                crossAxisSpacing: 10,
-                              ),
-                          itemBuilder: (context, index) {
-                            final ep = state.episodes[index];
+                      if (state.episodes.isNotEmpty)
+                        SliverPadding(
+                          padding: .fromLTRB(20, 0, 20, 20),
+                          sliver: SliverGrid.builder(
+                            itemCount: state.episodes.length,
+                            gridDelegate:
+                                SliverGridDelegateWithMaxCrossAxisExtent(
+                                  maxCrossAxisExtent: 350,
+                                  childAspectRatio: 16 / 10,
+                                  mainAxisSpacing: 10,
+                                  crossAxisSpacing: 10,
+                                ),
+                            itemBuilder: (context, index) {
+                              final ep = state.episodes[index];
 
-                            return NewMediaCard(
-                              item: ep,
-                              dimPlayed: ep.userData?.played ?? false,
-                              selected: ep.id == state.nextup.id,
-                              isNext: ep.id == next.id,
-                            );
-                          },
+                              return NewMediaCard(
+                                item: ep,
+                                dimPlayed: ep.userData?.played ?? false,
+                                selected: ep.id == state.nextup.id,
+                                isNext: ep.id == next.id,
+                              );
+                            },
+                          ),
+                        )
+                      else
+                        SliverPadding(
+                          padding: .fromSTEB(28, 0, 20, 20),
+                          sliver: SliverToBoxAdapter(
+                            child: Row(
+                              children: [
+                                Text('No items. LIBRARY. MUST. GROW').italic(),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                   SliverPeople(key: castsKey, tv: tv, season: season),
@@ -417,6 +431,17 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
         ],
       ),
     );
+  }
+
+  Widget _playButtonLabel(JellyfinItem tv, JellyfinItem next) {
+    final progress = tv.getPlayProgress();
+    if (progress < 1) {
+      return Text('S${next.parentIndexNumber}:E${next.indexNumber}');
+    } else if (progress == 1) {
+      return Text('Rewatch');
+    }
+
+    return Text('Play');
   }
 
   void _scrollToKey(GlobalKey key) {

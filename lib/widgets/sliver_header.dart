@@ -46,7 +46,7 @@ class SliverHeader extends SliverPersistentHeaderDelegate {
               end: 40,
             ).transform(percent),
             child: Opacity(
-              opacity: Tween<double>(begin: 1, end: 0).transform(percent),
+              opacity: Tween<double>(begin: 1, end: 0.7).transform(percent),
               child: child!,
             ),
           ),
