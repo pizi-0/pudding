@@ -107,22 +107,20 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
         key: buttonKey,
         variant: .outline,
         mainAxisAlignment: .spaceBetween,
-        onPress: () {
-          if (popup) {
-            controller.hide();
-            popup = false;
-          } else {
-            controller.show();
-            popup = true;
-          }
-
-          setState(() {});
-        },
-        suffix: AnimatedMorphIcon(
-          icon: popup
-              ? FPhosphorBoldIcons.caretUp
-              : FPhosphorBoldIcons.caretDown,
-        ),
+        onPress: tvAsync.isLoading
+            ? null
+            : () {
+                controller.toggle();
+                popup = !popup;
+                setState(() {});
+              },
+        suffix: tvAsync.isLoading
+            ? FCircularProgress()
+            : AnimatedMorphIcon(
+                icon: popup
+                    ? FPhosphorBoldIcons.caretUp
+                    : FPhosphorBoldIcons.caretDown,
+              ),
         child: Text(
           widget.selectedSeasonItem!.name,
         ),
