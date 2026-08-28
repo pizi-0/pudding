@@ -193,13 +193,11 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
                                   softWrap: false,
                                 ),
                               ),
-                            Expanded(
-                              child: Text(
-                                widget.item.getRemaining(),
-                                textAlign: .end,
-                                overflow: .clip,
-                                maxLines: 1,
-                              ),
+                            Text(
+                              widget.item.getRemaining(),
+                              textAlign: .end,
+                              overflow: .clip,
+                              maxLines: 1,
                             ),
                           ],
                         ),

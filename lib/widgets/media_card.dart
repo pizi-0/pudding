@@ -443,49 +443,74 @@ class BottomData extends StatelessWidget {
     return AnimatedSize(
       duration: kDefaultAnimationDuration,
       alignment: .bottomCenter,
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          spacing: 4,
-          crossAxisAlignment: .stretch,
-          mainAxisSize: .min,
-          children: [
-            if (item.isResumable)
-              FDeterminateProgress(
-                value: item.getPlayProgress(),
-              ).fadeOut(animate: hover, duration: kDefaultAnimationDuration),
-            Row(
-              spacing: 10,
-              crossAxisAlignment: .end,
-              children: [
-                Expanded(
-                  child: Text(
-                    item.getTitle(),
-                    maxLines: hover ? null : 1,
-                    overflow: hover ? null : .ellipsis,
-                  ).bold(),
-                ),
-                _playStatusIndicator(theme),
-              ],
+      child: ClipRect(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.transparent, theme.colors.background],
+              begin: .topCenter,
+              end: .bottomCenter,
             ),
-            DefaultTextStyle(
-              style: theme.typography.body.xs.copyWith(
-                color: theme.colors.foreground.withAlpha(
-                  200,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: .spaceBetween,
+          ),
+          child: BackdropFilter(
+            enabled: hover,
+            filter: .blur(),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+              child: Column(
+                spacing: 4,
+                crossAxisAlignment: .stretch,
+                mainAxisSize: .min,
                 children: [
-                  if (_getYear(context) != null) Text(_getYear(context)!),
-                  if (item.getCommunityRating() != null)
-                    StarRatingContainer(
-                      rating: item.getCommunityRating()!.toStringAsFixed(2),
+                  if (item.isResumable)
+                    FDeterminateProgress(
+                      value: item.getPlayProgress(),
+                    ).fadeOut(
+                      animate: hover,
+                      duration: kDefaultAnimationDuration,
                     ),
+                  Row(
+                    spacing: 10,
+                    crossAxisAlignment: .end,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: .start,
+                          children: [
+                            Text(
+                              item.getTitle(),
+                              maxLines: hover ? 8 : 1,
+                              overflow: hover ? null : .ellipsis,
+                            ).bold(),
+                          ],
+                        ),
+                      ),
+                      _playStatusIndicator(theme),
+                    ],
+                  ),
+                  DefaultTextStyle(
+                    style: theme.typography.body.xs.copyWith(
+                      color: theme.colors.foreground.withAlpha(
+                        200,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: .spaceBetween,
+                      children: [
+                        if (_getYear(context) != null) Text(_getYear(context)!),
+                        if (item.getCommunityRating() != null)
+                          StarRatingContainer(
+                            rating: item.getCommunityRating()!.toStringAsFixed(
+                              2,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
