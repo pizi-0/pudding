@@ -415,18 +415,20 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                             gridDelegate:
                                 SliverGridDelegateWithMaxCrossAxisExtent(
                                   maxCrossAxisExtent: 350,
-                                  childAspectRatio: 16 / 10,
-                                  mainAxisSpacing: 10,
+                                  childAspectRatio: 16 / 13,
+                                  mainAxisSpacing: 20,
                                   crossAxisSpacing: 10,
                                 ),
                             itemBuilder: (context, index) {
                               final ep = state.episodes[index];
+                              final ov = ep.getOverview();
 
                               return NewMediaCard(
                                 item: ep,
                                 dimPlayed: ep.userData?.played ?? false,
                                 selected: ep.id == state.nextup.id,
                                 isNext: ep.id == next.id,
+                                bottom: Text(ov ?? '').showIf(ov != null),
                               );
                             },
                           ),

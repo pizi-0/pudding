@@ -293,6 +293,7 @@ class NewMediaCard extends StatefulWidget {
   final Function()? onPressed;
   final bool selected;
   final bool isNext;
+  final Widget? bottom;
   const NewMediaCard({
     super.key,
     required this.item,
@@ -301,6 +302,7 @@ class NewMediaCard extends StatefulWidget {
     this.onPressed,
     this.selected = false,
     this.isNext = false,
+    this.bottom,
   });
 
   @override
@@ -319,107 +321,136 @@ class _NewMediaCardState extends State<NewMediaCard> {
     final favorite = item.isFavorite;
 
     return RepaintBoundary(
-      child: FButton.raw(
-        onHoverChange: (value) => setState(() => hover = value),
-        onFocusChange: (value) => setState(() => hover = value),
-        variant: widget.selected ? .primary : .outline,
-        onPress: widget.onPressed,
-        child: Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: ClipRRect(
-            borderRadius: style.borderRadius.sm,
-            child: Container(
-              color: Colors.black,
-              child: Stack(
-                fit: .expand,
-                children: [
-                  Positioned(
-                    left: -1,
-                    top: -1,
-                    right: -1,
-                    bottom: -1,
-                    child: ShaderMask(
-                      shaderCallback: (rect) => LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          Colors.black,
-                        ],
-                        begin: .center,
-                        end: .bottomCenter,
-                      ).createShader(rect),
-                      blendMode: .dstOut,
-                      child: AnimatedOpacity(
-                        duration: kDefaultAnimationDuration,
-                        opacity: widget.dimPlayed && !hover
-                            ? 0.4
-                            : hover
-                            ? 0.8
-                            : 1,
-                        child: AnimatedScale(
-                          duration: kDefaultAnimationDuration,
-                          alignment: .bottomCenter,
-                          scale: hover ? 1.01 : 1,
-                          child: CachedNetworkImage(
-                            memCacheHeight: 700,
-                            fit: .cover,
-                            imageUrl: item.getImage(
-                              type: imageType,
-                            ),
-                            errorBuilder: (context, error, stackTrace) =>
-                                CachedNetworkImage(
+      child: Column(
+        children: [
+          Expanded(
+            child: FButton.raw(
+              onHoverChange: (value) => setState(() => hover = value),
+              onFocusChange: (value) => setState(() => hover = value),
+              variant: widget.selected ? .primary : .outline,
+              onPress: widget.onPressed,
+              child: Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: ClipRRect(
+                  borderRadius: style.borderRadius.sm,
+                  child: Container(
+                    color: Colors.black,
+                    child: Stack(
+                      fit: .expand,
+                      children: [
+                        Positioned(
+                          left: -1,
+                          top: -1,
+                          right: -1,
+                          bottom: -1,
+                          child: ShaderMask(
+                            shaderCallback: (rect) => LinearGradient(
+                              colors: [
+                                Colors.transparent,
+                                Colors.black,
+                              ],
+                              begin: .center,
+                              end: .bottomCenter,
+                            ).createShader(rect),
+                            blendMode: .dstOut,
+                            child: AnimatedOpacity(
+                              duration: kDefaultAnimationDuration,
+                              opacity: widget.dimPlayed && !hover
+                                  ? 0.4
+                                  : hover
+                                  ? 0.8
+                                  : 1,
+                              child: AnimatedScale(
+                                duration: kDefaultAnimationDuration,
+                                alignment: .bottomCenter,
+                                scale: hover ? 1.01 : 1,
+                                child: CachedNetworkImage(
                                   memCacheHeight: 700,
                                   fit: .cover,
                                   imageUrl: item.getImage(
-                                    type: JellyfinImagesApi.typeBanner,
+                                    type: imageType,
                                   ),
                                   errorBuilder: (context, error, stackTrace) =>
                                       CachedNetworkImage(
                                         memCacheHeight: 700,
                                         fit: .cover,
                                         imageUrl: item.getImage(
-                                          type: JellyfinImagesApi.typePrimary,
+                                          type: JellyfinImagesApi.typeBanner,
                                         ),
                                         errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                CachedNetworkImage(
-                                                  memCacheHeight: 700,
-                                                  fit: .cover,
-                                                  imageUrl: item.getImage(
-                                                    type: JellyfinImagesApi
-                                                        .typeBackdrop,
+                                            (
+                                              context,
+                                              error,
+                                              stackTrace,
+                                            ) => CachedNetworkImage(
+                                              memCacheHeight: 700,
+                                              fit: .cover,
+                                              imageUrl: item.getImage(
+                                                type: JellyfinImagesApi
+                                                    .typePrimary,
+                                              ),
+                                              errorBuilder:
+                                                  (
+                                                    context,
+                                                    error,
+                                                    stackTrace,
+                                                  ) => CachedNetworkImage(
+                                                    memCacheHeight: 700,
+                                                    fit: .cover,
+                                                    imageUrl: item.getImage(
+                                                      type: JellyfinImagesApi
+                                                          .typeBackdrop,
+                                                    ),
                                                   ),
-                                                ),
+                                            ),
                                       ),
                                 ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                  if (favorite)
-                    Align(
-                      alignment: .topRight,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Icon(
-                          FPhosphorFillIcons.heart,
-                          color: Colors.pink,
+                        if (favorite)
+                          Align(
+                            alignment: .topRight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Icon(
+                                FPhosphorFillIcons.heart,
+                                color: Colors.pink,
+                              ),
+                            ),
+                          ),
+                        Align(
+                          alignment: .bottomCenter,
+                          child: BottomData(
+                            item: item,
+                            hover: hover,
+                            isNext: widget.isNext,
+                          ),
                         ),
-                      ),
-                    ),
-                  Align(
-                    alignment: .bottomCenter,
-                    child: BottomData(
-                      item: item,
-                      hover: hover,
-                      isNext: widget.isNext,
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+          if (widget.bottom != null)
+            AnimatedSize(
+              duration: kDefaultAnimationDuration,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DefaultTextStyle(
+                  maxLines: 2,
+                  overflow: .ellipsis,
+                  style: theme.typography.body.sm.copyWith(
+                    color: theme.colors.mutedForeground,
+                  ),
+                  child: widget.bottom!,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
