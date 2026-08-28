@@ -71,8 +71,6 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
         );
       }
 
-      print(res.items.first.raw);
-
       return res.items.first;
     } on Exception catch (_) {
       rethrow;
