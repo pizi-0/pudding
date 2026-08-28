@@ -56,17 +56,7 @@ class _PuddingScaffoldState extends State<PuddingScaffold> {
                 if (widget.backdrop != null)
                   Positioned.fill(
                     child: ClipRRect(
-                      child: ColorFiltered(
-                        colorFilter: ColorFilter.mode(
-                          Color.lerp(
-                            Colors.transparent,
-                            theme.colors.background.withAlpha(200),
-                            1,
-                          )!,
-                          .darken,
-                        ),
-                        child: widget.backdrop,
-                      ),
+                      child: widget.backdrop,
                     ),
                   ),
                 Positioned.fill(

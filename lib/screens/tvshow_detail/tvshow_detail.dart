@@ -64,7 +64,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
 
     final max = size.width < theme.breakpoints.md;
 
-    final overviewWidth = max ? size.width : size.width * 0.6;
+    final overviewWidth = max ? size.width : size.width * 0.4;
 
     final crossAxisAlignment = max
         ? CrossAxisAlignment.center
@@ -75,7 +75,21 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
         valueListenable: scrollOffset,
         builder: (context, value, child) {
           return ImageFiltered(
-            imageFilter: .blur(sigmaX: value * 10, sigmaY: value * 10),
+            imageFilter: .compose(
+              outer: .blur(
+                sigmaX: (value * 250).clamp(0, 100),
+                sigmaY: (value * 250).clamp(0, 100),
+                tileMode: .clamp,
+              ),
+              inner: ColorFilter.mode(
+                Color.lerp(
+                  theme.colors.background.withAlpha(180),
+                  theme.colors.background.withAlpha(200),
+                  value,
+                )!,
+                .dstOut,
+              ),
+            ),
             child: CachedNetworkImage(
               imageUrl: client.images.url(
                 itemId: widget.id,
@@ -233,13 +247,21 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                             mainAxisAlignment: .end,
                             children: [
                               ConstrainedBox(
-                                constraints: BoxConstraints(maxWidth: 450),
+                                constraints: BoxConstraints(
+                                  maxWidth: 450,
+                                  maxHeight: 450,
+                                ),
                                 child: Column(
                                   spacing: 16,
                                   children: [
                                     if (logo != null)
-                                      CachedNetworkImage(
-                                        imageUrl: tv.getLogo(),
+                                      Expanded(
+                                        child: CachedNetworkImage(
+                                          imageUrl: tv.getLogo(),
+                                          alignment: .bottomCenter,
+                                          memCacheWidth: 450,
+                                          fit: .contain,
+                                        ),
                                       ),
 
                                     if (genres.isNotEmpty)
@@ -354,7 +376,6 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                   crossAxisAlignment: .start,
                                   children: [
                                     FDivider(),
-
                                     Text(overview ?? 'No overview'),
                                   ],
                                 ),
