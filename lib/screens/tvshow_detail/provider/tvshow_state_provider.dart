@@ -20,6 +20,8 @@ final defaultField = [
   'RecursiveItemCount',
   'SeasonUserData',
   'People',
+  'LocalTrailerCount',
+  'RemoteTrailers',
 ];
 
 class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
@@ -68,6 +70,8 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
           'getTvshow: \nQuery returns empty. \nid: $id',
         );
       }
+
+      print(res.items.first.raw);
 
       return res.items.first;
     } on Exception catch (_) {

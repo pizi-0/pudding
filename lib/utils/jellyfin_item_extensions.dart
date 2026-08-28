@@ -141,6 +141,13 @@ extension JellyInfo on JellyfinItem {
     return childCount;
   }
 
+  List<String> remoteTrailers() {
+    return ((raw['RemoteTrailers'] ?? []) as List<dynamic>)
+        .map((e) => e['Url'])
+        .cast<String>()
+        .toList();
+  }
+
   String getRaw() {
     final JsonEncoder encoder = JsonEncoder.withIndent(' ');
     String pretty = encoder.convert(raw);
