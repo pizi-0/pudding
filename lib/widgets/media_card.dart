@@ -593,7 +593,7 @@ class InfoLayer extends StatelessWidget {
             color: isNext ? theme.colors.primary : null,
           ),
           Text(
-            '${item.getRuntime()}',
+            item.isResumable ? item.getRemaining() : '${item.getRuntime()}',
             style: theme.typography.body.xs.copyWith(
               color: theme.colors.foreground.withAlpha(
                 200,
