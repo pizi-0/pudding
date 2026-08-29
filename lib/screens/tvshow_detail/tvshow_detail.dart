@@ -1,5 +1,5 @@
 import 'package:awesome_extensions/awesome_extensions.dart'
-    show ListExtension, StyledText, WidgetCommonExtension;
+    show ListExtension, OpacityExtension, StyledText, WidgetCommonExtension;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
@@ -436,7 +436,15 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                 dimPlayed: ep.userData?.played ?? false,
                                 selected: ep.id == state.nextup.id,
                                 isNext: ep.id == next.id,
-                                bottom: Text(ov ?? '').showIf(ov != null),
+                                bottom: Text(ov ?? '')
+                                    .setOpacity(
+                                      opacity:
+                                          ep.id == next.id ||
+                                              ep.getPlayProgress() == 1
+                                          ? 1
+                                          : 0,
+                                    )
+                                    .showIf(ov != null),
                               );
                             },
                           ),
