@@ -318,8 +318,6 @@ class _NewMediaCardState extends State<NewMediaCard> {
     final theme = FTheme.of(context);
     final style = theme.style;
 
-    final favorite = item.isFavorite;
-
     return RepaintBoundary(
       child: Column(
         children: [
@@ -327,8 +325,22 @@ class _NewMediaCardState extends State<NewMediaCard> {
             child: FButton.raw(
               onHoverChange: (value) => setState(() => hover = value),
               onFocusChange: (value) => setState(() => hover = value),
-              variant: widget.selected ? .primary : .outline,
+              variant: .outline,
               onPress: widget.onPressed,
+              style: .delta(
+                decoration: .delta([
+                  .all(
+                    .boxDelta(
+                      border: .all(
+                        color: widget.selected
+                            ? theme.colors.primary
+                            : theme.colors.border,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ]),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(2.0),
                 child: ClipRRect(
@@ -398,17 +410,6 @@ class _NewMediaCardState extends State<NewMediaCard> {
                             ),
                           ),
                         ),
-                        if (favorite)
-                          Align(
-                            alignment: .topRight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(
-                                FPhosphorFillIcons.heart,
-                                color: Colors.pink,
-                              ),
-                            ),
-                          ),
                         Positioned.fill(
                           bottom: -1,
                           top: -1,
@@ -587,7 +588,7 @@ class InfoLayer extends StatelessWidget {
         spacing: 4,
         children: [
           Icon(
-            isNext ? FPhosphorBoldIcons.play : FPhosphorBoldIcons.clock,
+            isNext ? FPhosphorFillIcons.play : FPhosphorBoldIcons.clock,
             size: theme.typography.body.sm.fontSize,
             color: isNext ? theme.colors.primary : null,
           ),
