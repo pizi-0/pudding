@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:awesome_extensions/awesome_extensions.dart' show StyledText;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
@@ -55,154 +56,176 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
                 left: -1,
                 right: -1,
                 bottom: -1,
-                child: ClipRect(
-                  child: ShaderMask(
-                    shaderCallback: (rect) => LinearGradient(
-                      colors: [
-                        Colors.black26,
-                        Colors.black,
-                      ],
+                child: AnimatedScale(
+                  alignment: .bottomCenter,
+                  duration: kDefaultAnimationDuration,
+                  scale: hover ? 1.01 : 1,
+                  child: OverflowBox(
+                    maxWidth: size.width * weight / totalWeight,
+                    minWidth: size.width * weight / totalWeight,
+                    child: AnimatedOpacity(
+                      duration: kDefaultAnimationDuration,
+                      opacity: hover ? 0.8 : 1,
+                      child: CachedNetworkImage(
+                        imageUrl: widget.item.getImage(
+                          type: widget.item.isEpisode
+                              ? JellyfinImagesApi.typePrimary
+                              : JellyfinImagesApi.typeThumb,
+                        ),
+                        fit: .cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            CachedNetworkImage(
+                              imageUrl: widget.item.getImage(
+                                type: JellyfinImagesApi.typeBackdrop,
+                              ),
+                              fit: .cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  CachedNetworkImage(
+                                    imageUrl: widget.item.getImage(
+                                      type: JellyfinImagesApi.typePrimary,
+                                    ),
+                                    fit: .cover,
+                                    errorBuilder:
+                                        (
+                                          context,
+                                          error,
+                                          stackTrace,
+                                        ) => Center(
+                                          child: Icon(
+                                            FPhosphorBoldIcons.imageBroken,
+                                          ),
+                                        ),
+                                  ),
+                            ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              Positioned(
+                top: -1,
+                bottom: -1,
+                left: -1,
+                right: -1,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.transparent, theme.colors.background],
                       begin: .center,
                       end: .bottomCenter,
-                    ).createShader(rect),
-                    blendMode: .darken,
-                    child: OverflowBox(
-                      maxWidth: size.width * weight / totalWeight,
-                      minWidth: size.width * weight / totalWeight,
-                      child: AnimatedOpacity(
-                        duration: kDefaultAnimationDuration,
-                        opacity: hover ? 0.8 : 1,
-                        child: AnimatedScale(
-                          alignment: .bottomCenter,
-                          duration: kDefaultAnimationDuration,
-                          scale: hover ? 1.02 : 1,
-                          child: CachedNetworkImage(
-                            imageUrl: widget.item.getImage(
-                              type: widget.item.isEpisode
-                                  ? JellyfinImagesApi.typePrimary
-                                  : JellyfinImagesApi.typeThumb,
-                            ),
-                            fit: .cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                CachedNetworkImage(
-                                  imageUrl: widget.item.getImage(
-                                    type: JellyfinImagesApi.typeBackdrop,
-                                  ),
-                                  fit: .cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      CachedNetworkImage(
-                                        imageUrl: widget.item.getImage(
-                                          type: JellyfinImagesApi.typePrimary,
-                                        ),
-                                        fit: .cover,
-                                        errorBuilder:
-                                            (
-                                              context,
-                                              error,
-                                              stackTrace,
-                                            ) => Center(
-                                              child: Icon(
-                                                FPhosphorBoldIcons.imageBroken,
-                                              ),
-                                            ),
-                                      ),
-                                ),
-                          ),
-                        ),
-                      ),
                     ),
                   ),
-                ),
-              ),
-              Align(
-                alignment: .topRight,
-                child: Padding(
-                  padding: .all(10),
-                  child: Text('${widget.index + 1}/${widget.total}'),
-                ),
-              ),
-              if (widget.item.isEpisode)
-                Align(
-                  alignment: AlignmentGeometry.centerLeft,
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxHeight: 150),
-                      child: Opacity(
-                        opacity: 0.6,
-                        child: CachedNetworkImage(
-                          imageUrl: widget.item.getLogo(),
-                          width: 150,
-                          errorBuilder: (context, error, stackTrace) =>
-                              SizedBox.shrink(),
+                    padding: const EdgeInsets.all(9.0),
+                    child: Column(
+                      children: [
+                        Align(
+                          alignment: .topRight,
+                          child: Text('${widget.index + 1}/${widget.total}'),
                         ),
-                      ),
-                    ),
-                  ),
-                ),
-              Align(
-                alignment: .bottomCenter,
-                child: Padding(
-                  padding: const .all(10.0),
-                  child: Column(
-                    spacing: 4,
-                    crossAxisAlignment: .start,
-                    mainAxisSize: .min,
-                    children: <Widget>[
-                      if (resumable)
-                        Opacity(
-                          opacity: 0.8,
-                          child: FDeterminateProgress(
-                            style: .delta(motion: .delta(duration: .zero)),
-                            value: widget.item.getPlayProgress(),
-                          ),
-                        ),
-                      Text(
-                        widget.item.getTitle(),
-                        overflow: .clip,
-                        softWrap: false,
-                      ).bold(),
+                        if (widget.item.isEpisode)
+                          Expanded(
+                            child: Align(
+                              alignment: AlignmentGeometry.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(maxHeight: 150),
+                                  child: Opacity(
+                                    opacity: 0.8,
+                                    child: CachedNetworkImage(
+                                      imageUrl: widget.item.getLogo(),
+                                      width: 150,
+                                      errorBuilder: (
+                                        context,
+                                        error,
+                                        stackTrace,
+                                      ) => SizedBox.shrink(),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        else
+                          Spacer(),
+                        Column(
+                          spacing: 4,
+                          crossAxisAlignment: .start,
+                          mainAxisSize: .min,
+                          children: <Widget>[
+                            if (resumable)
+                              Opacity(
+                                opacity: 0.8,
+                                child: FDeterminateProgress(
+                                  style: .delta(
+                                    motion: .delta(duration: .zero),
+                                  ),
+                                  value: widget.item.getPlayProgress(),
+                                ),
+                              ).fadeOut(
+                                animate: hover,
+                                duration: kDefaultAnimationDuration,
+                              ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: AnimatedSize(
+                                    duration: kDefaultAnimationDuration,
+                                    child: Text(
+                                      widget.item.getTitle(),
+                                      overflow: .ellipsis,
+                                      maxLines: hover ? 3 : 1,
+                                    ).bold(),
+                                  ),
+                                ),
+                              ],
+                            ),
 
-                      DefaultTextStyle(
-                        style: theme.typography.display.sm.copyWith(
-                          color: theme.colors.mutedForeground,
-                        ),
-                        child: Row(
-                          children: [
-                            if (widget.item.seriesName != null ||
-                                widget.item.isSeries)
-                              Expanded(
-                                flex: weight,
-                                child: Padding(
-                                  padding: const EdgeInsetsGeometry.only(
-                                    right: 8,
-                                  ),
-                                  child: Text(
-                                    '${widget.item.seriesName ?? widget.item.name} (${widget.item.productionYear})',
+                            DefaultTextStyle(
+                              style: theme.typography.display.sm.copyWith(
+                                color: theme.colors.mutedForeground,
+                              ),
+                              child: Row(
+                                children: [
+                                  if (widget.item.seriesName != null ||
+                                      widget.item.isSeries)
+                                    Expanded(
+                                      flex: weight,
+                                      child: Padding(
+                                        padding: const EdgeInsetsGeometry.only(
+                                          right: 8,
+                                        ),
+                                        child: Text(
+                                          '${widget.item.seriesName ?? widget.item.name} (${widget.item.productionYear})',
+                                          overflow: .clip,
+                                          softWrap: false,
+                                        ),
+                                      ),
+                                    ),
+                                  if (widget.item.isMovie)
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        widget.item.productionYear.toString(),
+                                        overflow: .clip,
+                                        softWrap: false,
+                                      ),
+                                    ),
+                                  Text(
+                                    widget.item.getRemaining(),
+                                    textAlign: .end,
                                     overflow: .clip,
-                                    softWrap: false,
+                                    maxLines: 1,
                                   ),
-                                ),
+                                ],
                               ),
-                            if (widget.item.isMovie)
-                              Expanded(
-                                flex: 3,
-                                child: Text(
-                                  widget.item.productionYear.toString(),
-                                  overflow: .clip,
-                                  softWrap: false,
-                                ),
-                              ),
-                            Text(
-                              widget.item.getRemaining(),
-                              textAlign: .end,
-                              overflow: .clip,
-                              maxLines: 1,
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

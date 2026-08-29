@@ -343,68 +343,57 @@ class _NewMediaCardState extends State<NewMediaCard> {
                           top: -1,
                           right: -1,
                           bottom: -1,
-                          child: ShaderMask(
-                            shaderCallback: (rect) => LinearGradient(
-                              colors: [
-                                Colors.transparent,
-                                Colors.black,
-                              ],
-                              begin: .center,
-                              end: .bottomCenter,
-                            ).createShader(rect),
-                            blendMode: .dstOut,
-                            child: AnimatedOpacity(
+                          child: AnimatedOpacity(
+                            duration: kDefaultAnimationDuration,
+                            opacity: widget.dimPlayed && !hover
+                                ? 0.4
+                                : hover
+                                ? 0.8
+                                : 1,
+                            child: AnimatedScale(
                               duration: kDefaultAnimationDuration,
-                              opacity: widget.dimPlayed && !hover
-                                  ? 0.4
-                                  : hover
-                                  ? 0.8
-                                  : 1,
-                              child: AnimatedScale(
-                                duration: kDefaultAnimationDuration,
-                                alignment: .bottomCenter,
-                                scale: hover ? 1.01 : 1,
-                                child: CachedNetworkImage(
-                                  memCacheHeight: 700,
-                                  fit: .cover,
-                                  imageUrl: item.getImage(
-                                    type: imageType,
-                                  ),
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      CachedNetworkImage(
-                                        memCacheHeight: 700,
-                                        fit: .cover,
-                                        imageUrl: item.getImage(
-                                          type: JellyfinImagesApi.typeBanner,
-                                        ),
-                                        errorBuilder:
-                                            (
-                                              context,
-                                              error,
-                                              stackTrace,
-                                            ) => CachedNetworkImage(
-                                              memCacheHeight: 700,
-                                              fit: .cover,
-                                              imageUrl: item.getImage(
-                                                type: JellyfinImagesApi
-                                                    .typePrimary,
-                                              ),
-                                              errorBuilder:
-                                                  (
-                                                    context,
-                                                    error,
-                                                    stackTrace,
-                                                  ) => CachedNetworkImage(
-                                                    memCacheHeight: 700,
-                                                    fit: .cover,
-                                                    imageUrl: item.getImage(
-                                                      type: JellyfinImagesApi
-                                                          .typeBackdrop,
-                                                    ),
-                                                  ),
-                                            ),
-                                      ),
+                              alignment: .bottomCenter,
+                              scale: hover ? 1.01 : 1,
+                              child: CachedNetworkImage(
+                                memCacheHeight: 700,
+                                fit: .cover,
+                                imageUrl: item.getImage(
+                                  type: imageType,
                                 ),
+                                errorBuilder: (context, error, stackTrace) =>
+                                    CachedNetworkImage(
+                                      memCacheHeight: 700,
+                                      fit: .cover,
+                                      imageUrl: item.getImage(
+                                        type: JellyfinImagesApi.typeBanner,
+                                      ),
+                                      errorBuilder:
+                                          (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) => CachedNetworkImage(
+                                            memCacheHeight: 700,
+                                            fit: .cover,
+                                            imageUrl: item.getImage(
+                                              type:
+                                                  JellyfinImagesApi.typePrimary,
+                                            ),
+                                            errorBuilder:
+                                                (
+                                                  context,
+                                                  error,
+                                                  stackTrace,
+                                                ) => CachedNetworkImage(
+                                                  memCacheHeight: 700,
+                                                  fit: .cover,
+                                                  imageUrl: item.getImage(
+                                                    type: JellyfinImagesApi
+                                                        .typeBackdrop,
+                                                  ),
+                                                ),
+                                          ),
+                                    ),
                               ),
                             ),
                           ),
@@ -420,9 +409,12 @@ class _NewMediaCardState extends State<NewMediaCard> {
                               ),
                             ),
                           ),
-                        Align(
-                          alignment: .bottomCenter,
-                          child: BottomData(
+                        Positioned.fill(
+                          bottom: -1,
+                          top: -1,
+                          left: -1,
+                          right: -1,
+                          child: InfoLayer(
                             item: item,
                             hover: hover,
                             isNext: widget.isNext,
@@ -456,11 +448,11 @@ class _NewMediaCardState extends State<NewMediaCard> {
   }
 }
 
-class BottomData extends StatelessWidget {
+class InfoLayer extends StatelessWidget {
   final JellyfinItem item;
   final bool isNext;
   final bool hover;
-  const BottomData({
+  const InfoLayer({
     super.key,
     required this.item,
     this.hover = false,
@@ -470,78 +462,82 @@ class BottomData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = context.theme;
+    final favorite = item.isFavorite;
 
-    return AnimatedSize(
-      duration: kDefaultAnimationDuration,
-      alignment: .bottomCenter,
-      child: ClipRect(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.transparent, theme.colors.background],
-              begin: .topCenter,
-              end: .bottomCenter,
-            ),
-          ),
-          child: BackdropFilter(
-            enabled: hover,
-            filter: .blur(),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
-              child: Column(
-                spacing: 4,
-                crossAxisAlignment: .stretch,
-                mainAxisSize: .min,
-                children: [
-                  if (item.isResumable)
-                    FDeterminateProgress(
-                      value: item.getPlayProgress(),
-                    ).fadeOut(
-                      animate: hover,
-                      duration: kDefaultAnimationDuration,
-                    ),
-                  Row(
-                    spacing: 10,
-                    crossAxisAlignment: .end,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: .start,
-                          children: [
-                            Text(
-                              item.getTitle(),
-                              maxLines: hover ? 8 : 1,
-                              overflow: hover ? null : .ellipsis,
-                            ).bold(),
-                          ],
-                        ),
-                      ),
-                      _playStatusIndicator(theme),
-                    ],
-                  ),
-                  DefaultTextStyle(
-                    style: theme.typography.body.xs.copyWith(
-                      color: theme.colors.foreground.withAlpha(
-                        200,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: .spaceBetween,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.transparent, theme.colors.background],
+          begin: .center,
+          end: .bottomCenter,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(9),
+        child: Column(
+          spacing: 4,
+          crossAxisAlignment: .stretch,
+          mainAxisSize: .min,
+          children: [
+            if (favorite)
+              Align(
+                alignment: .centerRight,
+                child: Icon(
+                  FPhosphorFillIcons.heart,
+                  color: Colors.pink,
+                ),
+              ),
+            Spacer(),
+            if (item.isResumable)
+              FDeterminateProgress(
+                value: item.getPlayProgress(),
+              ).fadeOut(
+                animate: hover,
+                duration: kDefaultAnimationDuration,
+              ),
+            Row(
+              spacing: 4,
+              crossAxisAlignment: .end,
+              children: [
+                Expanded(
+                  child: AnimatedSize(
+                    duration: kDefaultAnimationDuration,
+                    alignment: .topCenter,
+                    child: Column(
+                      crossAxisAlignment: .start,
                       children: [
-                        if (_getYear(context) != null) Text(_getYear(context)!),
-                        if (item.getCommunityRating() != null)
-                          StarRatingContainer(
-                            rating: item.getCommunityRating()!.toStringAsFixed(
-                              2,
-                            ),
-                          ),
+                        Text(
+                          item.getTitle(),
+                          maxLines: hover ? 8 : 1,
+                          overflow: hover ? null : .ellipsis,
+                        ).bold(),
                       ],
                     ),
                   ),
+                ),
+                _playStatusIndicator(theme),
+              ],
+            ),
+            DefaultTextStyle(
+              style: theme.typography.body.xs.copyWith(
+                color: theme.colors.foreground.withAlpha(
+                  200,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: .spaceBetween,
+                children: [
+                  if (_getYear(context) != null) Text(_getYear(context)!),
+                  if (item.getCommunityRating() != null)
+                    StarRatingContainer(
+                      rating: item.getCommunityRating()!.toStringAsFixed(
+                        2,
+                      ),
+                    ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
