@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pudding/const/const.dart';
 
 class SliverHeader extends SliverPersistentHeaderDelegate {
   final double maxExtentHeight;
@@ -43,10 +44,11 @@ class SliverHeader extends SliverPersistentHeaderDelegate {
           Positioned(
             bottom: Tween<double>(
               begin: 0,
-              end: 40,
+              end: 0,
             ).transform(percent),
-            child: Opacity(
-              opacity: Tween<double>(begin: 1, end: 0.7).transform(percent),
+            child: AnimatedOpacity(
+              duration: kDefaultAnimationDuration,
+              opacity: percent > 0.8 ? 0 : 1,
               child: child!,
             ),
           ),

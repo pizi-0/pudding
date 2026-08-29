@@ -238,10 +238,10 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                         },
                       ),
                       child: SizedBox(
-                        height: size.height,
+                        height: size.height - 76,
                         width: size.width,
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(40, 0, 40, 40),
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                           child: Column(
                             crossAxisAlignment: crossAxisAlignment,
                             mainAxisAlignment: .end,
@@ -376,7 +376,15 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                   crossAxisAlignment: .start,
                                   children: [
                                     FDivider(),
-                                    Text(overview ?? 'No overview'),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: theme.colors.barrier,
+                                        borderRadius:
+                                            theme.style.borderRadius.md,
+                                      ),
+                                      padding: .all(20),
+                                      child: Text(overview ?? 'No overview'),
+                                    ),
                                   ],
                                 ),
                               ),
