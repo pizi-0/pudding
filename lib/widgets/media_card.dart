@@ -576,7 +576,7 @@ class InfoLayer extends StatelessWidget {
         spacing: 4,
         children: [
           Icon(
-            isNext ? FPhosphorBoldIcons.play : FPhosphorBoldIcons.eye,
+            isNext ? FPhosphorFillIcons.play : FPhosphorBoldIcons.eye,
             color: isNext ? theme.colors.primary : null,
             size: theme.typography.body.sm.fontSize,
           ),
