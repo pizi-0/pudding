@@ -163,6 +163,47 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
       );
     });
   }
+
+  Future<void> toggleSeriesFavorite() async {
+    final isfav = state.value?.tvshow?.isFavorite ?? false;
+
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final current = state.value ?? TvshowScreenState();
+
+      if (isfav) {
+        await client.userData.unmarkFavorite(id);
+      } else {
+        await client.userData.markFavorite(id);
+      }
+
+      final tv = await getTvshow();
+
+      return current.copyWith(tvshow: tv);
+    });
+  }
+
+  Future<void> toggleSeriesPlayed() async {
+    final isplayed = state.value?.tvshow?.userData?.played ?? false;
+
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final current = state.value ?? TvshowScreenState();
+
+      if (isplayed) {
+        await client.userData.markUnplayed(id);
+      } else {
+        await client.userData.markPlayed(id);
+      }
+
+      final (tv, eps) = await (
+        getTvshow(),
+        getEpisodesForSeason(seasonId: state.value!.selectedSeason!.id),
+      ).wait;
+
+      return current.copyWith(tvshow: tv, episodes: eps);
+    });
+  }
 }
 
 final tvshowStateProvider =
