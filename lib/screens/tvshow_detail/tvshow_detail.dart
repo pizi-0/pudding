@@ -464,15 +464,23 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                 dimPlayed: ep.userData?.played ?? false,
                                 selected: ep.id == state.nextup?.id,
                                 isNext: ep.id == next?.id,
-                                bottom: Text(ov ?? '')
-                                    .setOpacity(
-                                      opacity:
-                                          ep.id == next?.id ||
-                                              ep.getPlayProgress() == 1
-                                          ? 1
-                                          : 0,
-                                    )
-                                    .showIf(ov != null),
+                                bottom: SizedBox(
+                                  height: 36,
+                                  child: Row(
+                                    crossAxisAlignment: .start,
+                                    children: [
+                                      Expanded(
+                                        child: Text(ov ?? '').setOpacity(
+                                          opacity:
+                                              ep.id == next?.id ||
+                                                  ep.getPlayProgress() == 1
+                                              ? 1
+                                              : 0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               );
                             },
                           ),
