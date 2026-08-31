@@ -107,6 +107,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
         },
       ),
       child: SilkyCustomScrollView(
+        scrollSpeed: 2,
         physics: ClampingScrollPhysics(),
         slivers: [
           tvAsync.when(

@@ -48,7 +48,10 @@ class SliverHeader extends SliverPersistentHeaderDelegate {
             ).transform(percent),
             child: AnimatedOpacity(
               duration: kDefaultAnimationDuration,
-              opacity: percent > 0.8 ? 0 : 1,
+              opacity: Tween<double>(
+                begin: 1,
+                end: 0,
+              ).transform(percent > 0.7 ? percent : 0),
               child: child!,
             ),
           ),
