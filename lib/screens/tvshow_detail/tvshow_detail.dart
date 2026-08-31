@@ -35,6 +35,7 @@ class TvshowDetail extends ConsumerStatefulWidget {
 class _TvshowDetailState extends ConsumerState<TvshowDetail> {
   final GlobalKey seasonKey = GlobalKey(debugLabel: 'season-sliver-header');
   final GlobalKey castsKey = GlobalKey(debugLabel: 'cast-sliver-header');
+  ScrollController scrollController = ScrollController();
   bool favoriteLoading = false;
   bool playedLoading = false;
   ValueNotifier<double> scrollOffset = ValueNotifier(0);
@@ -50,6 +51,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
   @override
   void dispose() {
     scrollOffset.dispose();
+    scrollController.dispose();
     super.dispose();
   }
 
@@ -107,6 +109,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
         },
       ),
       child: SilkyCustomScrollView(
+        controller: scrollController,
         scrollSpeed: 2,
         physics: ClampingScrollPhysics(),
         slivers: [
@@ -212,7 +215,13 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                           ]),
                                         ),
                                         variant: .outline,
-                                        onPress: () {},
+                                        onPress: () =>
+                                            scrollController.animateTo(
+                                              0,
+                                              duration:
+                                                  kDefaultAnimationDuration,
+                                              curve: Curves.easeInOut,
+                                            ),
                                         suffix: FCircularProgress().showIf(
                                           tvAsync.isLoading,
                                         ),
@@ -322,9 +331,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                                   tvAsync.isLoading &&
                                                       favoriteLoading
                                                   ? null
-                                                  : () => _toggleFavorite(
-                                                      isFavorite,
-                                                    ),
+                                                  : _toggleFavorite,
                                               child: Icon(
                                                 FPhosphorBoldIcons.heart,
                                                 color: isFavorite
@@ -338,9 +345,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                                 tvAsync.isLoading &&
                                                     playedLoading
                                                 ? null
-                                                : () => _togglePlayed(
-                                                    isPlayed,
-                                                  ),
+                                                : _togglePlayed,
                                             child: Icon(
                                               FPhosphorBoldIcons.check,
                                               color: isPlayed
@@ -517,25 +522,13 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
     }
   }
 
-  Future<void> _toggleFavorite(bool isFavorite) async {
+  Future<void> _toggleFavorite() async {
     if (favoriteLoading) return;
 
     try {
       favoriteLoading = true;
 
-      if (isFavorite) {
-        await client.userData.unmarkFavorite(
-          widget.id,
-        );
-      } else {
-        await client.userData.markFavorite(
-          widget.id,
-        );
-      }
-
-      ref.invalidate(
-        tvshowStateProvider(widget.id),
-      );
+      ref.read(tvshowStateProvider(widget.id).notifier).toggleSeriesFavorite();
     } on Exception catch (e) {
       debugPrint(e.toString());
     } finally {
@@ -543,21 +536,13 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
     }
   }
 
-  Future<void> _togglePlayed(bool isPlayed) async {
+  Future<void> _togglePlayed() async {
     if (playedLoading) return;
 
     try {
       playedLoading = true;
 
-      if (isPlayed) {
-        await client.userData.markUnplayed(widget.id);
-      } else {
-        await client.userData.markPlayed(widget.id);
-      }
-
-      ref.invalidate(
-        tvshowStateProvider(widget.id),
-      );
+      ref.read(tvshowStateProvider(widget.id).notifier).toggleSeriesPlayed();
     } on Exception catch (e) {
       debugPrint(e.toString());
     } finally {
