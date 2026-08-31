@@ -150,19 +150,19 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
               final tv = state.tvshow;
               final next = state.nextup;
               final season = state.selectedSeason;
-              final logo = tv.imageTags[JellyfinImagesApi.typeLogo];
-              final genres = tv.genres.sublist(
+              final logo = tv?.imageTags[JellyfinImagesApi.typeLogo];
+              final genres = tv?.genres.sublist(
                 0,
                 tv.genres.length > 3 ? 3 : tv.genres.length,
               );
 
-              final isPlayed = tv.userData?.played ?? false;
-              final isFavorite = tv.isFavorite;
-              final overview = tv.overview;
-              final runYears = tv.getSeriesRunYears();
-              final seasonCount = tv.childCount;
-              final int? episodeCount = tv.raw['RecursiveItemCount'];
-              final unplayed = tv.getUnplayed();
+              final isPlayed = tv?.userData?.played ?? false;
+              final isFavorite = tv?.isFavorite ?? false;
+              final overview = tv?.overview;
+              final runYears = tv?.getSeriesRunYears();
+              final seasonCount = tv?.childCount;
+              final int? episodeCount = tv?.raw['RecursiveItemCount'];
+              final unplayed = tv?.getUnplayed();
 
               return SliverMainAxisGroup(
                 slivers: [
@@ -216,7 +216,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                         suffix: FCircularProgress().showIf(
                                           tvAsync.isLoading,
                                         ),
-                                        child: Text(tv.name),
+                                        child: Text('${tv?.name}'),
                                       ),
                                     ],
                                   ),
@@ -258,14 +258,14 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                     if (logo != null)
                                       Expanded(
                                         child: CachedNetworkImage(
-                                          imageUrl: tv.getLogo(),
+                                          imageUrl: tv!.getLogo(),
                                           alignment: .bottomCenter,
                                           memCacheWidth: 450,
                                           fit: .contain,
                                         ),
                                       ),
 
-                                    if (genres.isNotEmpty)
+                                    if (genres != null && genres.isNotEmpty)
                                       Row(
                                         mainAxisAlignment: .center,
                                         children: genres
@@ -301,7 +301,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                                 ),
                                               ),
                                             ),
-                                            onPress: tvAsync.isLoading
+                                            onPress: next == null
                                                 ? null
                                                 : () {},
                                             prefix: Icon(
@@ -355,7 +355,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                       mainAxisAlignment: .center,
                                       children:
                                           [
-                                            Text(runYears),
+                                            Text('$runYears'),
                                             if (seasonCount != null)
                                               Text('$seasonCount seasons'),
                                             if (episodeCount != null)
@@ -403,24 +403,46 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                         spacing: 20,
                         mainAxisSize: .min,
                         children: [
-                          SeasonSelector(
-                            next: next,
-                            seriesId: widget.id,
-                            selectedSeasonItem: state.selectedSeason,
-                            seasonItems: state.seasons,
-                            onSeasonChange: (s) => tvNotifier
-                                .onSeasonChanged(s.id)
-                                .then((_) => _scrollToKey(seasonKey)),
-                          ),
+                          if (tvAsync.isLoading && state.seasons == null)
+                            FButton(
+                              variant: .outline,
+                              onPress: () {},
+                              child: FCircularProgress(),
+                            )
+                          else if (state.seasons != null)
+                            SeasonSelector(
+                              next: next,
+                              seriesId: widget.id,
+                              selectedSeasonItem: state.selectedSeason,
+                              seasonItems: state.seasons!,
+                              onSeasonChange: (s) => tvNotifier
+                                  .onSeasonChanged(s.id)
+                                  .then((_) => _scrollToKey(seasonKey)),
+                            ),
                         ],
                       ),
                     ),
                     slivers: [
-                      if (state.episodes.isNotEmpty)
+                      if (tvAsync.isLoading && state.episodes == null)
+                        SliverPadding(
+                          padding: .fromLTRB(20, 0, 20, 20),
+                          sliver: SliverToBoxAdapter(
+                            child: Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: FCircularProgress(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      else if (state.episodes != null &&
+                          state.episodes!.isNotEmpty)
                         SliverPadding(
                           padding: .fromLTRB(20, 0, 20, 20),
                           sliver: SliverGrid.builder(
-                            itemCount: state.episodes.length,
+                            itemCount: state.episodes!.length,
                             gridDelegate:
                                 SliverGridDelegateWithMaxCrossAxisExtent(
                                   maxCrossAxisExtent: 350,
@@ -429,18 +451,18 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                                   crossAxisSpacing: 10,
                                 ),
                             itemBuilder: (context, index) {
-                              final ep = state.episodes[index];
+                              final ep = state.episodes![index];
                               final ov = ep.getOverview();
 
                               return NewMediaCard(
                                 item: ep,
                                 dimPlayed: ep.userData?.played ?? false,
-                                selected: ep.id == state.nextup.id,
-                                isNext: ep.id == next.id,
+                                selected: ep.id == state.nextup?.id,
+                                isNext: ep.id == next?.id,
                                 bottom: Text(ov ?? '')
                                     .setOpacity(
                                       opacity:
-                                          ep.id == next.id ||
+                                          ep.id == next?.id ||
                                               ep.getPlayProgress() == 1
                                           ? 1
                                           : 0,
@@ -463,7 +485,8 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                         ),
                     ],
                   ),
-                  SliverPeople(key: castsKey, tv: tv, season: season),
+                  if (tv != null)
+                    SliverPeople(key: castsKey, tv: tv, season: season),
                 ],
               );
             },
@@ -473,10 +496,10 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
     );
   }
 
-  Widget _playButtonLabel(JellyfinItem tv, JellyfinItem next) {
-    final progress = tv.getPlayProgress();
+  Widget _playButtonLabel(JellyfinItem? tv, JellyfinItem? next) {
+    final progress = tv?.getPlayProgress() ?? 0;
     if (progress < 1) {
-      return Text('S${next.parentIndexNumber}:E${next.indexNumber}');
+      return Text('S${next?.parentIndexNumber}:E${next?.indexNumber}');
     } else if (progress == 1) {
       return Text('Rewatch');
     }

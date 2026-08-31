@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -36,26 +37,37 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
   }
 
   Future<TvshowScreenState> getState() async {
-    final (tvshow, nextup, seasons) = await (
-      getTvshow(),
-      getNextup(),
-      getSeasons(),
-    ).wait;
+    state = await AsyncValue.guard(() async {
+      final current = state.value ?? TvshowScreenState();
+      final (tvshow, nextup) = await (
+        getTvshow(),
+        getNextup(),
+      ).wait;
 
-    final selectedSeason = seasons.firstWhere(
-      (s) => s.id == nextup.seasonId,
-      orElse: () => seasons.first,
-    );
+      return current.copyWith(tvshow: tvshow, nextup: nextup);
+    });
 
-    final episodes = await getEpisodesForSeason(seasonId: selectedSeason.id);
+    state = AsyncLoading();
 
-    return TvshowScreenState(
-      tvshow: tvshow,
-      nextup: nextup,
-      seasons: seasons,
-      episodes: episodes,
-      selectedSeason: selectedSeason,
-    );
+    state = await AsyncValue.guard(() async {
+      final current = state.value ?? TvshowScreenState();
+      final seasons = await getSeasons();
+
+      final selectedSeason = seasons.firstWhere(
+        (s) => s.id == current.nextup?.seasonId,
+        orElse: () => seasons.first,
+      );
+
+      final episodes = await getEpisodesForSeason(seasonId: selectedSeason.id);
+
+      return current.copyWith(
+        seasons: seasons,
+        selectedSeason: selectedSeason,
+        episodes: episodes,
+      );
+    });
+
+    return state.value!;
   }
 
   Future<JellyfinItem> getTvshow() async {
@@ -139,15 +151,14 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
   Future<void> onSeasonChanged(String seasonId) async {
     state = AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final current = state.value;
+      final current = state.value ?? TvshowScreenState();
 
       final res = await getEpisodesForSeason(seasonId: seasonId);
 
-      return current!.copyWith(
+      return current.copyWith(
         episodes: res,
-        selectedSeason: current.seasons.firstWhere(
+        selectedSeason: current.seasons?.firstWhereOrNull(
           (s) => s.id == seasonId,
-          orElse: () => current.seasons.first,
         ),
       );
     });

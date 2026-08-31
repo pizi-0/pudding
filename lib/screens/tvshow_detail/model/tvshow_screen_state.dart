@@ -2,18 +2,18 @@
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 
 class TvshowScreenState {
-  final JellyfinItem tvshow;
-  final JellyfinItem nextup;
-  final List<JellyfinItem> seasons;
-  final List<JellyfinItem> episodes;
-  final JellyfinItem selectedSeason;
+  final JellyfinItem? tvshow;
+  final JellyfinItem? nextup;
+  final List<JellyfinItem>? seasons;
+  final List<JellyfinItem>? episodes;
+  final JellyfinItem? selectedSeason;
 
   TvshowScreenState({
-    required this.tvshow,
-    required this.nextup,
-    required this.seasons,
-    required this.episodes,
-    required this.selectedSeason,
+    this.tvshow,
+    this.nextup,
+    this.seasons,
+    this.episodes,
+    this.selectedSeason,
   });
 
   TvshowScreenState copyWith({
