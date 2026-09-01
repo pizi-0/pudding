@@ -17,6 +17,7 @@ import 'package:pudding/widgets/media_card.dart';
 import 'package:pudding/widgets/people_grid.dart';
 import 'package:pudding/widgets/pudding_scaffold.dart';
 import 'package:pudding/widgets/sliver_header.dart';
+import 'package:pudding/widgets/topbar.dart';
 import 'package:silky_scroll/silky_scroll.dart';
 
 import '../../widgets/sliver_section.dart';
@@ -189,61 +190,57 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                             blurRadius: 10,
                           );
 
-                          return Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Row(
-                              children: [
-                                FButton.icon(
-                                  style: .delta(
-                                    decoration: .delta([
-                                      .all(.boxDelta(boxShadow: [shadow])),
-                                    ]),
-                                  ),
-                                  onPress: context.pop,
-                                  child: Icon(FPhosphorBoldIcons.caretLeft),
-                                ),
-                                Icon(FPhosphorBoldIcons.dot),
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      FButton(
-                                        style: .delta(
-                                          decoration: .delta([
-                                            .all(
-                                              .boxDelta(boxShadow: [shadow]),
-                                            ),
-                                          ]),
-                                        ),
-                                        variant: .outline,
-                                        onPress: () =>
-                                            scrollController.animateTo(
-                                              0,
-                                              duration:
-                                                  kDefaultAnimationDuration,
-                                              curve: Curves.easeInOut,
-                                            ),
-                                        suffix: FCircularProgress().showIf(
-                                          tvAsync.isLoading,
-                                        ),
-                                        child: Text('${tv?.name}'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Icon(FPhosphorBoldIcons.dot),
-                                FButton.icon(
-                                  style: .delta(
-                                    decoration: .delta([
-                                      .all(.boxDelta(boxShadow: [shadow])),
-                                    ]),
-                                  ),
-                                  onPress: context.pop,
-                                  child: Icon(
-                                    FPhosphorBoldIcons.arrowClockwise,
-                                  ),
-                                ),
-                              ],
+                          return Topbar(
+                            prefix: FButton.icon(
+                              style: .delta(
+                                decoration: .delta([
+                                  .all(.boxDelta(boxShadow: [shadow])),
+                                ]),
+                              ),
+                              onPress: context.pop,
+                              child: Icon(FPhosphorBoldIcons.caretLeft),
                             ),
+                            suffix: FButton.icon(
+                              style: .delta(
+                                decoration: .delta([
+                                  .all(.boxDelta(boxShadow: [shadow])),
+                                ]),
+                              ),
+                              onPress: context.pop,
+                              child: Icon(
+                                FPhosphorBoldIcons.arrowClockwise,
+                              ),
+                            ),
+                            children: [
+                              FButton(
+                                mainAxisAlignment: .start,
+                                mainAxisSize: .min,
+                                style: .delta(
+                                  decoration: .delta([
+                                    .all(
+                                      .boxDelta(boxShadow: [shadow]),
+                                    ),
+                                  ]),
+                                ),
+                                variant: .outline,
+                                onPress: () => scrollController.animateTo(
+                                  0,
+                                  duration: kDefaultAnimationDuration,
+                                  curve: Curves.easeInOut,
+                                ),
+                                suffix: FCircularProgress().showIf(
+                                  tvAsync.isLoading,
+                                ),
+                                child: Flexible(
+                                  fit: .loose,
+                                  child: Text(
+                                    '${tv?.name}',
+                                    maxLines: 1,
+                                    overflow: .ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),

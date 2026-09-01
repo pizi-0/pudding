@@ -15,6 +15,7 @@ import 'package:silky_scroll/silky_scroll.dart';
 import '../../const/const.dart';
 import '../../widgets/logo_shimmer.dart';
 import '../../widgets/sliver_header.dart';
+import '../../widgets/topbar.dart';
 
 class MovieDetailScreen extends ConsumerStatefulWidget {
   final String id;
@@ -124,61 +125,65 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
                             blurRadius: 10,
                           );
 
-                          return Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Row(
-                              children: [
-                                FButton.icon(
-                                  style: .delta(
-                                    decoration: .delta([
-                                      .all(.boxDelta(boxShadow: [shadow])),
-                                    ]),
-                                  ),
-                                  onPress: context.pop,
-                                  child: Icon(FPhosphorBoldIcons.caretLeft),
-                                ),
-                                Icon(FPhosphorBoldIcons.dot),
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      FButton(
-                                        style: .delta(
-                                          decoration: .delta([
-                                            .all(
-                                              .boxDelta(boxShadow: [shadow]),
-                                            ),
-                                          ]),
-                                        ),
-                                        variant: .outline,
-                                        onPress: () =>
-                                            scrollController.animateTo(
-                                              0,
-                                              duration:
-                                                  kDefaultAnimationDuration,
-                                              curve: Curves.easeInOut,
-                                            ),
-                                        suffix: FCircularProgress().showIf(
-                                          movieAsync.isLoading,
-                                        ),
-                                        child: Text(m.name),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Icon(FPhosphorBoldIcons.dot),
-                                FButton.icon(
-                                  style: .delta(
-                                    decoration: .delta([
-                                      .all(.boxDelta(boxShadow: [shadow])),
-                                    ]),
-                                  ),
-                                  onPress: context.pop,
-                                  child: Icon(
-                                    FPhosphorBoldIcons.arrowClockwise,
-                                  ),
-                                ),
-                              ],
+                          return Topbar(
+                            prefix: FButton.icon(
+                              style: .delta(
+                                decoration: .delta([
+                                  .all(.boxDelta(boxShadow: [shadow])),
+                                ]),
+                              ),
+                              onPress: context.pop,
+                              child: Icon(FPhosphorBoldIcons.caretLeft),
                             ),
+                            suffix: FButton.icon(
+                              style: .delta(
+                                decoration: .delta([
+                                  .all(.boxDelta(boxShadow: [shadow])),
+                                ]),
+                              ),
+                              onPress: context.pop,
+                              child: Icon(
+                                FPhosphorBoldIcons.arrowClockwise,
+                              ),
+                            ),
+                            children: [
+                              FButton(
+                                mainAxisAlignment: .start,
+                                mainAxisSize: .min,
+                                style: .delta(
+                                  contentStyle: .delta(
+                                    textStyle: .delta([
+                                      .all(
+                                        .delta(
+                                          overflow: () => .ellipsis,
+                                        ),
+                                      ),
+                                    ]),
+                                  ),
+                                  decoration: .delta([
+                                    .all(
+                                      .boxDelta(boxShadow: [shadow]),
+                                    ),
+                                  ]),
+                                ),
+                                variant: .outline,
+                                onPress: () => scrollController.animateTo(
+                                  0,
+                                  duration: kDefaultAnimationDuration,
+                                  curve: Curves.easeInOut,
+                                ),
+                                suffix: FCircularProgress().showIf(
+                                  movieAsync.isLoading,
+                                ),
+                                child: Flexible(
+                                  fit: .loose,
+                                  child: Text(
+                                    m.name,
+                                    overflow: .ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),
