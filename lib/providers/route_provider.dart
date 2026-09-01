@@ -4,7 +4,7 @@ import 'package:go_transitions/go_transitions.dart';
 import 'package:pudding/navigation_shell.dart';
 import 'package:pudding/screens/auth/auth_provider.dart';
 import 'package:pudding/screens/auth/auth_screen.dart';
-import 'package:pudding/screens/detail_screens/movies_detail_screen.dart';
+import 'package:pudding/screens/movie_detail/movies_detail_screen.dart';
 import 'package:pudding/screens/home/home.dart';
 import 'package:pudding/screens/library_detail/library_detail_screen.dart';
 import 'package:pudding/screens/settings/settings.dart';
@@ -64,7 +64,7 @@ final routeProvider = Provider<GoRouter>(
         name: 'Movie details',
         path: '/movie/:movieId',
         builder: (context, state) => MovieDetailScreen(
-          movieId: state.pathParameters['movieId'],
+          id: state.pathParameters['movieId']!,
         ),
         pageBuilder: GoTransitions.fade.call,
       ),

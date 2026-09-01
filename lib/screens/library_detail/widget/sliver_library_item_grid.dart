@@ -11,6 +11,7 @@ import 'package:pudding/const/const.dart';
 import 'package:pudding/models/jelly_filter.dart';
 import 'package:pudding/models/pudding_display_prefs.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
+import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/bar.dart';
 import 'package:pudding/widgets/media_card.dart';
 import 'package:pudding/widgets/section_header.dart';
@@ -273,7 +274,15 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                 key: ValueKey(item.id),
                 item: item,
                 imageType: prefs.imageType,
-                onPressed: () => context.push('/show/${item.id}'),
+                onPressed: () {
+                  if (item.isSeries) {
+                    context.push('/show/${item.id}');
+                  }
+
+                  if (item.isMovie) {
+                    context.push('/movie/${item.id}');
+                  }
+                },
               );
             },
           ),
