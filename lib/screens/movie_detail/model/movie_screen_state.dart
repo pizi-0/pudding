@@ -23,7 +23,14 @@ class MovieScreenState {
   String? get overview => movie!.overview;
 
   bool get hasLogo => movie!.imageTags.containsKey(JellyfinImagesApi.typeLogo);
+  bool get hasPrimary =>
+      movie!.imageTags.containsKey(JellyfinImagesApi.typePrimary);
+  bool get hasBackdrop =>
+      movie!.imageTags.containsKey(JellyfinImagesApi.typeBackdrop);
+
   String get logo => movie!.getLogo();
+  String get primary => movie!.getPrimary();
+  String get backdrop => movie!.getBackdrop();
 
   String get name => movie!.getTitle();
   String? get year => movie!.productionYear?.toString();
