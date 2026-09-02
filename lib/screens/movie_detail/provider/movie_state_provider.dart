@@ -15,6 +15,8 @@ final fields = [
   'Genres',
   'RemoteTrailers',
   'LocalTrailerCount',
+  'MediaSources',
+  'MediaSourceCount',
 ];
 
 class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
@@ -42,6 +44,18 @@ class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
 
       return current.copyWith(movie: res.items.first);
     });
+
+    if (state.value!.isMultipart) {
+      state = AsyncLoading();
+
+      state = await AsyncValue.guard(() async {
+        final current = state.value!;
+
+        final parts = await getAdditionalParts();
+
+        return current.copyWith(multipart: parts);
+      });
+    }
 
     return state.value!;
   }
@@ -86,6 +100,12 @@ class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
         movie: current.movie!.copyWith(userData: newData),
       );
     });
+  }
+
+  Future<List<JellyfinItem>> getAdditionalParts() async {
+    final res = await client.videos.additionalParts(id);
+
+    return res.map((e) => JellyfinItem.fromJson(e)).toList();
   }
 }
 

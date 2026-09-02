@@ -5,14 +5,17 @@ import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
 class MovieScreenState {
   final JellyfinItem? movie;
+  final List<JellyfinItem> multipart;
 
-  const MovieScreenState({this.movie});
+  const MovieScreenState({this.movie, this.multipart = const []});
 
   MovieScreenState copyWith({
     JellyfinItem? movie,
+    List<JellyfinItem>? multipart,
   }) {
     return MovieScreenState(
       movie: movie ?? this.movie,
+      multipart: multipart ?? this.multipart,
     );
   }
 
@@ -43,4 +46,6 @@ class MovieScreenState {
   List<JellyPeople> get peoples => movie!.getPeoples();
   String? get rating => movie!.getCommunityRating()?.toStringAsFixed(2);
   String? get parentalRating => movie!.getOfficialRating();
+
+  bool get isMultipart => (movie!.raw['PartCount'] ?? 1) > 1;
 }

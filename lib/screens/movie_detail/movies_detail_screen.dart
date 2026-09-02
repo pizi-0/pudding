@@ -9,7 +9,10 @@ import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/screens/movie_detail/provider/movie_state_provider.dart';
 import 'package:pudding/services/di.dart';
+import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/widgets/media_card.dart';
 import 'package:pudding/widgets/pudding_scaffold.dart';
+import 'package:pudding/widgets/sliver_section.dart';
 import 'package:silky_scroll/silky_scroll.dart';
 
 import '../../const/const.dart';
@@ -387,6 +390,47 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
                         ),
                       ),
                     ),
+                  ),
+                  if (m.isMultipart)
+                    SliverSection(
+                      header: FButton(
+                        variant: .outline,
+                        onPress: () {},
+                        child: Text('Additional parts'),
+                      ),
+                      slivers: [
+                        SliverPadding(
+                          padding: .fromLTRB(20, 0, 20, 20),
+                          sliver: SliverGrid.builder(
+                            itemCount: m.multipart.length,
+                            gridDelegate:
+                                SliverGridDelegateWithMaxCrossAxisExtent(
+                                  maxCrossAxisExtent: 350,
+                                  childAspectRatio: 16 / 10,
+                                ),
+                            itemBuilder: (context, index) {
+                              final part = m.multipart[index];
+                              return NewMediaCard(item: part);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  SliverSection(
+                    header: FButton(
+                      variant: .outline,
+                      onPress: () => ref
+                          .read(movieStateProvider(widget.id).notifier)
+                          .getAdditionalParts(),
+                      child: Text('Info'),
+                    ),
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Text(
+                          m.movie!.getRaw(),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               );
