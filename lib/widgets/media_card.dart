@@ -549,7 +549,7 @@ class InfoLayer extends StatelessWidget {
       return item.getSeriesRunYears();
     }
 
-    if (item.isMovie || item.isSeason) {
+    if (item.isMovie || item.isSeason || item.isVideo) {
       return item.productionYear?.toString();
     }
 
@@ -583,7 +583,7 @@ class InfoLayer extends StatelessWidget {
           Text('${item.getUnplayed()}'),
         ],
       );
-    } else if (item.isMovie || item.isEpisode) {
+    } else if (item.isMovie || item.isEpisode || item.isVideo) {
       return Row(
         spacing: 4,
         children: [
