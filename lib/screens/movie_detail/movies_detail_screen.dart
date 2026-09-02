@@ -1,5 +1,5 @@
 import 'package:awesome_extensions/awesome_extensions.dart'
-    show WidgetCommonExtension, ListExtension;
+    show ListExtension, StyledText, WidgetCommonExtension;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
@@ -56,12 +56,52 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
         : CrossAxisAlignment.start;
 
     return PuddingScaffold(
-      backdrop: CachedNetworkImage(
-        imageUrl: client.images.url(
-          itemId: widget.id,
-          type: JellyfinImagesApi.typeBackdrop,
-        ),
-        fit: .cover,
+      backdrop: ValueListenableBuilder(
+        valueListenable: scrollOffset,
+        builder: (context, value, child) {
+          return ImageFiltered(
+            imageFilter: .compose(
+              outer: .blur(
+                sigmaX: (value * 250).clamp(0, 100),
+                sigmaY: (value * 250).clamp(0, 100),
+                tileMode: .clamp,
+              ),
+              inner: ColorFilter.mode(
+                Color.lerp(
+                  theme.colors.background.withAlpha(180),
+                  theme.colors.background.withAlpha(200),
+                  value,
+                )!,
+                .dstOut,
+              ),
+            ),
+            child: CachedNetworkImage(
+              imageUrl: client.images.url(
+                itemId: widget.id,
+                type: JellyfinImagesApi.typeBackdrop,
+              ),
+              fit: .cover,
+              errorBuilder: (context, error, stackTrace) => CachedNetworkImage(
+                imageUrl: client.images.url(
+                  itemId: widget.id,
+                  type: JellyfinImagesApi.typePrimary,
+                ),
+                errorBuilder: (context, error, stackTrace) => Align(
+                  alignment: .bottomEnd,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Missing \'backdrop\', \'primary\'',
+                      style: theme.typography.body.xs.copyWith(
+                        color: theme.colors.mutedForeground,
+                      ),
+                    ).italic(),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
       child: SilkyCustomScrollView(
         slivers: [
@@ -204,15 +244,27 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
                                 child: Column(
                                   spacing: 16,
                                   children: [
-                                    if (m.hasLogo)
-                                      Expanded(
-                                        child: CachedNetworkImage(
-                                          imageUrl: m.logo,
-                                          alignment: .bottomCenter,
-                                          memCacheWidth: 450,
-                                          fit: .contain,
-                                        ),
-                                      ),
+                                    Expanded(
+                                      child: m.hasLogo
+                                          ? CachedNetworkImage(
+                                              imageUrl: m.logo,
+                                              alignment: .bottomCenter,
+                                              memCacheWidth: 450,
+                                              fit: .contain,
+                                            )
+                                          : m.hasPrimary
+                                          ? ClipRRect(
+                                              borderRadius:
+                                                  theme.style.borderRadius.md,
+                                              child: CachedNetworkImage(
+                                                imageUrl: m.primary,
+                                                alignment: .bottomCenter,
+                                                memCacheWidth: 450,
+                                                fit: .contain,
+                                              ),
+                                            )
+                                          : SizedBox(),
+                                    ),
 
                                     if (m.hasGenres)
                                       Row(
