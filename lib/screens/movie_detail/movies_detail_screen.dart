@@ -11,6 +11,7 @@ import 'package:pudding/screens/movie_detail/provider/movie_state_provider.dart'
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/media_card.dart';
+import 'package:pudding/widgets/people_grid.dart';
 import 'package:pudding/widgets/pudding_scaffold.dart';
 import 'package:pudding/widgets/sliver_section.dart';
 import 'package:silky_scroll/silky_scroll.dart';
@@ -416,6 +417,19 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
                         ),
                       ],
                     ),
+                  SliverSection(
+                    header: FButton(
+                      variant: .outline,
+                      onPress: () {},
+                      child: Text('Cast & Crew'),
+                    ),
+                    slivers: [
+                      SliverPadding(
+                        padding: .fromLTRB(20, 0, 20, 20),
+                        sliver: PeopleGrid(peoples: m.peoples),
+                      ),
+                    ],
+                  ),
                   SliverSection(
                     header: FButton(
                       variant: .outline,
