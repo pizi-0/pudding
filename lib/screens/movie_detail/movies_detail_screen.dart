@@ -13,7 +13,9 @@ import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/media_card.dart';
 import 'package:pudding/widgets/people_grid.dart';
 import 'package:pudding/widgets/pudding_scaffold.dart';
+import 'package:pudding/widgets/rating_container.dart';
 import 'package:pudding/widgets/sliver_section.dart';
+import 'package:pudding/widgets/star_rating_container.dart';
 import 'package:silky_scroll/silky_scroll.dart';
 
 import '../../const/const.dart';
@@ -348,21 +350,42 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
                                         ],
                                       ),
                                     ),
-                                    // Row(
-                                    //   mainAxisAlignment: .center,
-                                    //   children:
-                                    //       [
-                                    //         Text('$runYears'),
-                                    //         if (seasonCount != null)
-                                    //           Text('$seasonCount seasons'),
-                                    //         if (episodeCount != null)
-                                    //           Text('$episodeCount episodes'),
-                                    //         if (unplayed != null)
-                                    //           Text('$unplayed unplayed'),
-                                    //       ].separatedBy(
-                                    //         Icon(FPhosphorBoldIcons.dot),
-                                    //       ),
-                                    // ),
+                                    Row(
+                                      mainAxisAlignment: .center,
+                                      children:
+                                          [
+                                            Text('${m.year}'),
+                                            Row(
+                                              spacing: 4,
+                                              children: [
+                                                Text('${m.duration}'),
+                                                if (m.isMultipart)
+                                                  Text(
+                                                    '(Multi parts)',
+                                                    style: theme
+                                                        .typography
+                                                        .body
+                                                        .xs
+                                                        .copyWith(
+                                                          color: theme
+                                                              .colors
+                                                              .mutedForeground,
+                                                        ),
+                                                  ).italic(),
+                                              ],
+                                            ),
+                                            if (m.parentalRating != null)
+                                              RatingContainer(
+                                                rating: m.parentalRating!,
+                                              ),
+                                            if (m.rating != null)
+                                              StarRatingContainer(
+                                                rating: m.rating!,
+                                              ),
+                                          ].separatedBy(
+                                            Icon(FPhosphorBoldIcons.dot),
+                                          ),
+                                    ),
                                   ],
                                 ),
                               ),
