@@ -104,6 +104,18 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                   itemId: widget.id,
                   type: JellyfinImagesApi.typePrimary,
                 ),
+                errorBuilder: (context, error, stackTrace) => Align(
+                  alignment: .bottomEnd,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Missing \'backdrop\', \'primary\'',
+                      style: theme.typography.body.xs.copyWith(
+                        color: theme.colors.mutedForeground,
+                      ),
+                    ).italic(),
+                  ),
+                ),
               ),
             ),
           );
