@@ -33,6 +33,8 @@ class MovieDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
+  final GlobalKey peopleKey = GlobalKey(debugLabel: 'people-section');
+
   final ScrollController scrollController = ScrollController();
   final client = services<JellyfinClient>();
 
@@ -440,19 +442,7 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
                         ),
                       ],
                     ),
-                  SliverSection(
-                    header: FButton(
-                      variant: .outline,
-                      onPress: () {},
-                      child: Text('Cast & Crew'),
-                    ),
-                    slivers: [
-                      SliverPadding(
-                        padding: .fromLTRB(20, 0, 20, 20),
-                        sliver: PeopleGrid(peoples: m.peoples),
-                      ),
-                    ],
-                  ),
+                  SliverPeople(key: peopleKey, media: m.movie!),
                   SliverSection(
                     header: FButton(
                       variant: .outline,
