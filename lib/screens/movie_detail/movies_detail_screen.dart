@@ -113,6 +113,7 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
         },
       ),
       child: SilkyCustomScrollView(
+        controller: scrollController,
         slivers: [
           movieAsync.when(
             skipLoadingOnReload: true,
