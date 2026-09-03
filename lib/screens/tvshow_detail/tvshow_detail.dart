@@ -508,7 +508,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
                     ],
                   ),
                   if (tv != null)
-                    SliverPeople(key: castsKey, tv: tv, season: season),
+                    SliverPeople(key: castsKey, media: tv, altMedia: season),
                 ],
               );
             },

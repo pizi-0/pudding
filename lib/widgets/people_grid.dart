@@ -44,12 +44,12 @@ class PeopleGrid extends StatelessWidget {
 }
 
 class SliverPeople extends StatefulWidget {
-  final JellyfinItem tv;
-  final JellyfinItem? season;
+  final JellyfinItem media;
+  final JellyfinItem? altMedia;
   const SliverPeople({
     super.key,
-    required this.tv,
-    this.season,
+    required this.media,
+    this.altMedia,
   });
 
   @override
@@ -58,11 +58,13 @@ class SliverPeople extends StatefulWidget {
 
 class _SliverPeopleState extends State<SliverPeople> {
   bool showAll = false;
-  late List<JellyPeople> selectedList = widget.tv.getPeoples();
+  late List<JellyPeople> selectedList = widget.media.getPeoples();
 
   @override
   Widget build(BuildContext context) {
-    final isSeasonList = listEquals(selectedList, widget.season?.getPeoples());
+    final isAltList = listEquals(selectedList, widget.altMedia?.getPeoples());
+
+    final isSeries = widget.media.isSeries;
 
     return SliverSection(
       header: Row(
@@ -71,17 +73,18 @@ class _SliverPeopleState extends State<SliverPeople> {
           Row(
             spacing: 10,
             children: [
-              FButton.icon(
-                variant: .outline,
-                onPress: () => setState(() {
-                  if (isSeasonList) {
-                    selectedList = widget.tv.getPeoples();
-                  } else {
-                    selectedList = widget.season?.getPeoples() ?? [];
-                  }
-                }),
-                child: Icon(FPhosphorBoldIcons.arrowsLeftRight),
-              ),
+              if (widget.altMedia != null)
+                FButton.icon(
+                  variant: .outline,
+                  onPress: () => setState(() {
+                    if (isAltList) {
+                      selectedList = widget.media.getPeoples();
+                    } else {
+                      selectedList = widget.altMedia?.getPeoples() ?? [];
+                    }
+                  }),
+                  child: Icon(FPhosphorBoldIcons.arrowsLeftRight),
+                ),
               FButton(
                 variant: .outline,
                 onPress: () {
@@ -89,7 +92,9 @@ class _SliverPeopleState extends State<SliverPeople> {
                 },
 
                 child: Text(
-                  '${isSeasonList ? widget.season?.name : 'Series'} Cast & Crew',
+                  isSeries
+                      ? '${isAltList ? widget.altMedia?.name : 'Series'} Cast & Crew'
+                      : 'Cast & Crew',
                 ),
               ),
             ],
