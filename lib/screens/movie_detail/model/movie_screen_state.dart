@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:collection/collection.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:pudding/models/jelly_people.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
@@ -7,16 +8,23 @@ import 'package:pudding/utils/num_extensions.dart';
 class MovieScreenState {
   final JellyfinItem? movie;
   final List<JellyfinItem> multipart;
+  final List<JellyfinItem> similars;
 
-  const MovieScreenState({this.movie, this.multipart = const []});
+  const MovieScreenState({
+    this.movie,
+    this.multipart = const [],
+    this.similars = const [],
+  });
 
   MovieScreenState copyWith({
     JellyfinItem? movie,
     List<JellyfinItem>? multipart,
+    List<JellyfinItem>? similars,
   }) {
     return MovieScreenState(
       movie: movie ?? this.movie,
       multipart: multipart ?? this.multipart,
+      similars: similars ?? this.similars,
     );
   }
 
@@ -52,6 +60,10 @@ class MovieScreenState {
   String? get duration => _getDuration();
 
   String? get size => _getSize();
+
+  List<JellyfinItem> get sortedSimilars => similars.sorted(
+    (a, b) => (a.sortName ?? a.name).compareTo((b.sortName ?? b.name)),
+  );
 
   String? _getDuration() {
     if (isMultipart) {

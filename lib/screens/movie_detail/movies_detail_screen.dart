@@ -445,6 +445,33 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
                   SliverSection(
                     header: FButton(
                       variant: .outline,
+                      onPress: () {},
+                      child: Text('More like this'),
+                    ),
+                    slivers: [
+                      SliverPadding(
+                        padding: .fromLTRB(20, 0, 20, 20),
+                        sliver: SliverGrid.builder(
+                          itemCount: m.similars.length,
+                          gridDelegate:
+                              SliverGridDelegateWithMaxCrossAxisExtent(
+                                maxCrossAxisExtent: 200,
+                                childAspectRatio: 10 / 16,
+                                mainAxisSpacing: 10,
+                                crossAxisSpacing: 10,
+                              ),
+                          itemBuilder: (context, index) {
+                            final s = m.sortedSimilars[index];
+
+                            return NewMediaCard(item: s);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  SliverSection(
+                    header: FButton(
+                      variant: .outline,
                       onPress: () => ref
                           .read(movieStateProvider(widget.id).notifier)
                           .getAdditionalParts(),

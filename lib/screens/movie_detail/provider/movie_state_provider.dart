@@ -57,6 +57,15 @@ class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
       });
     }
 
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final current = state.value ?? MovieScreenState();
+
+      final similars = await getSimilar();
+
+      return current.copyWith(similars: similars);
+    });
+
     return state.value!;
   }
 
@@ -106,6 +115,16 @@ class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
     final res = await client.videos.additionalParts(id);
 
     return res.map((e) => JellyfinItem.fromJson(e)).toList();
+  }
+
+  Future<List<JellyfinItem>> getSimilar() async {
+    final res = await client.library.similarMovies(
+      itemId: id,
+      limit: 10,
+      fields: ['SortName'],
+    );
+
+    return res.items;
   }
 }
 
