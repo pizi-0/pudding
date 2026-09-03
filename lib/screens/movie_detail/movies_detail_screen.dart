@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pudding/screens/movie_detail/provider/movie_state_provider.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/widgets/icon_text.dart';
 import 'package:pudding/widgets/media_card.dart';
 import 'package:pudding/widgets/people_grid.dart';
 import 'package:pudding/widgets/pudding_scaffold.dart';
@@ -356,26 +357,12 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
                                       mainAxisAlignment: .center,
                                       children:
                                           [
-                                            Text('${m.year}'),
-                                            Row(
-                                              spacing: 4,
-                                              children: [
-                                                Text('${m.duration}'),
-                                                if (m.isMultipart)
-                                                  Text(
-                                                    '(Multi parts)',
-                                                    style: theme
-                                                        .typography
-                                                        .body
-                                                        .xs
-                                                        .copyWith(
-                                                          color: theme
-                                                              .colors
-                                                              .mutedForeground,
-                                                        ),
-                                                  ).italic(),
-                                              ],
-                                            ),
+                                            if (m.year != null)
+                                              IconText(
+                                                text: m.year!,
+                                                icon:
+                                                    FPhosphorBoldIcons.calendar,
+                                              ),
                                             if (m.parentalRating != null)
                                               RatingContainer(
                                                 rating: m.parentalRating!,
@@ -383,6 +370,17 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
                                             if (m.rating != null)
                                               StarRatingContainer(
                                                 rating: m.rating!,
+                                              ),
+                                            if (m.duration != null)
+                                              IconText(
+                                                text: m.duration!,
+                                                icon: FPhosphorBoldIcons.clock,
+                                              ),
+                                            if (m.size != null)
+                                              IconText(
+                                                text: m.size!,
+                                                icon: FPhosphorBoldIcons
+                                                    .floppyDisk,
                                               ),
                                           ].separatedBy(
                                             Icon(FPhosphorBoldIcons.dot),

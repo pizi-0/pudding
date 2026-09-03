@@ -42,7 +42,7 @@ class MovieScreenState {
   List<String> get genres => movie!.genres;
   bool get hasGenres => genres.isNotEmpty;
   List<String> get genresShort =>
-      genres.length > 3 ? genres.sublist(0, 3) : genres;
+      genres.length > 3 ? genres.sublist(0, 2) : genres;
 
   List<JellyPeople> get peoples => movie!.getPeoples();
   String? get rating => movie!.getCommunityRating()?.toStringAsFixed(2);
@@ -50,6 +50,8 @@ class MovieScreenState {
 
   bool get isMultipart => (movie!.raw['PartCount'] ?? 1) > 1;
   String? get duration => _getDuration();
+
+  String? get size => _getSize();
 
   String? _getDuration() {
     if (isMultipart) {
@@ -60,6 +62,18 @@ class MovieScreenState {
       return total.toFormattedDuration();
     } else {
       return movie?.durationMs?.toFormattedDuration();
+    }
+  }
+
+  String? _getSize() {
+    if (isMultipart) {
+      final total =
+          multipart.fold(0, (p, e) => p + (e.mediaSources.single.size ?? 0)) +
+          (movie?.mediaSources.single.size ?? 0);
+
+      return total.toLocalizedSize();
+    } else {
+      return movie?.mediaSources.single.size?.toLocalizedSize();
     }
   }
 }
