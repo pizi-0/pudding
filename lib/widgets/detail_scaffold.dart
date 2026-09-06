@@ -10,6 +10,7 @@ import 'package:pudding/services/di.dart';
 import 'package:silky_scroll/silky_scroll.dart';
 
 class DetailScaffold<T> extends ConsumerStatefulWidget {
+  /// for premade  use [DetailBackdrop]
   final Widget? backdrop;
   final Widget? header;
   final bool? nested;
@@ -108,7 +109,7 @@ class _DetailScaffoldState<T> extends ConsumerState<DetailScaffold<T>> {
 
                   ...widget.slivers.map(
                     (s) => SliverPadding(
-                      padding: .fromLTRB(20, 0, 20, 20),
+                      padding: .fromLTRB(20, 0, 20, 40),
                       sliver: s,
                     ),
                   ),
