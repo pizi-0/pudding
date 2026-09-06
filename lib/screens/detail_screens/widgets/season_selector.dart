@@ -182,3 +182,149 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
     );
   }
 }
+
+class NewSeasonSelector extends ConsumerStatefulWidget {
+  final String seriesId;
+
+  const NewSeasonSelector({super.key, required this.seriesId});
+
+  @override
+  ConsumerState<NewSeasonSelector> createState() => _NewSeasonSelectorState();
+}
+
+class _NewSeasonSelectorState extends ConsumerState<NewSeasonSelector> {
+  final GlobalKey buttonKey = GlobalKey();
+  String? selected;
+  bool popup = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = FTheme.of(context);
+    final style = theme.style;
+    final tvAsync = ref.watch(tvshowStateProvider(widget.seriesId));
+
+    return tvAsync.when(
+      skipLoadingOnReload:
+          tvAsync.isReloading && tvAsync.value?.selectedSeason != null,
+      loading: () => FButton(
+        onPress: () {},
+        variant: .outline,
+        child: FCircularProgress(),
+      ),
+      error: (error, stackTrace) => FButton(
+        onPress: () {},
+        variant: .destructive,
+        child: Text(error.toString()),
+      ),
+      data: (data) {
+        return FPopover(
+          overflow: .flip,
+          style: .delta(
+            popoverPadding: .value(.all(20)),
+            barrierFilter: (context, animation) => .compose(
+              outer: ImageFilter.blur(
+                sigmaX: animation * 5,
+                sigmaY: animation * 5,
+              ),
+              inner: ColorFilter.mode(
+                Color.lerp(
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.2),
+                  animation,
+                )!,
+                .srcOver,
+              ),
+            ),
+          ),
+          cutoutBuilder: (path, bounds) => path.addRRect(
+            RRect.fromRectAndRadius(
+              bounds,
+              style.borderRadius.md.bottomLeft,
+            ),
+          ), //
+          onTapHide: () {
+            setState(() {
+              popup = false;
+            });
+          },
+          constraints: FPortalConstraints(),
+          builder: (context, controller, child) => FButton(
+            style: .delta(contentStyle: .delta(spacing: 20)),
+            key: buttonKey,
+            variant: .outline,
+            mainAxisAlignment: .spaceBetween,
+            onPress: tvAsync.isLoading
+                ? () {}
+                : () {
+                    controller.toggle();
+                    popup = !popup;
+                    setState(() {});
+                  },
+            suffix: tvAsync.isLoading
+                ? FCircularProgress()
+                : AnimatedMorphIcon(
+                    icon: popup
+                        ? FPhosphorBoldIcons.caretUp
+                        : FPhosphorBoldIcons.caretDown,
+                  ),
+            child: Text(
+              data.selectedSeason!.name,
+            ),
+          ),
+          childAnchor: .bottomLeft,
+          popoverAnchor: .topLeft,
+          popoverBuilder: (context, controller) {
+            return GridView.builder(
+              itemCount: data.seasons!.length,
+              shrinkWrap: true,
+              padding: .all(10),
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 200,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                childAspectRatio: 10 / 16,
+              ),
+              itemBuilder: (context, index) {
+                final season = data.seasons!.elementAt(index);
+
+                return Stack(
+                  children: [
+                    NewMediaCard(
+                      item: season,
+                      selected: season.id == data.selectedSeason!.id,
+                      isNext: data.nextup!.seasonId == season.id,
+                      onPressed: () async {
+                        selected = season.id;
+                        setState(() {});
+
+                        // await widget.onSeasonChange(season);
+                        controller.hide();
+
+                        popup = false;
+                        setState(() {});
+                      },
+                    ),
+                    if (tvAsync.isLoading && selected == season.id)
+                      Positioned.fill(
+                        bottom: 2,
+                        right: 2,
+                        left: 2,
+                        top: 2,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: theme.colors.background.withAlpha(200),
+                            borderRadius: style.borderRadius.sm,
+                          ),
+                          child: FCircularProgress(),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+}

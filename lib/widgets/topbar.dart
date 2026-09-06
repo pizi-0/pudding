@@ -8,7 +8,6 @@ class Topbar extends StatelessWidget {
 
   const new({
     super.key,
-
     this.prefix,
     this.children = const [],
     this.suffix,

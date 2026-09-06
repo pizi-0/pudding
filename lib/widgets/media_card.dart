@@ -431,16 +431,13 @@ class _NewMediaCardState extends State<NewMediaCard> {
           if (widget.bottom != null)
             AnimatedSize(
               duration: kDefaultAnimationDuration,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DefaultTextStyle(
-                  maxLines: 2,
-                  overflow: .ellipsis,
-                  style: theme.typography.body.sm.copyWith(
-                    color: theme.colors.mutedForeground,
-                  ),
-                  child: widget.bottom!,
+              child: DefaultTextStyle(
+                maxLines: 3,
+                overflow: .ellipsis,
+                style: theme.typography.body.sm.copyWith(
+                  color: theme.colors.mutedForeground,
                 ),
+                child: widget.bottom!,
               ),
             ),
         ],

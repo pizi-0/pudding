@@ -10,12 +10,12 @@ import 'package:go_router/go_router.dart';
 import 'package:pudding/screens/movie_detail/provider/movie_state_provider.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_people.dart';
 import 'package:pudding/widgets/icon_text.dart';
 import 'package:pudding/widgets/media_card.dart';
-import 'package:pudding/widgets/people_grid.dart';
 import 'package:pudding/widgets/pudding_scaffold.dart';
 import 'package:pudding/widgets/rating_container.dart';
-import 'package:pudding/widgets/sliver_section.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_section.dart';
 import 'package:pudding/widgets/star_rating_container.dart';
 import 'package:silky_scroll/silky_scroll.dart';
 

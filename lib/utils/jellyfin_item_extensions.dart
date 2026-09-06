@@ -46,6 +46,14 @@ extension JellyInfo on JellyfinItem {
     return '$startYear-${endYear?.year ?? ''}';
   }
 
+  String getYear() {
+    if (isSeries) {
+      return getSeriesRunYears();
+    } else {
+      return productionYear.toString();
+    }
+  }
+
   String getEndsAt(BuildContext context) {
     final playedDurationMs = ((userData?.playbackPositionTicks ?? 0) / 10000);
     final resumable = playedDurationMs != 0;
