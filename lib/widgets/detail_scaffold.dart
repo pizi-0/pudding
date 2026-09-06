@@ -1,6 +1,7 @@
 import 'package:awesome_extensions/awesome_extensions.dart' show StyledText;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
@@ -57,66 +58,75 @@ class _DetailScaffoldState<T> extends ConsumerState<DetailScaffold<T>> {
           primary.unfocus();
         }
       },
-      child: FScaffold(
-        childPad: false,
-        child: Stack(
-          fit: .expand,
-          children: [
-            if (widget.backdrop != null)
-              Positioned(
-                child: ValueListenableBuilder(
-                  valueListenable: scrollOffset,
-                  builder: (context, value, child) {
-                    return ImageFiltered(
-                      imageFilter: .compose(
-                        outer: .blur(
-                          sigmaX: (value * 250).clamp(0, 100),
-                          sigmaY: (value * 250).clamp(0, 100),
-                          tileMode: .clamp,
+      child: Listener(
+        onPointerDown: (event) {
+          if (event.buttons == kBackMouseButton) {
+            if (context.canPop()) {
+              context.pop();
+            }
+          }
+        },
+        child: FScaffold(
+          childPad: false,
+          child: Stack(
+            fit: .expand,
+            children: [
+              if (widget.backdrop != null)
+                Positioned(
+                  child: ValueListenableBuilder(
+                    valueListenable: scrollOffset,
+                    builder: (context, value, child) {
+                      return ImageFiltered(
+                        imageFilter: .compose(
+                          outer: .blur(
+                            sigmaX: (value * 250).clamp(0, 100),
+                            sigmaY: (value * 250).clamp(0, 100),
+                            tileMode: .clamp,
+                          ),
+                          inner: ColorFilter.mode(
+                            Color.lerp(
+                              theme.colors.background.withAlpha(180),
+                              theme.colors.background.withAlpha(200),
+                              value,
+                            )!,
+                            .dstOut,
+                          ),
                         ),
-                        inner: ColorFilter.mode(
-                          Color.lerp(
-                            theme.colors.background.withAlpha(180),
-                            theme.colors.background.withAlpha(200),
-                            value,
-                          )!,
-                          .dstOut,
+                        child: child!,
+                      );
+                    },
+                    child: widget.backdrop,
+                  ),
+                ),
+              Positioned.fill(
+                child: SilkyCustomScrollView(
+                  controller: scrollController,
+                  slivers: [
+                    if (widget.header != null)
+                      PinnedHeaderSliver(
+                        child: ValueListenableBuilder(
+                          valueListenable: topbarShadow,
+                          builder: (context, value, child) {
+                            return FTheme(
+                              data: _headerButtonStyle(context, value),
+                              child: widget.header!,
+                            );
+                          },
+                          child: widget.header,
                         ),
                       ),
-                      child: child!,
-                    );
-                  },
-                  child: widget.backdrop,
+
+                    ...widget.slivers.map(
+                      (s) => SliverPadding(
+                        padding: .fromLTRB(20, 0, 20, 40),
+                        sliver: s,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            Positioned.fill(
-              child: SilkyCustomScrollView(
-                controller: scrollController,
-                slivers: [
-                  if (widget.header != null)
-                    PinnedHeaderSliver(
-                      child: ValueListenableBuilder(
-                        valueListenable: topbarShadow,
-                        builder: (context, value, child) {
-                          return FTheme(
-                            data: _headerButtonStyle(context, value),
-                            child: widget.header!,
-                          );
-                        },
-                        child: widget.header,
-                      ),
-                    ),
-
-                  ...widget.slivers.map(
-                    (s) => SliverPadding(
-                      padding: .fromLTRB(20, 0, 20, 40),
-                      sliver: s,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
