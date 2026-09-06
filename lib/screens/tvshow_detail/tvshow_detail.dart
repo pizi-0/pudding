@@ -81,7 +81,13 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
             ]),
           ),
         ],
-        error: (error, stackTrace) => [],
+        error: (error, stackTrace) => [
+          SliverFillViewport(
+            delegate: SliverChildListDelegate.fixed([
+              Center(child: Text(error.toString())),
+            ]),
+          ),
+        ],
         data: (tv) {
           return [
             SliverShowcase.tv(
