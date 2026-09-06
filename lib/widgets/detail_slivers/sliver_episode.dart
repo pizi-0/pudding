@@ -1,0 +1,67 @@
+import 'package:awesome_extensions/awesome_extensions.dart'
+    show WidgetCommonExtension;
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
+import 'package:pudding/screens/detail_screens/widgets/season_selector.dart';
+import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
+import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/widgets/media_card.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_section.dart';
+
+class SliverEpisodes extends ConsumerWidget {
+  final String id;
+  const new({super.key, required this.id});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tvAsync = ref.watch(tvshowStateProvider(id));
+
+    return SliverSection(
+      key: key,
+      header: NewSeasonSelector(seriesId: id),
+      slivers: [
+        tvAsync.when(
+          skipLoadingOnReload:
+              tvAsync.isReloading && tvAsync.value?.episodes != null,
+          loading: () => SliverToBoxAdapter(
+            child: FCircularProgress(),
+          ),
+          error: (error, stackTrace) => SliverToBoxAdapter(
+            child: Text(error.toString()),
+          ),
+          data: (data) {
+            return SliverGrid.builder(
+              itemCount: data.episodes!.length,
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 350,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                childAspectRatio: 16 / 14,
+              ),
+              itemBuilder: (context, index) {
+                final tv = data.episodes![index];
+
+                return NewMediaCard(
+                  item: tv,
+                  dimPlayed: tv.userData?.played ?? false,
+                  bottom: AspectRatio(
+                    aspectRatio: 16 / 4,
+                    child:
+                        Container(
+                          padding: .all(8),
+                          child: Text(tv.getOverview() ?? 'No overview'),
+                        ).showIf(
+                          (tv.userData?.played ?? false) ||
+                              (tv.id == data.nextup?.id),
+                        ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+}

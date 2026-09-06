@@ -1,0 +1,58 @@
+import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
+
+class SliverSection extends StatefulWidget {
+  final Widget header;
+  final List<Widget> slivers;
+  const SliverSection({super.key, required this.header, required this.slivers});
+
+  @override
+  State<SliverSection> createState() => _SliverSectionState();
+}
+
+class _SliverSectionState extends State<SliverSection> {
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.theme;
+
+    return SliverMainAxisGroup(
+      slivers: [
+        SliverLayoutBuilder(
+          builder: (context, constraints) {
+            final percent = constraints.overlap / 76;
+
+            return PinnedHeaderSliver(
+              child: Align(
+                alignment: .centerStart,
+                child: Row(
+                  mainAxisSize: .min,
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: theme.style.borderRadius.md,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.lerp(
+                              Colors.transparent,
+                              theme.colors.background,
+                              percent,
+                            )!,
+                            spreadRadius: 10 * percent,
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: widget.header,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        SliverPadding(padding: .only(top: 20)),
+        ...widget.slivers,
+      ],
+    );
+  }
+}
