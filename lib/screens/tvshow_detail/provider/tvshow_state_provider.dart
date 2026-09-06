@@ -67,6 +67,13 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
       );
     });
 
+    state = await AsyncValue.guard(() async {
+      final current = state.value ?? TvshowScreenState();
+      final res = await getSimilar();
+
+      return current.copyWith(similars: res);
+    });
+
     return state.value!;
   }
 
@@ -157,7 +164,7 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
 
       return current.copyWith(
         episodes: res,
-        selectedSeason: current.seasons?.firstWhereOrNull(
+        selectedSeason: current.seasons.firstWhereOrNull(
           (s) => s.id == seasonId,
         ),
       );
@@ -203,6 +210,16 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
 
       return current.copyWith(tvshow: tv, episodes: eps);
     });
+  }
+
+  Future<List<JellyfinItem>> getSimilar() async {
+    final res = await client.library.similarShows(
+      itemId: id,
+      limit: 10,
+      fields: ['SortName'],
+    );
+
+    return res.items;
   }
 }
 

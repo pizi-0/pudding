@@ -8,6 +8,7 @@ import 'package:pudding/widgets/detail_scaffold.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_episode.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_people.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_showcase.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_similar.dart';
 import 'package:pudding/widgets/logo_shimmer.dart';
 import 'package:pudding/widgets/topbar.dart';
 
@@ -101,6 +102,9 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
             SliverPeople(
               media: tv.tvshow!,
               altMedia: tv.selectedSeason,
+            ),
+            SliverSimilar(
+              items: tv.similars,
             ),
           ];
         },
