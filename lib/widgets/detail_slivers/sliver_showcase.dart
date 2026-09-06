@@ -1,4 +1,5 @@
-import 'package:awesome_extensions/awesome_extensions.dart' show ListExtension;
+import 'package:awesome_extensions/awesome_extensions.dart'
+    show ListExtension, StyledText;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
@@ -58,8 +59,10 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
         ? CrossAxisAlignment.center
         : CrossAxisAlignment.start;
 
+    final year = item.getYear();
     final parentalRating = item.getOfficialRating();
     final rating = item.getCommunityRating();
+    final duration = (next ?? item).getRuntime();
 
     return SliverToBoxAdapter(
       child: Align(
@@ -77,15 +80,20 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 400),
+                  constraints: BoxConstraints(maxWidth: 400, maxHeight: 500),
                   child: Column(
                     spacing: 20,
                     crossAxisAlignment: crossAxisAlignment,
+                    mainAxisAlignment: .end,
                     children: [
                       FittedBox(
                         child: CachedNetworkImage(
                           imageUrl: item.getLogo(),
                           width: 400,
+                          errorBuilder: (context, error, stackTrace) => Text(
+                            item.name,
+                            style: theme.typography.display.xl,
+                          ).bold(),
                         ),
                       ),
                       Row(
@@ -128,15 +136,21 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
                       Row(
                         mainAxisSize: .min,
                         children: [
-                          IconText(
-                            text: item.getYear(),
-                            icon: FPhosphorBoldIcons.calendar,
-                          ),
+                          if (year != null)
+                            IconText(
+                              text: year,
+                              icon: FPhosphorBoldIcons.calendar,
+                            ),
                           if (parentalRating != null)
                             RatingContainer(rating: parentalRating),
                           if (rating != null)
                             StarRatingContainer(
                               rating: rating.toStringAsFixed(2),
+                            ),
+                          if (duration != null)
+                            IconText(
+                              text: duration,
+                              icon: FPhosphorBoldIcons.clock,
                             ),
                         ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
                       ),
@@ -162,10 +176,15 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
   Widget _playButtonLabel(JellyfinItem? tv, JellyfinItem? next) {
     if (widget._variant == .tv) {
       final progress = tv?.getPlayProgress() ?? 0;
+
       if (progress < 1) {
         return Text('S${next?.parentIndexNumber}:E${next?.indexNumber}');
       } else if (progress == 1) {
         return Text('Rewatch');
+      }
+    } else {
+      if (tv!.isResumable) {
+        return Text('Resume');
       }
     }
 

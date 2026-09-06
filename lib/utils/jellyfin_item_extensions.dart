@@ -28,7 +28,11 @@ extension JellyInfo on JellyfinItem {
   }
 
   String? getOverview() {
-    return overview;
+    final ov = (overview ?? '').trim();
+
+    if (ov.isEmpty) return null;
+
+    return ov;
   }
 
   String? getRuntime() {
@@ -46,11 +50,11 @@ extension JellyInfo on JellyfinItem {
     return '$startYear-${endYear?.year ?? ''}';
   }
 
-  String getYear() {
+  String? getYear() {
     if (isSeries) {
       return getSeriesRunYears();
     } else {
-      return productionYear.toString();
+      return productionYear?.toString();
     }
   }
 
