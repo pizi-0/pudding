@@ -32,7 +32,7 @@ class SliverEpisodes extends ConsumerWidget {
           ),
           data: (data) {
             return SliverGrid.builder(
-              itemCount: data.episodes!.length,
+              itemCount: data.episodes.length,
               gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 350,
                 mainAxisSpacing: 10,
@@ -40,7 +40,7 @@ class SliverEpisodes extends ConsumerWidget {
                 childAspectRatio: 16 / 14,
               ),
               itemBuilder: (context, index) {
-                final tv = data.episodes![index];
+                final tv = data.episodes[index];
 
                 return NewMediaCard(
                   item: tv,

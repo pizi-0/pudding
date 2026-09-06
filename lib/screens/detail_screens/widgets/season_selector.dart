@@ -275,7 +275,7 @@ class _NewSeasonSelectorState extends ConsumerState<NewSeasonSelector> {
           popoverAnchor: .topLeft,
           popoverBuilder: (context, controller) {
             return GridView.builder(
-              itemCount: data.seasons!.length,
+              itemCount: data.seasons.length,
               shrinkWrap: true,
               padding: .all(10),
               gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
@@ -285,7 +285,7 @@ class _NewSeasonSelectorState extends ConsumerState<NewSeasonSelector> {
                 childAspectRatio: 10 / 16,
               ),
               itemBuilder: (context, index) {
-                final season = data.seasons!.elementAt(index);
+                final season = data.seasons.elementAt(index);
 
                 return Stack(
                   children: [
