@@ -93,7 +93,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
             SliverShowcase.tv(
               item: tv.tvshow!,
               nextup: tv.nextup,
-              maxExtent: size.height - 76 - 76,
+              maxExtent: size.height - 76 - 96,
               onToggleFavorite: _toggleFavorite,
               onTogglePlayed: _togglePlayed,
             ),
