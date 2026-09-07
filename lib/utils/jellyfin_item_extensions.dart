@@ -176,6 +176,7 @@ extension JellyInfo on JellyfinItem {
   bool get isMovie => type == JellyfinItemKind.movie;
   bool get isEpisode => type == JellyfinItemKind.episode;
   bool get isSeason => type == JellyfinItemKind.season;
+  bool get isBoxsets => type == 'BoxSet';
   bool get isVideo => type == 'Video';
   bool get showRuntime =>
       (durationMs != null || durationMs != 0) && (isMovie || isEpisode);

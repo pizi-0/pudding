@@ -568,7 +568,7 @@ class InfoLayer extends StatelessWidget {
       return Icon(FPhosphorBoldIcons.check, color: Colors.green);
     }
 
-    if (item.isSeries || item.isSeason) {
+    if (item.isSeries || item.isSeason || item.isBoxsets) {
       return Row(
         spacing: 4,
         children: [
