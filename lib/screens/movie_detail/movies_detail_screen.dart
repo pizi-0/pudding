@@ -1,9 +1,7 @@
-import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/screens/movie_detail/provider/movie_state_provider.dart';
-import 'package:pudding/services/di.dart';
 import 'package:pudding/widgets/detail_scaffold.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_error.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_loader.dart';
@@ -23,20 +21,12 @@ class MovieDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
+  final GlobalKey multipartKey = GlobalKey(debugLabel: 'multipart-section');
   final GlobalKey peopleKey = GlobalKey(debugLabel: 'people-section');
+  final GlobalKey similarKey = GlobalKey(debugLabel: 'similar-section');
 
-  final ScrollController scrollController = ScrollController();
-  final client = services<JellyfinClient>();
-
-  ValueNotifier<double> scrollOffset = ValueNotifier(0);
   bool favoriteLoading = false;
   bool playedLoading = false;
-
-  @override
-  void dispose() {
-    scrollController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,11 +68,15 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
               onTogglePlayed: _togglePlayed,
             ),
 
-            if (m.isMultipart) SliverMultipart(items: m.multipart),
+            if (m.isMultipart)
+              SliverMultipart(
+                key: multipartKey,
+                items: m.multipart,
+              ),
 
-            SliverPeople(media: m.movie!),
+            SliverPeople(key: peopleKey, media: m.movie!),
 
-            SliverSimilar(items: m.similars),
+            SliverSimilar(key: similarKey, items: m.similars),
           ];
         },
       ),

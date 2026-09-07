@@ -11,8 +11,13 @@ import 'package:pudding/widgets/media_card.dart';
 
 class SeasonSelector extends ConsumerStatefulWidget {
   final String seriesId;
+  final Function()? onSeasonChanged;
 
-  const SeasonSelector({super.key, required this.seriesId});
+  const SeasonSelector({
+    super.key,
+    required this.seriesId,
+    this.onSeasonChanged,
+  });
 
   @override
   ConsumerState<SeasonSelector> createState() => _SeasonSelectorState();
@@ -151,11 +156,14 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
                         setState(() {});
                         await tvNotifier.onSeasonChanged(season.id);
 
-                        // await widget.onSeasonChange(season);
                         controller.hide();
 
                         popup = false;
-                        setState(() {});
+                        if (mounted) setState(() {});
+
+                        if (widget.onSeasonChanged != null) {
+                          widget.onSeasonChanged!();
+                        }
                       },
                     ),
                     if (tvAsync.isLoading && selected == season.id)

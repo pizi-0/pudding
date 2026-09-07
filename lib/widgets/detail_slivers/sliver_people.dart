@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:morphnext/morphnext.dart';
-import 'package:pudding/const/const.dart';
 import 'package:pudding/models/jelly_people.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/utils/scroll_to_key_extension.dart';
 import 'package:pudding/widgets/people_grid.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_section.dart';
 
@@ -56,7 +56,9 @@ class _SliverPeopleState extends State<SliverPeople> {
               FButton(
                 variant: .outline,
                 onPress: () {
-                  _scrollToKey(widget.key as GlobalKey);
+                  if (widget.key is GlobalKey) {
+                    (widget.key as GlobalKey).scrollToKey();
+                  }
                 },
 
                 child: Text(
@@ -99,16 +101,6 @@ class _SliverPeopleState extends State<SliverPeople> {
       } else {
         return selectedList;
       }
-    }
-  }
-
-  void _scrollToKey(GlobalKey key) {
-    if (key.currentContext != null) {
-      Scrollable.ensureVisible(
-        key.currentContext!,
-        alignment: 0,
-        duration: kDefaultAnimationDuration,
-      );
     }
   }
 }

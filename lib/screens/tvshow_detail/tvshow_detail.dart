@@ -1,9 +1,7 @@
-import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
-import 'package:pudding/services/di.dart';
 import 'package:pudding/widgets/detail_scaffold.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_episode.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_people.dart';
@@ -11,8 +9,6 @@ import 'package:pudding/widgets/detail_slivers/sliver_showcase.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_similar.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_topbar.dart';
 import 'package:pudding/widgets/logo_shimmer.dart';
-
-final client = services<JellyfinClient>();
 
 class TvshowDetail extends ConsumerStatefulWidget {
   final String id;
@@ -24,12 +20,12 @@ class TvshowDetail extends ConsumerStatefulWidget {
 }
 
 class _TvshowDetailState extends ConsumerState<TvshowDetail> {
-  final GlobalKey seasonKey = GlobalKey(debugLabel: 'season-sliver-header');
-  final GlobalKey castsKey = GlobalKey(debugLabel: 'cast-sliver-header');
-  ScrollController scrollController = ScrollController();
+  final GlobalKey seasonKey = GlobalKey(debugLabel: 'season-section');
+  final GlobalKey peopleKey = GlobalKey(debugLabel: 'people-section');
+  final GlobalKey similarKey = GlobalKey(debugLabel: 'similar-section');
+
   bool favoriteLoading = false;
   bool playedLoading = false;
-  ValueNotifier<double> scrollOffset = ValueNotifier(0);
 
   @override
   void initState() {
@@ -40,12 +36,6 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
   }
 
   @override
-  void dispose() {
-    scrollOffset.dispose();
-    scrollController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
@@ -97,12 +87,17 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
               onToggleFavorite: _toggleFavorite,
               onTogglePlayed: _togglePlayed,
             ),
-            SliverEpisodes(id: widget.id),
+            SliverEpisodes(
+              key: seasonKey,
+              id: widget.id,
+            ),
             SliverPeople(
+              key: peopleKey,
               media: tv.tvshow!,
               altMedia: tv.selectedSeason,
             ),
             SliverSimilar(
+              key: similarKey,
               items: tv.similars,
             ),
           ];

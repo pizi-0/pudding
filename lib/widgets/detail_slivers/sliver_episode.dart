@@ -6,20 +6,28 @@ import 'package:forui/forui.dart';
 import 'package:pudding/screens/detail_screens/widgets/season_selector.dart';
 import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/utils/scroll_to_key_extension.dart';
 import 'package:pudding/widgets/media_card.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_section.dart';
 
 class SliverEpisodes extends ConsumerWidget {
   final String id;
-  const new({super.key, required this.id});
+  final Function()? onSeasonChanged;
+  const new({super.key, required this.id, this.onSeasonChanged});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tvAsync = ref.watch(tvshowStateProvider(id));
 
     return SliverSection(
-      key: key,
-      header: SeasonSelector(seriesId: id),
+      header: SeasonSelector(
+        seriesId: id,
+        onSeasonChanged: () {
+          if (key is GlobalKey) {
+            (key as GlobalKey).scrollToKey();
+          }
+        },
+      ),
       slivers: [
         tvAsync.when(
           skipLoadingOnReload:
@@ -53,7 +61,8 @@ class SliverEpisodes extends ConsumerWidget {
                           child: Text(tv.getOverview() ?? 'No overview'),
                         ).showIf(
                           (tv.userData?.played ?? false) ||
-                              (tv.id == data.nextup?.id),
+                              (tv.id == data.nextup?.id) ||
+                              index == 0,
                         ),
                   ),
                 );
