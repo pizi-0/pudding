@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:awesome_extensions/awesome_extensions.dart' show StyledText;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
@@ -31,7 +33,6 @@ class DetailScaffold<T> extends ConsumerStatefulWidget {
 class _DetailScaffoldState<T> extends ConsumerState<DetailScaffold<T>> {
   final scrollController = ScrollController();
   ValueNotifier<double> scrollOffset = ValueNotifier(0);
-  ValueNotifier<double> topbarShadow = ValueNotifier(0);
 
   @override
   void initState() {
@@ -123,9 +124,9 @@ class _DetailScaffoldState<T> extends ConsumerState<DetailScaffold<T>> {
   void _onScroll() {
     final offset = scrollController.offset;
     final viewport = scrollController.position.viewportDimension;
+    final threshold = viewport * 0.2;
 
-    scrollOffset.value = (offset / viewport).clamp(0, 1);
-    topbarShadow.value = (offset / 76).clamp(0, 1);
+    scrollOffset.value = max(0, (offset - threshold) / viewport);
   }
 }
 
