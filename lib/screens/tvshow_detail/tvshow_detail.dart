@@ -9,8 +9,8 @@ import 'package:pudding/widgets/detail_slivers/sliver_episode.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_people.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_showcase.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_similar.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_topbar.dart';
 import 'package:pudding/widgets/logo_shimmer.dart';
-import 'package:pudding/widgets/topbar.dart';
 
 final client = services<JellyfinClient>();
 
@@ -53,8 +53,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
 
     return DetailScaffold(
       backdrop: DetailBackdrop(id: widget.id),
-      header: Topbar(
-        prefix: PBackButton(),
+      headerSliver: SliverTopbar(
         suffix: PDetailRefreshButton(),
         children: [
           if (tvAsync.hasValue)

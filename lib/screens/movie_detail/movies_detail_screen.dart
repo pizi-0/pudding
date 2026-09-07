@@ -11,8 +11,7 @@ import 'package:pudding/widgets/detail_slivers/sliver_multipart.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_people.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_showcase.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_similar.dart';
-
-import '../../widgets/topbar.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_topbar.dart';
 
 class MovieDetailScreen extends ConsumerStatefulWidget {
   final String id;
@@ -47,20 +46,19 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
 
     return DetailScaffold(
       backdrop: DetailBackdrop(id: widget.id),
-      header: Topbar(
-        prefix: PBackButton(),
+      headerSliver: SliverTopbar(
         suffix: PDetailRefreshButton(),
         children: [
           if (movieAsync.hasValue)
             FButton(
               variant: .outline,
+              mainAxisAlignment: .start,
               mainAxisSize: .min,
               onPress: () {},
               suffix: movieAsync.isLoading ? FCircularProgress() : null,
               child: Flexible(
-                fit: .loose,
                 child: Text(
-                  movieAsync.value!.name,
+                  movieAsync.value!.movie!.name,
                   overflow: .ellipsis,
                 ),
               ),

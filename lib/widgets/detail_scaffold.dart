@@ -13,7 +13,7 @@ import 'package:silky_scroll/silky_scroll.dart';
 class DetailScaffold<T> extends ConsumerStatefulWidget {
   /// for premade  use [DetailBackdrop]
   final Widget? backdrop;
-  final Widget? header;
+  final Widget? headerSliver;
   final bool? nested;
   final List<Widget> slivers;
   const new({
@@ -21,7 +21,7 @@ class DetailScaffold<T> extends ConsumerStatefulWidget {
     this.backdrop,
     this.slivers = const [],
     this.nested = true,
-    this.header,
+    this.headerSliver,
   });
 
   @override
@@ -102,19 +102,7 @@ class _DetailScaffoldState<T> extends ConsumerState<DetailScaffold<T>> {
                 child: SilkyCustomScrollView(
                   controller: scrollController,
                   slivers: [
-                    if (widget.header != null)
-                      PinnedHeaderSliver(
-                        child: ValueListenableBuilder(
-                          valueListenable: topbarShadow,
-                          builder: (context, value, child) {
-                            return FTheme(
-                              data: _headerButtonStyle(context, value),
-                              child: widget.header!,
-                            );
-                          },
-                          child: widget.header,
-                        ),
-                      ),
+                    if (widget.headerSliver != null) widget.headerSliver!,
 
                     ...widget.slivers.map(
                       (s) => SliverPadding(
@@ -129,32 +117,6 @@ class _DetailScaffoldState<T> extends ConsumerState<DetailScaffold<T>> {
           ),
         ),
       ),
-    );
-  }
-
-  FThemeData _headerButtonStyle(BuildContext context, double value) {
-    final theme = context.theme;
-
-    final shadow = BoxShadow(
-      color: Color.lerp(Colors.transparent, theme.colors.background, value)!,
-      spreadRadius: 10 * value,
-      blurRadius: 10,
-    );
-
-    return theme.copyWith(
-      buttonStyles: .delta([
-        .all(
-          .delta([
-            .all(
-              .delta(
-                decoration: .delta([
-                  .all(.boxDelta(boxShadow: [shadow])),
-                ]),
-              ),
-            ),
-          ]),
-        ),
-      ]),
     );
   }
 
