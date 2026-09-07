@@ -65,19 +65,18 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
     final duration = (next ?? item).getRuntime();
 
     return SliverToBoxAdapter(
-      child: Align(
-        alignment: .bottomStart,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: widget.maxExtent ?? size.height,
-            maxWidth: overviewWidth,
-          ),
-          child: Column(
-            spacing: 10,
-            mainAxisAlignment: .end,
-            crossAxisAlignment: crossAxisAlignment,
-            children: [
-              Padding(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: widget.maxExtent ?? size.height,
+          maxWidth: overviewWidth,
+        ),
+        child: Column(
+          spacing: 10,
+          mainAxisAlignment: .end,
+          crossAxisAlignment: crossAxisAlignment,
+          children: [
+            Expanded(
+              child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: 400, maxHeight: 500),
@@ -86,14 +85,18 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
                     crossAxisAlignment: crossAxisAlignment,
                     mainAxisAlignment: .end,
                     children: [
-                      FittedBox(
+                      Expanded(
                         child: CachedNetworkImage(
                           imageUrl: item.getLogo(),
+                          alignment: .bottomLeft,
                           width: 400,
-                          errorBuilder: (context, error, stackTrace) => Text(
-                            item.name,
-                            style: theme.typography.display.xl,
-                          ).bold(),
+                          errorBuilder: (context, error, stackTrace) => Align(
+                            alignment: .bottomCenter,
+                            child: Text(
+                              item.name,
+                              style: theme.typography.display.xl,
+                            ).bold(),
+                          ),
                         ),
                       ),
                       Row(
@@ -158,16 +161,16 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
                   ),
                 ),
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: theme.colors.barrier,
-                  borderRadius: theme.style.borderRadius.md,
-                ),
-                padding: .all(10),
-                child: Text(item.getOverview() ?? 'No overview'),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: theme.colors.barrier,
+                borderRadius: theme.style.borderRadius.md,
               ),
-            ],
-          ),
+              padding: .all(10),
+              child: Text(item.getOverview() ?? 'No overview'),
+            ),
+          ],
         ),
       ),
     );
