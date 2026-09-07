@@ -37,10 +37,15 @@ extension JellyViewInfo on JellyfinView {
       return Icon(FPhosphorBoldIcons.playlist);
     }
 
+    if (isHomevideos) {
+      return Icon(FPhosphorBoldIcons.fileVideo);
+    }
+
     return Icon(FPhosphorBoldIcons.questionMark);
   }
 
   bool get isBoxsets => collectionType == 'boxsets';
   bool get isPlaylists => collectionType == 'playlists';
   bool get isBooks => collectionType == 'books';
+  bool get isHomevideos => collectionType == 'homevideos';
 }
