@@ -1,33 +1,18 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:morphnext/morphnext.dart';
 import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
-import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/media_card.dart';
 
 class SeasonSelector extends ConsumerStatefulWidget {
   final String seriesId;
-  final JellyfinItem? next;
-  final JellyfinItem? selectedSeasonItem;
-  final Iterable<JellyfinItem?> seasonItems;
-  final double maxHeight;
-  final Future Function(JellyfinItem season) onSeasonChange;
 
-  const SeasonSelector({
-    super.key,
-    this.next,
-    required this.seriesId,
-    required this.selectedSeasonItem,
-    required this.seasonItems,
-    required this.onSeasonChange,
-    this.maxHeight = 400,
-  });
+  const SeasonSelector({super.key, required this.seriesId});
 
   @override
   ConsumerState<SeasonSelector> createState() => _SeasonSelectorState();
@@ -42,166 +27,12 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
     final style = theme.style;
+    final tvAsync = ref.watch(tvshowStateProvider(widget.seriesId));
+    final tvNotifier = ref.read(tvshowStateProvider(widget.seriesId).notifier);
+
     final size = MediaQuery.sizeOf(context);
-    final tvAsync = ref.watch(tvshowStateProvider(widget.seriesId));
 
-    double maxwidth() {
-      final seasons = widget.seasonItems;
-      if (seasons.length * 210 > size.width) {
-        return size.width - 40;
-      }
-
-      return seasons.length * 210;
-    }
-
-    double maxHeight() {
-      final itemHeight = 16 / 10 * 200;
-      final maxColumn = max(1, ((size.width) / 200)).floor();
-      final maxRow = (widget.seasonItems.length / maxColumn).ceil();
-
-      if (maxRow * itemHeight > 3 * itemHeight - (maxRow * 10)) {
-        return 3 * itemHeight - (maxRow * 10);
-      } else {
-        return itemHeight;
-      }
-    }
-
-    return FPopover(
-      overflow: .flip,
-      style: .delta(
-        popoverPadding: .value(.all(20)),
-        barrierFilter: (context, animation) => .compose(
-          outer: ImageFilter.blur(
-            sigmaX: animation * 5,
-            sigmaY: animation * 5,
-          ),
-          inner: ColorFilter.mode(
-            Color.lerp(
-              Colors.transparent,
-              Colors.black.withValues(
-                alpha: 0.2,
-              ),
-              animation,
-            )!,
-            .srcOver,
-          ),
-        ),
-      ),
-      cutoutBuilder: (path, bounds) => path.addRRect(
-        RRect.fromRectAndRadius(
-          bounds,
-          style.borderRadius.md.bottomLeft,
-        ),
-      ), //
-      onTapHide: () {
-        setState(() {
-          popup = false;
-        });
-      },
-      constraints: FPortalConstraints(
-        maxWidth: maxwidth(),
-        maxHeight: maxHeight(),
-      ),
-      builder: (context, controller, child) => FButton(
-        style: .delta(contentStyle: .delta(spacing: 20)),
-        key: buttonKey,
-        variant: .outline,
-        mainAxisAlignment: .spaceBetween,
-        onPress: tvAsync.isLoading
-            ? null
-            : () {
-                controller.toggle();
-                popup = !popup;
-                setState(() {});
-              },
-        suffix: tvAsync.isLoading
-            ? FCircularProgress()
-            : AnimatedMorphIcon(
-                icon: popup
-                    ? FPhosphorBoldIcons.caretUp
-                    : FPhosphorBoldIcons.caretDown,
-              ),
-        child: Text(
-          widget.selectedSeasonItem!.name,
-        ),
-      ),
-      childAnchor: .bottomLeft,
-      popoverAnchor: .topLeft,
-      popoverBuilder: (context, controller) {
-        return GridView.builder(
-          itemCount: widget.seasonItems.length,
-          shrinkWrap: true,
-          padding: .all(10),
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200,
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio:
-                widget.seasonItems.first?.getSeasonCoverAspectRatio() ??
-                10 / 16,
-          ),
-          itemBuilder: (context, index) {
-            final season = widget.seasonItems.elementAt(index)!;
-
-            return Stack(
-              children: [
-                NewMediaCard(
-                  item: season,
-                  selected: season.id == widget.selectedSeasonItem?.id,
-                  isNext: widget.next?.seasonId == season.id,
-                  onPressed: () async {
-                    selected = season.id;
-                    setState(() {});
-
-                    await widget.onSeasonChange(season);
-                    controller.hide();
-
-                    popup = false;
-                    setState(() {});
-                  },
-                ),
-                if (tvAsync.isLoading && selected == season.id)
-                  Positioned.fill(
-                    bottom: 2,
-                    right: 2,
-                    left: 2,
-                    top: 2,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: theme.colors.background.withAlpha(200),
-                        borderRadius: style.borderRadius.sm,
-                      ),
-                      child: FCircularProgress(),
-                    ),
-                  ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
-class NewSeasonSelector extends ConsumerStatefulWidget {
-  final String seriesId;
-
-  const NewSeasonSelector({super.key, required this.seriesId});
-
-  @override
-  ConsumerState<NewSeasonSelector> createState() => _NewSeasonSelectorState();
-}
-
-class _NewSeasonSelectorState extends ConsumerState<NewSeasonSelector> {
-  final GlobalKey buttonKey = GlobalKey();
-  String? selected;
-  bool popup = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = FTheme.of(context);
-    final style = theme.style;
-    final tvAsync = ref.watch(tvshowStateProvider(widget.seriesId));
+    final maxColumn = max(1, (((size.width * 0.6)) / 200)).floor();
 
     return tvAsync.when(
       skipLoadingOnReload:
@@ -209,7 +40,8 @@ class _NewSeasonSelectorState extends ConsumerState<NewSeasonSelector> {
       loading: () => FButton(
         onPress: () {},
         variant: .outline,
-        child: FCircularProgress(),
+        suffix: FCircularProgress(),
+        child: Text('Season'),
       ),
       error: (error, stackTrace) => FButton(
         onPress: () {},
@@ -217,6 +49,23 @@ class _NewSeasonSelectorState extends ConsumerState<NewSeasonSelector> {
         child: Text(error.toString()),
       ),
       data: (data) {
+        double maxWidth() {
+          final bp = theme.breakpoints.lg;
+          final usableWidth = size.width - 40;
+
+          if (data.seasons.length > maxColumn) {
+            if (size.width < bp) {
+              return usableWidth;
+            }
+
+            return usableWidth * 0.6;
+          } else {
+            return (data.seasons.length * 200)
+                .clamp(200.0, usableWidth)
+                .toDouble();
+          }
+        }
+
         return FPopover(
           overflow: .flip,
           style: .delta(
@@ -247,7 +96,11 @@ class _NewSeasonSelectorState extends ConsumerState<NewSeasonSelector> {
               popup = false;
             });
           },
-          constraints: FPortalConstraints(),
+          constraints: FPortalConstraints(
+            maxWidth: maxWidth(),
+            maxHeight: size.height - 40,
+            minWidth: 200,
+          ),
           builder: (context, controller, child) => FButton(
             style: .delta(contentStyle: .delta(spacing: 20)),
             key: buttonKey,
@@ -296,6 +149,7 @@ class _NewSeasonSelectorState extends ConsumerState<NewSeasonSelector> {
                       onPressed: () async {
                         selected = season.id;
                         setState(() {});
+                        await tvNotifier.onSeasonChanged(season.id);
 
                         // await widget.onSeasonChange(season);
                         controller.hide();

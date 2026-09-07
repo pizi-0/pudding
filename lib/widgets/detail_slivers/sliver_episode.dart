@@ -19,7 +19,7 @@ class SliverEpisodes extends ConsumerWidget {
 
     return SliverSection(
       key: key,
-      header: NewSeasonSelector(seriesId: id),
+      header: SeasonSelector(seriesId: id),
       slivers: [
         tvAsync.when(
           skipLoadingOnReload:
