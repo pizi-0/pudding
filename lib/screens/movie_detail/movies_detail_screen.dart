@@ -29,6 +29,14 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
   bool playedLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ref.invalidate(movieStateProvider(widget.id));
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final movieAsync = ref.watch(movieStateProvider(widget.id));
 
