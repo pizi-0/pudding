@@ -74,6 +74,7 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
               maxExtent: size.height - 76 - 96,
               onToggleFavorite: _toggleFavorite,
               onTogglePlayed: _togglePlayed,
+              filesize: m.size,
             ),
 
             if (m.isMultipart)

@@ -12,15 +12,17 @@ import 'package:pudding/widgets/icon_text.dart';
 import 'package:pudding/widgets/rating_container.dart';
 import 'package:pudding/widgets/star_rating_container.dart';
 
-enum _ShowcaseVariant { general, tv }
+enum _ShowcaseVariant { general, tv, boxsets }
 
 class SliverShowcase extends ConsumerStatefulWidget {
   final JellyfinItem item;
   final JellyfinItem? nextup;
   final double? maxExtent;
+  final String? filesize;
   final _ShowcaseVariant _variant;
   final void Function()? onToggleFavorite;
   final void Function()? onTogglePlayed;
+
   const SliverShowcase({
     super.key,
     required this.item,
@@ -28,6 +30,7 @@ class SliverShowcase extends ConsumerStatefulWidget {
     this.maxExtent,
     this.onToggleFavorite,
     this.onTogglePlayed,
+    this.filesize,
   }) : _variant = .general;
 
   const SliverShowcase.tv({
@@ -37,7 +40,18 @@ class SliverShowcase extends ConsumerStatefulWidget {
     this.maxExtent,
     this.onToggleFavorite,
     this.onTogglePlayed,
+    this.filesize,
   }) : _variant = .tv;
+
+  const SliverShowcase.boxsets({
+    super.key,
+    required this.item,
+    this.nextup,
+    this.maxExtent,
+    this.onToggleFavorite,
+    this.onTogglePlayed,
+    this.filesize,
+  }) : _variant = .boxsets;
 
   @override
   ConsumerState<SliverShowcase> createState() => _SliverShowcaseState();
@@ -90,12 +104,15 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
                           imageUrl: item.getLogo(),
                           alignment: .bottomLeft,
                           width: 400,
-                          errorBuilder: (context, error, stackTrace) => Align(
-                            alignment: .bottomCenter,
-                            child: Text(
-                              item.name,
-                              style: theme.typography.display.xl,
-                            ).bold(),
+                          errorBuilder: (context, error, stackTrace) => Column(
+                            mainAxisAlignment: .end,
+                            crossAxisAlignment: .start,
+                            children: [
+                              Text(
+                                item.name,
+                                style: theme.typography.display.xl,
+                              ).bold(),
+                            ],
                           ),
                         ),
                       ),

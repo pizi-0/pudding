@@ -36,7 +36,7 @@ extension JellyInfo on JellyfinItem {
   }
 
   String? getRuntime() {
-    return (durationMs ?? 0).toFormattedDuration();
+    return durationMs?.toFormattedDuration();
   }
 
   String getSeriesRunYears() {
@@ -170,6 +170,10 @@ extension JellyInfo on JellyfinItem {
     final people = (raw['People'] ?? []) as List<dynamic>;
 
     return people.map((p) => JellyPeople.fromMap(p)).toList();
+  }
+
+  int getSize() {
+    return mediaSources.fold(0, (value, e) => value + (e.size ?? 0));
   }
 
   bool get isSeries => type == JellyfinItemKind.series;
