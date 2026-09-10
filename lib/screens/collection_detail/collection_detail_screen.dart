@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:morphnext/morphnext.dart';
 import 'package:pudding/screens/collection_detail/provider/collection_state_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/detail_scaffold.dart';
@@ -67,9 +68,6 @@ class _CollectionDetailScreenState
         data: (c) {
           return [
             SliverCollectionStats(id: widget.id),
-            SliverToBoxAdapter(
-              child: Text(c.collection!.getRaw()),
-            ),
             if (c.movies.isNotEmpty)
               SliverSection(
                 header: FButton(
@@ -160,6 +158,9 @@ class SliverCollectionStats extends ConsumerStatefulWidget {
 }
 
 class _SliverCollectionStatsState extends ConsumerState<SliverCollectionStats> {
+  bool favLoading = false;
+  bool playedLoading = false;
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
@@ -177,85 +178,131 @@ class _SliverCollectionStatsState extends ConsumerState<SliverCollectionStats> {
 
     return SliverToBoxAdapter(
       child: SizedBox(
-        height: size.height - 76 - 76,
+        height: size.height - 76 - 96,
         width: size.width - 40,
         child: Column(
           spacing: 20,
           mainAxisAlignment: .end,
           children: [
-            Row(
-              crossAxisAlignment: .end,
-              children: [
-                ClipRRect(
-                  borderRadius: theme.style.borderRadius.sm,
-                  child: SizedBox(
-                    width: 250,
-                    child: CachedNetworkImage(
-                      imageUrl: item.getPrimary(),
-                      filterQuality: .medium,
-                      fit: .cover,
+            Expanded(
+              child: Row(
+                crossAxisAlignment: .end,
+                children: [
+                  ClipRRect(
+                    borderRadius: theme.style.borderRadius.sm,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: 250,
+                        minWidth: 250,
+                        minHeight: 250,
+                      ),
+                      child: CachedNetworkImage(
+                        imageUrl: item.getPrimary(),
+                        filterQuality: .medium,
+                        fit: .cover,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      spacing: 10,
-                      mainAxisAlignment: .end,
-                      crossAxisAlignment: .start,
-                      children: [
-                        Row(
-                          children: genres
-                              .map((g) => Text(g))
-                              .toList()
-                              .separatedBy(Icon(FPhosphorBoldIcons.dot)),
-                        ),
-                        Row(
-                          children: [
-                            if (year != null)
-                              IconText(
-                                text: year.toString(),
-                                icon: FPhosphorBoldIcons.calendar,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        spacing: 10,
+                        mainAxisAlignment: .end,
+                        crossAxisAlignment: .start,
+                        children: [
+                          Row(
+                            children: [
+                              FButton(
+                                size: .lg,
+                                onPress: () {},
+                                prefix: Icon(FPhosphorBoldIcons.play),
+                                child: Text('Play'),
                               ),
-                            if (parentalRating != null)
-                              RatingContainer(rating: parentalRating),
-                          ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
-                        ),
-                        Row(
-                          children: [
-                            if (state.movies.isNotEmpty)
-                              IconText(
-                                text: '${state.movies.length} movies',
-                                icon: FPhosphorBoldIcons.filmSlate,
+                              Icon(FPhosphorBoldIcons.dot),
+                              Row(
+                                spacing: 8,
+                                children: [
+                                  FButton.icon(
+                                    size: .lg,
+                                    onPress: _onToggleFavorite,
+                                    child: AnimatedMorphIcon(
+                                      icon: item.isFavorite
+                                          ? FPhosphorFillIcons.heart
+                                          : FPhosphorBoldIcons.heart,
+                                      color: item.isFavorite
+                                          ? Colors.pink
+                                          : null,
+                                    ),
+                                  ),
+                                  FButton.icon(
+                                    size: .lg,
+                                    onPress: _onTogglePlayed,
+                                    child: AnimatedMorphIcon(
+                                      icon: item.userData?.played ?? false
+                                          ? FPhosphorBoldIcons.checks
+                                          : FPhosphorBoldIcons.check,
+                                      color: item.userData?.played ?? false
+                                          ? Colors.green
+                                          : null,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            if (state.series.isNotEmpty)
-                              IconText(
-                                text: '${state.series.length} series',
-                                icon: FPhosphorBoldIcons.television,
-                              ),
-                            if (state.seasons.isNotEmpty)
-                              IconText(
-                                text: '${state.seasons.length} seasons',
-                                icon: FPhosphorBoldIcons.television,
-                              ),
-                            if (state.episodes.isNotEmpty)
-                              IconText(
-                                text: '${state.episodes.length} episodes',
-                                icon: FPhosphorBoldIcons.televisionSimple,
-                              ),
-                            if (state.videos.isNotEmpty)
-                              IconText(
-                                text: '${state.videos.length} videos',
-                                icon: FPhosphorBoldIcons.video,
-                              ),
-                          ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
-                        ),
-                      ],
+                            ],
+                          ),
+                          Row(
+                            children: genres
+                                .map((g) => Text(g))
+                                .toList()
+                                .separatedBy(Icon(FPhosphorBoldIcons.dot)),
+                          ),
+                          Row(
+                            children: [
+                              if (year != null)
+                                IconText(
+                                  text: year.toString(),
+                                  icon: FPhosphorBoldIcons.calendar,
+                                ),
+                              if (parentalRating != null)
+                                RatingContainer(rating: parentalRating),
+                            ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
+                          ),
+                          Row(
+                            children: [
+                              if (state.movies.isNotEmpty)
+                                IconText(
+                                  text: '${state.movies.length} movies',
+                                  icon: FPhosphorBoldIcons.filmSlate,
+                                ),
+                              if (state.series.isNotEmpty)
+                                IconText(
+                                  text: '${state.series.length} series',
+                                  icon: FPhosphorBoldIcons.television,
+                                ),
+                              if (state.seasons.isNotEmpty)
+                                IconText(
+                                  text: '${state.seasons.length} seasons',
+                                  icon: FPhosphorBoldIcons.television,
+                                ),
+                              if (state.episodes.isNotEmpty)
+                                IconText(
+                                  text: '${state.episodes.length} episodes',
+                                  icon: FPhosphorBoldIcons.televisionSimple,
+                                ),
+                              if (state.videos.isNotEmpty)
+                                IconText(
+                                  text: '${state.videos.length} videos',
+                                  icon: FPhosphorBoldIcons.video,
+                                ),
+                            ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             if (overview != null)
               Row(
@@ -267,6 +314,38 @@ class _SliverCollectionStatsState extends ConsumerState<SliverCollectionStats> {
         ),
       ),
     );
+  }
+
+  Future<void> _onToggleFavorite() async {
+    if (favLoading) return;
+
+    try {
+      favLoading = true;
+
+      await ref
+          .read(collectionStateProvider(widget.id).notifier)
+          .toggleFavorite();
+    } catch (e) {
+      debugPrint(e.toString());
+    } finally {
+      favLoading = false;
+    }
+  }
+
+  Future<void> _onTogglePlayed() async {
+    if (playedLoading) return;
+
+    try {
+      playedLoading = true;
+
+      await ref
+          .read(collectionStateProvider(widget.id).notifier)
+          .togglePlayed();
+    } catch (e) {
+      debugPrint(e.toString());
+    } finally {
+      playedLoading = false;
+    }
   }
 
   Size posterSize(double width) {
