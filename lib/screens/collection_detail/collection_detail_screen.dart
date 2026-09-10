@@ -188,18 +188,25 @@ class _SliverCollectionStatsState extends ConsumerState<SliverCollectionStats> {
               child: Row(
                 crossAxisAlignment: .end,
                 children: [
-                  ClipRRect(
-                    borderRadius: theme.style.borderRadius.sm,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: 250,
-                        minWidth: 250,
-                        minHeight: 250,
-                      ),
-                      child: CachedNetworkImage(
-                        imageUrl: item.getPrimary(),
-                        filterQuality: .medium,
-                        fit: .cover,
+                  Container(
+                    clipBehavior: .hardEdge,
+                    decoration: BoxDecoration(
+                      borderRadius: theme.style.borderRadius.md,
+                      border: .all(color: theme.colors.border, width: 2),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: theme.style.borderRadius.sm,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: 250,
+                          minWidth: 250,
+                          minHeight: 250,
+                        ),
+                        child: CachedNetworkImage(
+                          imageUrl: item.getPrimary(),
+                          filterQuality: .medium,
+                          fit: .cover,
+                        ),
                       ),
                     ),
                   ),
@@ -307,7 +314,16 @@ class _SliverCollectionStatsState extends ConsumerState<SliverCollectionStats> {
             if (overview != null)
               Row(
                 children: [
-                  Expanded(child: Text(overview)),
+                  Flexible(
+                    child: Container(
+                      padding: .all(10),
+                      decoration: BoxDecoration(
+                        color: theme.colors.barrier,
+                        borderRadius: theme.style.borderRadius.md,
+                      ),
+                      child: Text(overview),
+                    ),
+                  ),
                 ],
               ),
           ],
