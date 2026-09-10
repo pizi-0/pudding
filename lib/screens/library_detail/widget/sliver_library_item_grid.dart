@@ -282,6 +282,10 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                   if (item.isMovie) {
                     context.push('/movie/${item.id}');
                   }
+
+                  if (item.isBoxsets) {
+                    context.push('/collection/${item.id}');
+                  }
                 },
               );
             },

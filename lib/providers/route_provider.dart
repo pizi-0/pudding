@@ -4,6 +4,7 @@ import 'package:go_transitions/go_transitions.dart';
 import 'package:pudding/navigation_shell.dart';
 import 'package:pudding/screens/auth/auth_provider.dart';
 import 'package:pudding/screens/auth/auth_screen.dart';
+import 'package:pudding/screens/collection_detail/collection_detail_screen.dart';
 import 'package:pudding/screens/movie_detail/movies_detail_screen.dart';
 import 'package:pudding/screens/home/home.dart';
 import 'package:pudding/screens/library_detail/library_detail_screen.dart';
@@ -65,6 +66,14 @@ final routeProvider = Provider<GoRouter>(
         path: '/movie/:movieId',
         builder: (context, state) => MovieDetailScreen(
           id: state.pathParameters['movieId']!,
+        ),
+        pageBuilder: GoTransitions.fade.call,
+      ),
+      GoRoute(
+        name: 'Collection details',
+        path: '/collection/:collectionId',
+        builder: (context, state) => CollectionDetailScreen(
+          id: state.pathParameters['collectionId']!,
         ),
         pageBuilder: GoTransitions.fade.call,
       ),
