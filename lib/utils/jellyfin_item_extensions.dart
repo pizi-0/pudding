@@ -176,6 +176,14 @@ extension JellyInfo on JellyfinItem {
     return mediaSources.fold(0, (value, e) => value + (e.size ?? 0));
   }
 
+  List<String> genresShort({int limit = 3}) {
+    if (genres.length > limit) {
+      return genres.sublist(0, 3);
+    } else {
+      return genres;
+    }
+  }
+
   bool get isSeries => type == JellyfinItemKind.series;
   bool get isMovie => type == JellyfinItemKind.movie;
   bool get isEpisode => type == JellyfinItemKind.episode;
