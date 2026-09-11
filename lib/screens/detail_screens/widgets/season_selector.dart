@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:morphnext/morphnext.dart';
+import 'package:pudding/const/const.dart';
 import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
 import 'package:pudding/widgets/media_card.dart';
 
@@ -140,7 +141,7 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
                 maxCrossAxisExtent: 200,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
-                childAspectRatio: 10 / 16,
+                childAspectRatio: kPosterAspectRatio,
               ),
               itemBuilder: (context, index) {
                 final season = data.seasons.elementAt(index);

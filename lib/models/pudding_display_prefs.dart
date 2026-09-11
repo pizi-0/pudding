@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:dart_jellyfin/dart_jellyfin.dart';
+import 'package:pudding/const/const.dart';
 
 class PuddingDisplayPrefs {
   /// 'poster' (10:16), thumb (16:10)
@@ -110,12 +111,12 @@ class PuddingDisplayPrefs {
 
   double _aspectRatio() {
     if (isPoster) {
-      return 11 / 16;
+      return kPosterAspectRatio;
     } else if (isSquare) {
       return 1;
     }
 
-    return 16 / 10;
+    return kThumbAspectRatio;
   }
 
   @override

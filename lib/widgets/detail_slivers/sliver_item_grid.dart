@@ -3,6 +3,7 @@ import 'package:awesome_extensions/awesome_extensions.dart'
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pudding/const/const.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/media_card.dart';
 
@@ -26,10 +27,10 @@ class SliverItemGrid extends StatelessWidget {
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: isPoster ? 250 : 350,
         childAspectRatio: isPoster
-            ? 10 / 16
+            ? kPosterAspectRatio
             : showBottom
             ? 16 / 14
-            : 16 / 10,
+            : kThumbAspectRatio,
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
       ),
