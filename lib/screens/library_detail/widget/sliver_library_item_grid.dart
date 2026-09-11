@@ -34,7 +34,7 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
 
     final data = libAsync.value!;
     final prefs = PuddingDisplayPrefs.fromMap(data.displayPrefs.customPrefs);
-    final List<double> marks = List.generate(11, (index) => (index * 0.1));
+    final List<double> marks = List.generate(51, (index) => (index * 0.02));
 
     return SliverMainAxisGroup(
       slivers: [
@@ -102,28 +102,45 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                   child: Row(
                     spacing: 10,
                     children: [
-                      FButton.icon(
-                        size: .sm,
-                        variant: .ghost,
-                        style: .delta(
-                          decoration: .delta([
-                            .all(
-                              .boxDelta(
-                                borderRadius: theme.style.borderRadius.sm,
-                              ),
+                      FTooltip(
+                        hover: false,
+                        tipBuilder: (context, controller) =>
+                            Text(prefs.maxImageWidth.toStringAsFixed(0)),
+                        builder: (context, controller, child) {
+                          return FButton.icon(
+                            size: .sm,
+                            variant: .ghost,
+                            style: .delta(
+                              decoration: .delta([
+                                .all(
+                                  .boxDelta(
+                                    borderRadius: theme.style.borderRadius.sm,
+                                  ),
+                                ),
+                              ]),
                             ),
-                          ]),
-                        ),
-                        onPress: () {
-                          if (libAsync.isLoading) return;
+                            onHoverChange: (h) {
+                              if (h) {
+                                controller.show();
+                              } else {
+                                controller.hide();
+                              }
+                            },
+                            onPress: () {
+                              if (libAsync.isLoading) return;
+                              controller.show();
 
-                          libNotifier
-                            ..setMaxImageWidth(
-                              (prefs.maxImageWidth - 50).clamp(200, 700),
-                            )
-                            ..updateDisplayPrefs();
+                              libNotifier
+                                ..setMaxImageWidth(
+                                  (prefs.maxImageWidth - 10).clamp(150, 650),
+                                )
+                                ..updateDisplayPrefs();
+                            },
+                            child: Icon(
+                              FPhosphorBoldIcons.magnifyingGlassMinus,
+                            ),
+                          );
                         },
-                        child: Icon(FPhosphorBoldIcons.magnifyingGlassMinus),
                       ),
                       SizedBox(
                         width: 120,
@@ -132,7 +149,7 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                           control: .liftedDiscrete(
                             interaction: .tapAndSlideThumb,
                             value: FSliderValue(
-                              max: ((prefs.maxImageWidth - 200) / 500).clamp(
+                              max: ((prefs.maxImageWidth - 150) / 500).clamp(
                                 0,
                                 1,
                               ),
@@ -142,7 +159,7 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                                 return;
                               }
                               libNotifier.setMaxImageWidth(
-                                (value.max * 500) + 200,
+                                (value.max * 500) + 150,
                               );
                             },
                           ),
@@ -158,33 +175,48 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                             childPadding: .value(.zero),
                           ),
                           tooltipBuilder: (controller, value) => Text(
-                            ((value * 500) + 200).toStringAsFixed(0),
+                            ((value * 500) + 150).toStringAsFixed(0),
                           ),
                         ),
                       ),
-                      FButton.icon(
-                        size: .sm,
-                        style: .delta(
-                          decoration: .delta([
-                            .all(
-                              .boxDelta(
-                                borderRadius: theme.style.borderRadius.sm,
-                              ),
+                      FTooltip(
+                        hover: false,
+                        tipBuilder: (context, controller) =>
+                            Text(prefs.maxImageWidth.toStringAsFixed(0)),
+                        builder: (context, controller, child) {
+                          return FButton.icon(
+                            size: .sm,
+                            style: .delta(
+                              decoration: .delta([
+                                .all(
+                                  .boxDelta(
+                                    borderRadius: theme.style.borderRadius.sm,
+                                  ),
+                                ),
+                              ]),
                             ),
-                          ]),
-                        ),
-                        variant: .ghost,
-                        onPress: () {
-                          if (libAsync.isLoading) return;
+                            variant: .ghost,
+                            onHoverChange: (h) {
+                              if (h) {
+                                controller.show();
+                              } else {
+                                controller.hide();
+                              }
+                            },
+                            onPress: () {
+                              if (libAsync.isLoading) return;
+                              controller.show();
 
-                          final double maxWidth = (prefs.maxImageWidth + 50)
-                              .clamp(200, 700);
+                              final double maxWidth = (prefs.maxImageWidth + 10)
+                                  .clamp(150, 650);
 
-                          libNotifier
-                            ..setMaxImageWidth(maxWidth)
-                            ..updateDisplayPrefs();
+                              libNotifier
+                                ..setMaxImageWidth(maxWidth)
+                                ..updateDisplayPrefs();
+                            },
+                            child: Icon(FPhosphorBoldIcons.magnifyingGlassPlus),
+                          );
                         },
-                        child: Icon(FPhosphorBoldIcons.magnifyingGlassPlus),
                       ),
                     ],
                   ),
