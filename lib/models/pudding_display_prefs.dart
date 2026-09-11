@@ -110,7 +110,7 @@ class PuddingDisplayPrefs {
 
   double _aspectRatio() {
     if (isPoster) {
-      return 10 / 16;
+      return 11 / 16;
     } else if (isSquare) {
       return 1;
     }

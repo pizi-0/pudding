@@ -138,7 +138,23 @@ extension JellyInfo on JellyfinItem {
   String getImage({
     String type = JellyfinImagesApi.typePrimary,
   }) {
-    return services<JellyfinClient>().images.url(itemId: id, type: type);
+    String type0 = type;
+    if (!imageTags.containsKey(type)) {
+      final preferred = [
+        JellyfinImagesApi.typePrimary,
+        JellyfinImagesApi.typeThumb,
+        JellyfinImagesApi.typeBackdrop,
+      ];
+
+      for (final t in preferred) {
+        if (imageTags.containsKey(t)) {
+          type0 = t;
+          break;
+        }
+      }
+    }
+
+    return services<JellyfinClient>().images.url(itemId: id, type: type0);
   }
 
   String? getOfficialRating() {
