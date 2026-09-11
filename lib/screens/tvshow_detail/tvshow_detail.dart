@@ -46,7 +46,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
       headerSliver: SliverTopbar(
         suffix: PDetailRefreshButton(),
         children: [
-          if (tvAsync.hasValue)
+          if (tvAsync.hasValue && tvAsync.value?.tvshow != null)
             FButton(
               variant: .outline,
               mainAxisAlignment: .start,

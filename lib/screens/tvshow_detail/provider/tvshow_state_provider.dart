@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:pudding/screens/tvshow_detail/model/tvshow_screen_state.dart';
@@ -96,7 +97,7 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
     }
   }
 
-  Future<JellyfinItem> getNextup() async {
+  Future<JellyfinItem?> getNextup() async {
     try {
       final next = await client.tvShows.nextUp(
         seriesId: id,
@@ -113,16 +114,15 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
 
         if (first.items.isEmpty) {
           if (first.items.isEmpty) {
-            throw Exception(
-              'getNextup: \nQuery returns empty. \nid: $id',
-            );
+            return null;
           }
         }
 
-        return first.items.first;
+        return first.items.firstOrNull;
       }
-      return next.items.first;
+      return next.items.firstOrNull;
     } catch (e) {
+      debugPrint(e.toString());
       throw Exception(['getNextup:', '$e']);
     }
   }

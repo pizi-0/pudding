@@ -39,6 +39,15 @@ class SliverEpisodes extends ConsumerWidget {
             child: Text(error.toString()),
           ),
           data: (data) {
+            if (data.episodes.isEmpty) {
+              return SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Text('No episodes found'),
+                ),
+              );
+            }
+
             return SliverGrid.builder(
               itemCount: data.episodes.length,
               gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
