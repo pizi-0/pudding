@@ -151,7 +151,7 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
                     NewMediaCard(
                       item: season,
                       selected: season.id == data.selectedSeason!.id,
-                      isNext: data.nextup!.seasonId == season.id,
+                      isNext: data.nextup?.seasonId == season.id,
                       onPressed: () async {
                         selected = season.id;
                         setState(() {});
