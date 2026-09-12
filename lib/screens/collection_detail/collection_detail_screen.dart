@@ -61,7 +61,7 @@ class _CollectionDetailScreenState
             ),
         ],
       ),
-      slivers: colAsync.when(
+      sliverBuilder: (context, controller) => colAsync.when(
         skipLoadingOnReload: true,
         loading: () => [SliverLoader(id: widget.id)],
         error: (error, stackTrace) => [SliverError(error: error.toString())],

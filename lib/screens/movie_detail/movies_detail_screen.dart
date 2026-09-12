@@ -63,7 +63,7 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
             ),
         ],
       ),
-      slivers: movieAsync.when(
+      sliverBuilder: (context, controller) => movieAsync.when(
         skipLoadingOnReload: true,
         loading: () => [SliverLoader(id: widget.id)],
         error: (error, stackTrace) => [SliverError(error: error.toString())],

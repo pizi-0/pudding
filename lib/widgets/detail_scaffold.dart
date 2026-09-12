@@ -16,14 +16,21 @@ class DetailScaffold<T> extends ConsumerStatefulWidget {
   /// for premade  use [DetailBackdrop]
   final Widget? backdrop;
   final Widget? headerSliver;
+  final Widget? sideChick;
   final bool? nested;
   final List<Widget> slivers;
+  final bool Function(UserScrollNotification)? onscroll;
+  final List<Widget> Function(BuildContext context, ScrollController controller)
+  sliverBuilder;
   const new({
     super.key,
     this.backdrop,
     this.slivers = const [],
     this.nested = true,
     this.headerSliver,
+    this.sideChick,
+    this.onscroll,
+    required this.sliverBuilder,
   });
 
   @override
@@ -50,6 +57,12 @@ class _DetailScaffoldState<T> extends ConsumerState<DetailScaffold<T>> {
   @override
   Widget build(BuildContext context) {
     final theme = context.theme;
+
+    final hasSide = widget.sideChick != null;
+    final hasHead = widget.headerSliver != null;
+
+    final double leftPad = hasSide ? 76 : 20;
+    final double topPad = hasHead ? 76 - 0 : 0;
 
     return TapRegion(
       onTapInside: (event) {
@@ -100,20 +113,34 @@ class _DetailScaffoldState<T> extends ConsumerState<DetailScaffold<T>> {
                   ),
                 ),
               Positioned.fill(
-                child: SilkyCustomScrollView(
-                  controller: scrollController,
-                  slivers: [
-                    if (widget.headerSliver != null) widget.headerSliver!,
+                child: NotificationListener<UserScrollNotification>(
+                  onNotification: widget.onscroll,
+                  child: SilkyCustomScrollView(
+                    controller: scrollController,
+                    slivers: [
+                      if (widget.headerSliver != null) widget.headerSliver!,
 
-                    ...widget.slivers.map(
-                      (s) => SliverPadding(
-                        padding: .fromLTRB(20, 0, 20, 40),
-                        sliver: s,
-                      ),
-                    ),
-                  ],
+                      ...widget
+                          .sliverBuilder(context, scrollController)
+                          .map(
+                            (s) => SliverPadding(
+                              padding: .fromLTRB(leftPad, 0, 20, 40),
+                              sliver: s,
+                            ),
+                          ),
+                    ],
+                  ),
                 ),
               ),
+              if (hasSide)
+                Positioned(
+                  left: 0,
+                  top: topPad,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: widget.sideChick!,
+                  ),
+                ),
             ],
           ),
         ),

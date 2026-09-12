@@ -62,7 +62,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
             ),
         ],
       ),
-      slivers: tvAsync.when(
+      sliverBuilder: (context, controller) => tvAsync.when(
         skipLoadingOnReload: true,
         loading: () => [
           SliverFillViewport(
