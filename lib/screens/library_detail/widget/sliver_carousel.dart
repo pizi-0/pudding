@@ -6,9 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:morphnext/morphnext.dart';
-import 'package:pudding/widgets/bar.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_section.dart';
 
-import '../../../widgets/section_header.dart';
 import 'hero_carousel_card.dart';
 
 class SliverCarousel extends StatefulWidget {
@@ -69,26 +68,24 @@ class _SliverCarouselState extends State<SliverCarousel> {
     final theme = context.theme;
     final items = widget.items;
 
-    return SliverMainAxisGroup(
-      slivers: [
-        PinnedHeaderSliver(
-          child: Bar(
-            padding: .fromLTRB(20, 0, 20, 10),
-            child: SectionHeader(
-              title: Row(
-                spacing: 10,
-                children: [
-                  Text('Continue watching'),
-                  AnimatedMorphIcon(
-                    icon: hover
-                        ? FPhosphorBoldIcons.pause
-                        : FPhosphorBoldIcons.play,
-                  ),
-                ],
-              ),
+    return SliverSection(
+      header: Row(
+        spacing: 10,
+        children: [
+          FButton(
+            variant: .outline,
+            onPress: () {},
+            child: Text('Continue watching'),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: AnimatedMorphIcon(
+              icon: hover ? FPhosphorBoldIcons.pause : FPhosphorBoldIcons.play,
             ),
           ),
-        ),
+        ],
+      ),
+      slivers: [
         SliverToBoxAdapter(
           child: MouseRegion(
             onEnter: (event) {
@@ -101,50 +98,46 @@ class _SliverCarouselState extends State<SliverCarousel> {
               hover = false;
               setState(() {});
             },
-            child: Padding(
-              padding: const .fromLTRB(20, 0, 10, 10),
-              child: SizedBox(
-                height: 250,
-                child: LayoutBuilder(
-                  builder: (context, size) {
-                    final weight = _flexWeights(
-                      theme.breakpoints,
-                      size.maxWidth,
-                    );
-                    return CarouselView.weightedBuilder(
-                      controller: carouselController,
-                      scrollDirection: .horizontal,
-                      infinite: true,
-                      itemSnapping: true,
-                      enableSplash: false,
-                      shrinkExtent: 100,
-                      itemCount: items.length,
-                      flexWeights: weight,
-                      itemBuilder: (context, index) {
-                        final item = items[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(
-                            right: 10.0,
+            child: SizedBox(
+              height: 250,
+              child: LayoutBuilder(
+                builder: (context, size) {
+                  final weight = _flexWeights(
+                    theme.breakpoints,
+                    size.maxWidth,
+                  );
+                  return CarouselView.weightedBuilder(
+                    controller: carouselController,
+                    scrollDirection: .horizontal,
+                    infinite: true,
+                    itemSnapping: true,
+                    enableSplash: false,
+                    shrinkExtent: 100,
+                    itemCount: items.length,
+                    flexWeights: weight,
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                          right: 10.0,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: theme.style.borderRadius.sm,
+                          child: HeroCarouselCard(
+                            item: item,
+                            index: index,
+                            total: items.length,
+                            flexWeights: weight,
                           ),
-                          child: ClipRRect(
-                            borderRadius: theme.style.borderRadius.sm,
-                            child: HeroCarouselCard(
-                              item: item,
-                              index: index,
-                              total: items.length,
-                              flexWeights: weight,
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ),
         ),
-        SliverPadding(padding: .only(bottom: 10)),
       ],
     );
   }
