@@ -5,6 +5,7 @@ import 'package:pudding/widgets/detail_scaffold.dart';
 
 class SliverTopbar extends StatefulWidget {
   final bool nested;
+  final double? extent;
   final Widget? suffix;
   final List<Widget> children;
   const new({
@@ -12,6 +13,7 @@ class SliverTopbar extends StatefulWidget {
     this.nested = true,
     this.suffix,
     this.children = const [],
+    this.extent,
   });
 
   @override
@@ -24,7 +26,7 @@ class _SliverTopbarState extends State<SliverTopbar> {
     return SliverLayoutBuilder(
       builder: (context, constraints) {
         final offset = constraints.scrollOffset;
-        final extent = constraints.viewportMainAxisExtent / 2;
+        final extent = widget.extent ?? constraints.viewportMainAxisExtent / 2;
         final double percent = (offset / extent).clamp(0, 1);
 
         return PinnedHeaderSliver(
