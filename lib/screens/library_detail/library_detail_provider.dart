@@ -5,11 +5,9 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:pudding/models/pudding_display_prefs.dart';
 import 'package:pudding/models/pudding_filters.dart';
 import 'package:pudding/screens/library_detail/user_views_provider.dart';
 import 'package:pudding/services/di.dart';
-import 'package:pudding/utils/jellyfin_display_prefs_extensions.dart';
 
 class LibraryNotifier extends AsyncNotifier<LibraryData> {
   final limit = 50;
@@ -45,7 +43,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
 
     final applied = state.value?.filters ?? PuddingFilters();
 
-    final (res, displayPrefs, next) = await (
+    final (res, next) = await (
       client.items.list(
         parentId: id,
         excludeItemTypes: [JellyfinItemKind.folder],
@@ -58,10 +56,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
         tags: applied.tags,
         fields: [],
       ),
-      client.displayPreferences.get(
-        displayPreferencesId: lib.id,
-        client: 'pudding',
-      ),
+
       _getSuggestions(),
     ).wait;
 
@@ -69,7 +64,6 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
       name: lib.name,
       items: res.items,
       count: res.totalRecordCount,
-      displayPrefs: displayPrefs,
       next: next,
       filters: applied,
     );
@@ -196,59 +190,6 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     return PuddingFilters.fromLegacyJelly(res);
   }
 
-  void setMaxImageWidth(double width) {
-    final current = state.value!;
-    final currentDisplayPrefs = current.displayPrefs;
-    Map<String, String> currentCustom = currentDisplayPrefs.customPrefs;
-    PuddingDisplayPrefs puddingPrefs = PuddingDisplayPrefs.fromMap(
-      currentCustom,
-    );
-
-    puddingPrefs = puddingPrefs.setImageWidth(width);
-
-    currentCustom.addAll(puddingPrefs.toMap());
-
-    state = AsyncValue.data(
-      current.copyWith(
-        displayPrefs: currentDisplayPrefs.copyWith(customPrefs: currentCustom),
-      ),
-    );
-  }
-
-  void setViewType(String type) {
-    final current = state.value!;
-    final currentDisplayPrefs = current.displayPrefs;
-    final currentCustom = currentDisplayPrefs.customPrefs;
-    PuddingDisplayPrefs puddingPrefs = PuddingDisplayPrefs.fromMap(
-      currentCustom,
-    );
-
-    puddingPrefs = puddingPrefs.setViewType(type);
-
-    currentCustom.addAll(puddingPrefs.toMap());
-
-    state = AsyncValue.data(
-      current.copyWith(
-        displayPrefs: currentDisplayPrefs.copyWith(customPrefs: currentCustom),
-      ),
-    );
-  }
-
-  /// post to server
-  Future<void> updateDisplayPrefs() async {
-    state = await AsyncValue.guard(() async {
-      final current = state.value!;
-
-      await client.displayPreferences.update(
-        displayPreferencesId: current.displayPrefs.id!,
-        client: current.displayPrefs.client!,
-        preferences: current.displayPrefs,
-      );
-
-      return current;
-    });
-  }
-
   List<String> _includeItemTypes(JellyfinView view) {
     if (view.isTvShows) {
       return [JellyfinItemKind.series];
@@ -270,7 +211,6 @@ class LibraryData {
   final int count;
   final List<JellyfinItem> items;
   final List<JellyfinItem> next;
-  final JellyfinDisplayPreferences displayPrefs;
   final PuddingFilters filters;
 
   LibraryData({
@@ -278,7 +218,6 @@ class LibraryData {
     required this.count,
     this.items = const [],
     required this.next,
-    required this.displayPrefs,
     required this.filters,
   });
 
@@ -295,7 +234,6 @@ class LibraryData {
       count: count ?? this.count,
       items: items ?? this.items,
       next: next ?? this.next,
-      displayPrefs: displayPrefs ?? this.displayPrefs,
       filters: filters ?? this.filters,
     );
   }
@@ -308,7 +246,6 @@ class LibraryData {
         other.count == count &&
         listEquals(other.items, items) &&
         listEquals(other.next, next) &&
-        other.displayPrefs == displayPrefs &&
         other.filters == filters;
   }
 
@@ -318,7 +255,6 @@ class LibraryData {
         count.hashCode ^
         items.hashCode ^
         next.hashCode ^
-        displayPrefs.hashCode ^
         filters.hashCode;
   }
 }

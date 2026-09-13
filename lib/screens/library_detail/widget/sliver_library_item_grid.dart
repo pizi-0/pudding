@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:morphnext/morphnext.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/models/jelly_filter.dart';
-import 'package:pudding/models/pudding_display_prefs.dart';
+import 'package:pudding/providers/settings_provider.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_section.dart';
@@ -31,8 +31,12 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
     final libAsync = ref.watch(libraryProvider(widget.id));
     final libNotifier = ref.read(libraryProvider(widget.id).notifier);
 
+    final prefs = ref.watch(
+      settingsProvider.select((s) => s.value!.libraryPrefs),
+    );
+
     final data = libAsync.value!;
-    final prefs = PuddingDisplayPrefs.fromMap(data.displayPrefs.customPrefs);
+    // final prefs = PuddingDisplayPrefs.fromMap(data.displayPrefs.customPrefs);
     // final List<double> marks = List.generate(51, (index) => (index * 0.02));
 
     return SliverSection(
@@ -73,8 +77,8 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
           key: ValueKey(widget.id),
           itemCount: data.items.length,
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: prefs.maxImageWidth,
-            childAspectRatio: prefs.aspectRatio,
+            maxCrossAxisExtent: prefs.itemWidth(widget.id),
+            childAspectRatio: prefs.aspectRatio(widget.id),
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,
           ),
@@ -84,7 +88,7 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
             return NewMediaCard(
               key: ValueKey(item.id),
               item: item,
-              imageType: prefs.imageType,
+              imageType: prefs.imageType(widget.id),
               onPressed: () {
                 if (item.isSeries) {
                   context.push('/show/${item.id}');

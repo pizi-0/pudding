@@ -28,7 +28,7 @@ final routeProvider = Provider<GoRouter>(
         case .unauthd:
           return '/login';
         default:
-          return null;
+          return '/splash';
       }
     },
     initialLocation: '/splash',
