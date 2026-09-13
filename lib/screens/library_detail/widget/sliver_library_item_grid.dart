@@ -1,9 +1,12 @@
+import 'package:awesome_extensions/awesome_extensions.dart'
+    show StringExtension;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
+import 'package:morphnext/morphnext.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/models/jelly_filter.dart';
 import 'package:pudding/models/pudding_display_prefs.dart';
@@ -30,15 +33,38 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
 
     final data = libAsync.value!;
     final prefs = PuddingDisplayPrefs.fromMap(data.displayPrefs.customPrefs);
-    final List<double> marks = List.generate(51, (index) => (index * 0.02));
+    // final List<double> marks = List.generate(51, (index) => (index * 0.02));
 
     return SliverSection(
       header: Row(
+        spacing: 10,
         children: [
           FButton(
             variant: .outline,
             onPress: () {},
             child: Text('All'),
+          ),
+          FButton.icon(
+            variant: .ghost,
+            onLongPress: () => libNotifier
+              ..resetFilter()
+              ..refresh(),
+            onSecondaryPress: () => libNotifier
+              ..resetFilter()
+              ..refresh(),
+            onPress: () {
+              showFSheet(
+                context: context,
+                builder: (context) => FilterSheet(id: widget.id),
+                side: .ltr,
+              );
+            },
+            child: AnimatedMorphIcon(
+              icon: data.filters.isEmpty
+                  ? FPhosphorBoldIcons.funnel
+                  : FPhosphorFillIcons.funnelX,
+              color: data.filters.isEmpty ? null : theme.colors.primary,
+            ),
           ),
         ],
       ),
@@ -368,7 +394,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               error: (error, stackTrace) =>
                   Center(child: Text(error.toString())),
               data: (data) {
-                final filters = JellyFilter.values.map((f) => f.name);
+                final filters = JellyFilter.values.map((f) => f);
                 final genres = data.genres;
                 final rating = data.parentalRating;
                 final years = data.years;
@@ -415,7 +441,10 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                     SliverRadio<String>(
                       title: Text('Filters'),
                       initialValues: libAsync.value?.filters.filters ?? [],
-                      filterItems: filters.toList(),
+                      filterItems: filters.map((f) => f.value).toList(),
+                      customLabels: filters
+                          .map((f) => f.name.capitalize)
+                          .toList(),
                       // enabled: !libAsync.isLoading,
                       onChanged: (result) {
                         libNotifier
@@ -493,6 +522,7 @@ class SliverRadio<T> extends StatefulWidget {
   final List<T> initialValues;
   final bool enabled;
   final Function(List<T> result) onChanged;
+  final List<String>? customLabels;
   const SliverRadio({
     super.key,
     this.enabled = true,
@@ -500,6 +530,7 @@ class SliverRadio<T> extends StatefulWidget {
     required this.initialValues,
     required this.filterItems,
     required this.onChanged,
+    this.customLabels,
   });
 
   @override
@@ -587,6 +618,9 @@ class SliverRadioState<T> extends State<SliverRadio<T>> {
                   itemBuilder: (context, index) {
                     final f = widget.filterItems[index];
                     final selected = filterList.contains(f);
+                    final custom = widget.customLabels?[index];
+
+                    final label = custom ?? f.toString();
 
                     return FButton(
                       variant: selected ? .primary : .outline,
@@ -603,7 +637,7 @@ class SliverRadioState<T> extends State<SliverRadio<T>> {
                             },
                       child: Expanded(
                         child: Text(
-                          f.toString(),
+                          label,
                           maxLines: 1,
                           textAlign: .center,
                           overflow: .ellipsis,

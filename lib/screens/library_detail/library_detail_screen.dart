@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 
+import 'package:awesome_extensions/awesome_extensions.dart'
+    show WidgetCommonExtension;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
@@ -72,6 +74,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
               variant: .outline,
               mainAxisSize: .min,
               onPress: () {},
+              suffix: FCircularProgress().showIf(libAsync.isLoading),
               child: Flexible(
                 fit: .loose,
                 child: Text('${libAsync.value?.name}'),
