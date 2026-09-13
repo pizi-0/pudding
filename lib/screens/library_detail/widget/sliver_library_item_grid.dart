@@ -31,9 +31,8 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
     final libAsync = ref.watch(libraryProvider(widget.id));
     final libNotifier = ref.read(libraryProvider(widget.id).notifier);
 
-    final prefs = ref.watch(
-      settingsProvider.select((s) => s.value!.libraryPrefs),
-    );
+    final settings = ref.watch(settingsProvider);
+    final prefs = settings.value!.libraryPrefs;
 
     final data = libAsync.value!;
     // final prefs = PuddingDisplayPrefs.fromMap(data.displayPrefs.customPrefs);
@@ -77,7 +76,7 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
           key: ValueKey(widget.id),
           itemCount: data.items.length,
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: prefs.itemWidth(widget.id),
+            maxCrossAxisExtent: prefs.itemWidth(widget.id).toDouble(),
             childAspectRatio: prefs.aspectRatio(widget.id),
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,

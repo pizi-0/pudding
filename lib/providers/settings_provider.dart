@@ -27,6 +27,12 @@ class SettingsNotifier extends AsyncNotifier<PuddingSettings> {
       return PuddingSettings();
     }
   }
+
+  void setSettings(PuddingSettings Function(PuddingSettings) settings) {
+    final val = settings(state.value ?? PuddingSettings());
+
+    state = AsyncData(val);
+  }
 }
 
 final settingsProvider =

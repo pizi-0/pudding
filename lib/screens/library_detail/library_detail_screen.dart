@@ -1,13 +1,16 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:awesome_extensions/awesome_extensions.dart'
     show WidgetCommonExtension;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/const/const.dart';
+import 'package:pudding/providers/settings_provider.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
 import 'package:pudding/screens/library_detail/user_views_provider.dart';
 import 'package:pudding/screens/library_detail/widget/sliver_carousel.dart';
@@ -61,6 +64,9 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
   Widget build(BuildContext context) {
     final libAsync = ref.watch(libraryProvider(widget.id!));
     final userviewAsync = ref.watch(userviewsProvider).value ?? {};
+    final settNotifier = ref.read(settingsProvider.notifier);
+    final settings = ref.watch(settingsProvider);
+    final prefs = settings.value!.libraryPrefs;
 
     return DetailScaffold(
       headerSliver: SliverTopbar(
@@ -80,6 +86,51 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                 child: Text('${libAsync.value?.name}'),
               ),
             ),
+          FPopover(
+            constraints: FPortalConstraints(maxWidth: 300),
+            popoverBuilder: (context, controller) => FCard(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    FSlider(
+                      control: .managedContinuous(
+                        initial: FSliderValue(
+                          max:
+                              (prefs.itemWidth(widget.id!) - 150) / (500 - 150),
+                        ),
+                        onChange: (value) => settNotifier.setSettings(
+                          (current) => current.copyWith(
+                            libraryPrefs: current.libraryPrefs.updateItemSize(
+                              current.libraryPrefs.viewType(widget.id!),
+                              lerpDouble(150, 500, value.max)!.round(),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // onEnd: (value) => settNotifier.setSettings(
+                      //   (current) => current.copyWith(
+                      //     libraryPrefs: current.libraryPrefs.updateItemSize(
+                      //       current.libraryPrefs.viewType(widget.id!),
+                      //       lerpDouble(150, 700, value.max)!.round(),
+                      //     ),
+                      //   ),
+                      // ),
+
+                      tooltipBuilder: (controller, value) =>
+                          Text(lerpDouble(150, 500, value)!.toStringAsFixed(0)),
+                      label: Text('Item width'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            builder: (context, controller, child) => FButton.icon(
+              variant: .ghost,
+              onPress: controller.toggle,
+              child: Icon(FPhosphorBoldIcons.gear),
+            ),
+          ),
         ],
       ),
       sideChick: Column(
