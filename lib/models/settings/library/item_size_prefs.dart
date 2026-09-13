@@ -2,9 +2,9 @@ import 'dart:convert';
 
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class ItemSizePrefs {
-  final double posterWidth;
-  final double thumbWidth;
-  final double squareWidth;
+  final int posterWidth;
+  final int thumbWidth;
+  final int squareWidth;
 
   const new({
     this.posterWidth = mwPoster,
@@ -13,9 +13,9 @@ class ItemSizePrefs {
   });
 
   ItemSizePrefs copyWith({
-    double? posterWidth,
-    double? thumbWidth,
-    double? squareWidth,
+    int? posterWidth,
+    int? thumbWidth,
+    int? squareWidth,
   }) {
     return ItemSizePrefs(
       posterWidth: posterWidth ?? this.posterWidth,
@@ -34,9 +34,9 @@ class ItemSizePrefs {
 
   factory ItemSizePrefs.fromMap(Map<String, dynamic> map) {
     return ItemSizePrefs(
-      posterWidth: map['posterWidth'] as double,
-      thumbWidth: map['thumbWidth'] as double,
-      squareWidth: map['squareWidth'] as double,
+      posterWidth: map['posterWidth'] as int,
+      thumbWidth: map['thumbWidth'] as int,
+      squareWidth: map['squareWidth'] as int,
     );
   }
 
@@ -46,6 +46,6 @@ class ItemSizePrefs {
       ItemSizePrefs.fromMap(json.decode(source) as Map<String, dynamic>);
 }
 
-const double mwPoster = 250;
-const double mwThumb = 350;
-const double mwSquare = 300;
+const int mwPoster = 250;
+const int mwThumb = 350;
+const int mwSquare = 300;

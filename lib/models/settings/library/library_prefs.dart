@@ -64,7 +64,7 @@ class LibraryPrefs {
     return LibraryPrefs(userviewPrefs: current);
   }
 
-  LibraryPrefs updateItemSize(String type, double value) {
+  LibraryPrefs updateItemSize(String type, int value) {
     final isPoster = type == vtPoster;
     final isThumb = type == vtThumb;
     final isSquare = type == vtSquare;
@@ -82,7 +82,13 @@ class LibraryPrefs {
   ///
   ///
 
-  double itemWidth(String id) {
+  String viewType(String id) {
+    final view = userviewPrefs[id] ?? UserViewPrefs();
+
+    return view.viewType;
+  }
+
+  int itemWidth(String id) {
     final size = itemSizePrefs;
     final view = userviewPrefs[id] ?? UserViewPrefs();
 
