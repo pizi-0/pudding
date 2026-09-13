@@ -40,6 +40,7 @@ class _SliverTopbarState extends State<SliverTopbar> {
                 ],
                 Expanded(
                   child: Row(
+                    spacing: 8,
                     children: widget.children
                         .map(
                           (c) => Flexible(
