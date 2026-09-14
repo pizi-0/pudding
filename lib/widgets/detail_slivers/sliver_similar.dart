@@ -22,10 +22,7 @@ class SliverSimilar extends StatelessWidget {
         child: Text('More like this'),
       ),
       slivers: [
-        SliverItemGrid(
-          items: items,
-          isPoster: true,
-        ),
+        SliverItemGrid(items: items),
       ],
     );
   }

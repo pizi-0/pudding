@@ -2,31 +2,38 @@ import 'package:awesome_extensions/awesome_extensions.dart'
     show WidgetCommonExtension;
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/const/const.dart';
+import 'package:pudding/models/settings/library/user_view_prefs.dart';
+import 'package:pudding/providers/settings_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/media_card.dart';
 
-class SliverItemGrid extends StatelessWidget {
+class SliverItemGrid extends ConsumerWidget {
   final List<JellyfinItem> items;
   final bool showBottom;
   final bool dimPlayed;
-  final bool isPoster;
+  final ViewType viewType;
   const new({
     super.key,
     this.items = const [],
     this.showBottom = false,
     this.dimPlayed = false,
-    this.isPoster = false,
+    this.viewType = .poster,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final prefs = ref.watch(
+      settingsProvider.select((s) => s.value!.libraryPrefs),
+    );
+
     return SliverGrid.builder(
       itemCount: items.length,
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: isPoster ? 250 : 350,
-        childAspectRatio: isPoster
+        maxCrossAxisExtent: prefs.itemWidth(viewType).toDouble(),
+        childAspectRatio: viewType == .poster
             ? kPosterAspectRatio
             : showBottom
             ? 16 / 14
@@ -45,7 +52,7 @@ class SliverItemGrid extends StatelessWidget {
           },
           dimPlayed: dimPlayed ? (item.userData?.played ?? false) : false,
           bottom: AspectRatio(aspectRatio: 16 / 4)
-              .showIf(showBottom && !isPoster),
+              .showIf(showBottom && viewType != .poster),
         );
       },
     );

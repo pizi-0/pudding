@@ -350,7 +350,7 @@ class _LibraryPrefsButtonState extends ConsumerState<LibraryPrefsButton> {
     final settings = ref.watch(settingsProvider).value ?? PuddingSettings();
     final prefs = settings.libraryPrefs;
 
-    final width = prefs.itemWidth(widget.id);
+    final width = prefs.itemWidth(prefs.viewType(widget.id));
 
     widthTextController = TextEditingController(text: width.toString());
     sliderController = FContinuousSliderController(
@@ -428,8 +428,10 @@ class _LibraryPrefsButtonState extends ConsumerState<LibraryPrefsButton> {
                       keyboardType: .number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       control: .managed(controller: widthTextController),
-                      onSubmit: (width) =>
-                          _setSlider(width, prefs.itemWidth(widget.id)),
+                      onSubmit: (width) => _setSlider(
+                        width,
+                        prefs.itemWidth(prefs.viewType(widget.id)),
+                      ),
                       textAlign: .center,
                       style: .delta(constraints: .new(maxHeight: 33)),
                     ),
@@ -442,19 +444,20 @@ class _LibraryPrefsButtonState extends ConsumerState<LibraryPrefsButton> {
               control: .managed(
                 initial: prefs.viewType(widget.id),
                 onChange: (type) async {
-                  final sett = await settNotifier.setSettings(
-                    (current) => current.copyWith(
-                      libraryPrefs: current.libraryPrefs.updateViewType(
-                        widget.id,
-                        type ?? .poster,
+                  if (type != null) {
+                    final sett = await settNotifier.setSettings(
+                      (current) => current.copyWith(
+                        libraryPrefs: current.libraryPrefs.updateViewType(
+                          widget.id,
+                          type,
+                        ),
                       ),
-                    ),
-                  );
-
-                  _setSlider(
-                    sett.libraryPrefs.itemWidth(widget.id).toString(),
-                    prefs.itemWidth(widget.id),
-                  );
+                    );
+                    _setSlider(
+                      sett.libraryPrefs.itemWidth(type).toString(),
+                      prefs.itemWidth(type),
+                    );
+                  }
                 },
               ),
               format: (value) => value.name.capitalize,

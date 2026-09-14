@@ -3,6 +3,7 @@ import 'package:awesome_extensions/awesome_extensions.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:pudding/providers/settings_provider.dart';
 import 'package:pudding/screens/detail_screens/widgets/season_selector.dart';
 import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
@@ -18,6 +19,9 @@ class SliverEpisodes extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tvAsync = ref.watch(tvshowStateProvider(id));
+    final prefs = ref.watch(
+      settingsProvider.select((s) => s.value!.libraryPrefs),
+    );
 
     return SliverSection(
       header: SeasonSelector(
@@ -51,7 +55,7 @@ class SliverEpisodes extends ConsumerWidget {
             return SliverGrid.builder(
               itemCount: data.episodes.length,
               gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 350,
+                maxCrossAxisExtent: prefs.itemWidth(.thumb).toDouble(),
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
                 childAspectRatio: 16 / 14,
