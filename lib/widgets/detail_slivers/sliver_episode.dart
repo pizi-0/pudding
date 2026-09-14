@@ -74,8 +74,8 @@ class SliverEpisodes extends ConsumerWidget {
                           child: Text(tv.getOverview() ?? 'No overview'),
                         ).showIf(
                           (tv.userData?.played ?? false) ||
-                              (tv.id == data.nextup?.id) ||
-                              index == 0,
+                              ((tv.id == data.nextup?.id) || index == 0) &&
+                                  !tv.isMissing,
                         ),
                   ),
                 );

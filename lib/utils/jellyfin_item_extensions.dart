@@ -157,6 +157,31 @@ extension JellyInfo on JellyfinItem {
     return services<JellyfinClient>().images.url(itemId: id, type: type0);
   }
 
+  String getParentImage({
+    String type = JellyfinImagesApi.typePrimary,
+  }) {
+    String type0 = type;
+    if (!imageTags.containsKey(type)) {
+      final preferred = [
+        JellyfinImagesApi.typePrimary,
+        JellyfinImagesApi.typeThumb,
+        JellyfinImagesApi.typeBackdrop,
+      ];
+
+      for (final t in preferred) {
+        if (imageTags.containsKey(t)) {
+          type0 = t;
+          break;
+        }
+      }
+    }
+
+    return services<JellyfinClient>().images.url(
+      itemId: seriesId ?? parentId ?? id,
+      type: type0,
+    );
+  }
+
   String? getOfficialRating() {
     return raw['OfficialRating'];
   }
@@ -206,6 +231,16 @@ extension JellyInfo on JellyfinItem {
   bool get isSeason => type == JellyfinItemKind.season;
   bool get isBoxsets => type == 'BoxSet';
   bool get isVideo => type == 'Video';
+  bool get isPlaceholder => raw['LocationType'] == 'Virtual';
+  bool get isMissing =>
+      ((premiereDate?.millisecondsSinceEpoch ?? 0) <
+          DateTime.now().millisecondsSinceEpoch) &&
+      isPlaceholder;
+  bool get isUpcoming =>
+      ((premiereDate?.millisecondsSinceEpoch ?? 0) >
+          DateTime.now().millisecondsSinceEpoch) &&
+      isPlaceholder;
+
   bool get showRuntime =>
       (durationMs != null || durationMs != 0) && (isMovie || isEpisode);
   bool get isResumable => userData?.playbackPositionTicks != 0;

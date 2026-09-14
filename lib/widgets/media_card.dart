@@ -372,12 +372,18 @@ class _NewMediaCardState extends State<NewMediaCard> {
                                   scale: hover ? 1.01 : 1,
                                   child: CachedNetworkImage(
                                     memCacheHeight: (height * 2).ceil(),
-                                    fit: .cover,
-                                    imageUrl: item.getImage(
-                                      type: imageType,
-                                    ),
+                                    fit: item.isPlaceholder ? .contain : .cover,
+                                    imageUrl: item.isPlaceholder
+                                        ? item.getParentImage(
+                                            type: JellyfinImagesApi.typeLogo,
+                                          )
+                                        : item.getImage(type: imageType),
                                     errorBuilder:
-                                        (context, error, stackTrace) => Center(
+                                        (
+                                          context,
+                                          error,
+                                          stackTrace,
+                                        ) => Center(
                                           child: Icon(
                                             FPhosphorBoldIcons.imageBroken,
                                           ),
@@ -439,6 +445,9 @@ class InfoLayer extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.theme;
     final favorite = item.isFavorite;
+    final placeholder = item.isPlaceholder;
+    final missing = item.isMissing;
+    final upcoming = item.isUpcoming;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -452,9 +461,12 @@ class InfoLayer extends StatelessWidget {
         padding: const EdgeInsets.all(9),
         child: Column(
           spacing: 4,
-          crossAxisAlignment: .stretch,
+          crossAxisAlignment: .start,
           mainAxisSize: .min,
           children: [
+            if (missing) FBadge(variant: .destructive, child: Text('Missing')),
+            if (upcoming) FBadge(variant: .secondary, child: Text('Upcoming')),
+            Spacer(),
             if (favorite)
               Align(
                 alignment: .centerRight,
@@ -491,7 +503,7 @@ class InfoLayer extends StatelessWidget {
                     ),
                   ),
                 ),
-                _playStatusIndicator(theme),
+                if (!placeholder) _playStatusIndicator(theme),
               ],
             ),
             DefaultTextStyle(
