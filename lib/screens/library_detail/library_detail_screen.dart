@@ -55,7 +55,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
     super.dispose();
   }
 
-  void _fetchMore(UserScrollNotification noti) {
+  void _fetchMore(ScrollUpdateNotification noti) {
     final max = noti.metrics.maxScrollExtent;
     final current = noti.metrics.pixels;
 
@@ -122,7 +122,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
             )
             .toList(),
       ),
-      onscroll: (UserScrollNotification n) {
+      onscroll: (ScrollUpdateNotification n) {
         _fetchMore(n);
 
         return true;

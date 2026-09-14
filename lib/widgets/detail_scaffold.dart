@@ -19,7 +19,7 @@ class DetailScaffold<T> extends ConsumerStatefulWidget {
   final Widget? sideChick;
   final bool? nested;
   final List<Widget> slivers;
-  final bool Function(UserScrollNotification)? onscroll;
+  final bool Function(ScrollUpdateNotification)? onscroll;
   final List<Widget> Function(BuildContext context, ScrollController controller)
   sliverBuilder;
   const new({
@@ -113,22 +113,35 @@ class _DetailScaffoldState<T> extends ConsumerState<DetailScaffold<T>> {
                   ),
                 ),
               Positioned.fill(
-                child: NotificationListener<UserScrollNotification>(
-                  onNotification: widget.onscroll,
-                  child: SilkyCustomScrollView(
-                    controller: scrollController,
-                    slivers: [
-                      if (widget.headerSliver != null) widget.headerSliver!,
+                child: NotificationListener<ScrollUpdateNotification>(
+                  onNotification: (notification) {
+                    if (notification.metrics.axis != Axis.vertical) {
+                      return false;
+                    }
 
-                      ...widget
-                          .sliverBuilder(context, scrollController)
-                          .map(
-                            (s) => SliverPadding(
-                              padding: .fromLTRB(leftPad, 0, 20, 40),
-                              sliver: s,
+                    widget.onscroll!(notification);
+                    return false;
+                  },
+                  child: ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(
+                      dragDevices: {...PointerDeviceKind.values},
+                      platform: .windows,
+                    ),
+                    child: SilkyCustomScrollView(
+                      controller: scrollController,
+                      slivers: [
+                        if (widget.headerSliver != null) widget.headerSliver!,
+
+                        ...widget
+                            .sliverBuilder(context, scrollController)
+                            .map(
+                              (s) => SliverPadding(
+                                padding: .fromLTRB(leftPad, 0, 20, 40),
+                                sliver: s,
+                              ),
                             ),
-                          ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
