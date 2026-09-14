@@ -28,10 +28,14 @@ class SettingsNotifier extends AsyncNotifier<PuddingSettings> {
     }
   }
 
-  void setSettings(PuddingSettings Function(PuddingSettings) settings) {
+  Future<PuddingSettings> setSettings(
+    PuddingSettings Function(PuddingSettings) settings,
+  ) async {
     final val = settings(state.value ?? PuddingSettings());
 
-    state = AsyncData(val);
+    state = AsyncData(state.value!.copyWith(libraryPrefs: val.libraryPrefs));
+
+    return state.value!;
   }
 }
 

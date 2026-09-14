@@ -53,7 +53,7 @@ class LibraryPrefs {
   ///
   ///
 
-  LibraryPrefs updateViewType(String id, String viewType) {
+  LibraryPrefs updateViewType(String id, ViewType viewType) {
     Map<String, UserViewPrefs> current = Map<String, UserViewPrefs>.from(
       userviewPrefs,
     );
@@ -61,15 +61,15 @@ class LibraryPrefs {
 
     current[id] = toUpdate.copyWith(viewType: viewType);
 
-    return LibraryPrefs(userviewPrefs: current);
+    return copyWith(userviewPrefs: current);
   }
 
-  LibraryPrefs updateItemSize(String type, int value) {
-    final isPoster = type == vtPoster;
-    final isThumb = type == vtThumb;
-    final isSquare = type == vtSquare;
+  LibraryPrefs updateItemSize(ViewType type, int value) {
+    final isPoster = type == .poster;
+    final isThumb = type == .thumb;
+    final isSquare = type == .square;
 
-    return LibraryPrefs(
+    return copyWith(
       itemSizePrefs: itemSizePrefs.copyWith(
         posterWidth: isPoster ? value : itemSizePrefs.posterWidth,
         thumbWidth: isThumb ? value : itemSizePrefs.thumbWidth,
@@ -82,7 +82,7 @@ class LibraryPrefs {
   ///
   ///
 
-  String viewType(String id) {
+  ViewType viewType(String id) {
     final view = userviewPrefs[id] ?? UserViewPrefs();
 
     return view.viewType;
@@ -95,7 +95,7 @@ class LibraryPrefs {
     if (view.isThumb) {
       return size.thumbWidth;
     } else if (view.isSquare) {
-      return size.thumbWidth;
+      return size.squareWidth;
     } else {
       return size.posterWidth;
     }

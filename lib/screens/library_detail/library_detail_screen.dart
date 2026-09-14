@@ -3,13 +3,15 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:awesome_extensions/awesome_extensions.dart'
-    show WidgetCommonExtension;
+    show WidgetCommonExtension, StringExtension;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/const/const.dart';
+import 'package:pudding/models/settings/library/pudding_settings.dart';
 import 'package:pudding/providers/settings_provider.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
 import 'package:pudding/screens/library_detail/user_views_provider.dart';
@@ -19,6 +21,8 @@ import 'package:pudding/widgets/detail_scaffold.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_error.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_loader.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_topbar.dart';
+
+import '../../models/settings/library/user_view_prefs.dart';
 
 class LibraryDetail extends ConsumerStatefulWidget {
   final String? id;
@@ -30,6 +34,8 @@ class LibraryDetail extends ConsumerStatefulWidget {
 }
 
 class _LibraryDetailState extends ConsumerState<LibraryDetail> {
+  final TextEditingController widthController = TextEditingController();
+
   bool all = false;
   bool manualRefresh = false;
   bool retried = false;
@@ -64,9 +70,6 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
   Widget build(BuildContext context) {
     final libAsync = ref.watch(libraryProvider(widget.id!));
     final userviewAsync = ref.watch(userviewsProvider).value ?? {};
-    final settNotifier = ref.read(settingsProvider.notifier);
-    final settings = ref.watch(settingsProvider);
-    final prefs = settings.value!.libraryPrefs;
 
     return DetailScaffold(
       headerSliver: SliverTopbar(
@@ -86,51 +89,7 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                 child: Text('${libAsync.value?.name}'),
               ),
             ),
-          FPopover(
-            constraints: FPortalConstraints(maxWidth: 300),
-            popoverBuilder: (context, controller) => FCard(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    FSlider(
-                      control: .managedContinuous(
-                        initial: FSliderValue(
-                          max:
-                              (prefs.itemWidth(widget.id!) - 150) / (500 - 150),
-                        ),
-                        onChange: (value) => settNotifier.setSettings(
-                          (current) => current.copyWith(
-                            libraryPrefs: current.libraryPrefs.updateItemSize(
-                              current.libraryPrefs.viewType(widget.id!),
-                              lerpDouble(150, 500, value.max)!.round(),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // onEnd: (value) => settNotifier.setSettings(
-                      //   (current) => current.copyWith(
-                      //     libraryPrefs: current.libraryPrefs.updateItemSize(
-                      //       current.libraryPrefs.viewType(widget.id!),
-                      //       lerpDouble(150, 700, value.max)!.round(),
-                      //     ),
-                      //   ),
-                      // ),
-
-                      tooltipBuilder: (controller, value) =>
-                          Text(lerpDouble(150, 500, value)!.toStringAsFixed(0)),
-                      label: Text('Item width'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            builder: (context, controller, child) => FButton.icon(
-              variant: .ghost,
-              onPress: controller.toggle,
-              child: Icon(FPhosphorBoldIcons.gear),
-            ),
-          ),
+          LibraryPrefsButton(id: widget.id!),
         ],
       ),
       sideChick: Column(
@@ -368,5 +327,165 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
     }
 
     ref.invalidate(libraryProvider(widget.id!));
+  }
+}
+
+class LibraryPrefsButton extends ConsumerStatefulWidget {
+  final String id;
+  const new({super.key, required this.id});
+
+  @override
+  ConsumerState<LibraryPrefsButton> createState() => _LibraryPrefsButtonState();
+}
+
+class _LibraryPrefsButtonState extends ConsumerState<LibraryPrefsButton> {
+  final int sliderMin = 150;
+  final int sliderMax = 600;
+
+  late final TextEditingController widthTextController;
+  late final FContinuousSliderController sliderController;
+
+  @override
+  void initState() {
+    final settings = ref.watch(settingsProvider).value ?? PuddingSettings();
+    final prefs = settings.libraryPrefs;
+
+    final width = prefs.itemWidth(widget.id);
+
+    widthTextController = TextEditingController(text: width.toString());
+    sliderController = FContinuousSliderController(
+      value: FSliderValue(max: (width - sliderMin) / (sliderMax - sliderMin)),
+    );
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    widthTextController.dispose();
+    sliderController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.theme;
+    final settings = ref.watch(settingsProvider).value ?? PuddingSettings();
+    final prefs = settings.libraryPrefs;
+    final settNotifier = ref.read(settingsProvider.notifier);
+
+    return FPopover(
+      style: .delta(
+        decoration: .boxDelta(color: theme.colors.background),
+        barrierFilter: (context, anim) => ImageFilter.compose(
+          outer: ImageFilter.blur(sigmaX: anim * 5, sigmaY: anim * 5),
+          inner: ColorFilter.mode(
+            Color.lerp(Colors.transparent, theme.colors.barrier, anim)!,
+            .srcOver,
+          ),
+        ),
+      ),
+      childAnchor: .bottomLeft,
+      popoverAnchor: .topLeft,
+      cutoutBuilder: FModalBarrier.defaultCutoutBuilder,
+      constraints: FPortalConstraints(maxWidth: 300),
+      popoverBuilder: (context, controller) => Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          spacing: 10,
+          children: [
+            FSlider(
+              control: .managedContinuous(
+                controller: sliderController,
+                onChange: (value) {
+                  final newWidth = lerpDouble(
+                    sliderMin,
+                    sliderMax,
+                    value.max,
+                  )!.round();
+
+                  settNotifier.setSettings(
+                    (current) => current.copyWith(
+                      libraryPrefs: current.libraryPrefs.updateItemSize(
+                        current.libraryPrefs.viewType(widget.id),
+                        newWidth,
+                      ),
+                    ),
+                  );
+
+                  widthTextController.text = newWidth.toString();
+                },
+              ),
+              tooltipControls: FSliderTooltipControls.disabled(),
+              label: Row(
+                mainAxisAlignment: .spaceBetween,
+                children: [
+                  Text('Item width'),
+                  SizedBox(
+                    width: 100,
+                    height: 33,
+                    child: FTextField(
+                      keyboardType: .number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      control: .managed(controller: widthTextController),
+                      onSubmit: (width) =>
+                          _setSlider(width, prefs.itemWidth(widget.id)),
+                      textAlign: .center,
+                      style: .delta(constraints: .new(maxHeight: 33)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            FSelect<ViewType>.rich(
+              label: Text('View type'),
+              control: .managed(
+                initial: prefs.viewType(widget.id),
+                onChange: (type) async {
+                  final sett = await settNotifier.setSettings(
+                    (current) => current.copyWith(
+                      libraryPrefs: current.libraryPrefs.updateViewType(
+                        widget.id,
+                        type ?? .poster,
+                      ),
+                    ),
+                  );
+
+                  _setSlider(
+                    sett.libraryPrefs.itemWidth(widget.id).toString(),
+                    prefs.itemWidth(widget.id),
+                  );
+                },
+              ),
+              format: (value) => value.name.capitalize,
+              children: ViewType.values
+                  .map(
+                    (t) =>
+                        FSelectItem(title: Text(t.name.capitalize), value: t),
+                  )
+                  .toList(),
+            ),
+          ],
+        ),
+      ),
+      builder: (context, controller, child) => FButton.icon(
+        variant: .ghost,
+        onPress: controller.toggle,
+        child: Icon(FPhosphorBoldIcons.gear),
+      ),
+    );
+  }
+
+  void _setSlider(String width, int current) {
+    final extent = sliderController.value.pixelConstraints.max;
+
+    int w = (int.tryParse(width) ?? current).clamp(
+      sliderMin,
+      sliderMax,
+    );
+
+    final to = ((w - sliderMin) / (sliderMax - sliderMin)) * extent;
+
+    sliderController.tap(to);
   }
 }

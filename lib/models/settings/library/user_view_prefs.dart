@@ -6,21 +6,30 @@ import '../../../const/const.dart';
 
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class UserViewPrefs {
-  final String viewType;
+  final ViewType viewType;
 
-  const new({this.viewType = vtPoster});
+  const new({this.viewType = .poster});
 
-  UserViewPrefs copyWith({String? viewType}) {
-    return UserViewPrefs(viewType: viewType ?? this.viewType);
+  UserViewPrefs copyWith({
+    ViewType? viewType,
+  }) {
+    return UserViewPrefs(
+      viewType: viewType ?? this.viewType,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{'viewType': viewType};
+    return <String, dynamic>{
+      'viewType': viewType.name,
+    };
   }
 
   factory UserViewPrefs.fromMap(Map<String, dynamic> map) {
     return UserViewPrefs(
-      viewType: map['viewType'] as String,
+      viewType: ViewType.values.firstWhere(
+        (v) => v.name == map['viewType'],
+        orElse: () => .poster,
+      ),
     );
   }
 
@@ -32,29 +41,30 @@ class UserViewPrefs {
   double get aspectRatio => _aspectRatio();
   String get imageType => _imageType();
 
-  bool get isPoster => viewType == vtPoster;
-  bool get isSquare => viewType == vtSquare;
-  bool get isThumb => viewType == vtThumb;
+  bool get isPoster => viewType == .poster;
+  bool get isSquare => viewType == .square;
+  bool get isThumb => viewType == .thumb;
 
   double _aspectRatio() {
-    if (isPoster) {
-      return kPosterAspectRatio;
-    } else if (isSquare) {
-      return 1;
+    switch (viewType) {
+      case .thumb:
+        return kThumbAspectRatio;
+      case .square:
+        return 1;
+      default:
+        return kPosterAspectRatio;
     }
-
-    return kThumbAspectRatio;
   }
 
   String _imageType() {
-    if (isPoster || isSquare) {
-      return JellyfinImagesApi.typePrimary;
-    }
+    switch (viewType) {
+      case .poster || .square:
+        return JellyfinImagesApi.typePrimary;
 
-    return JellyfinImagesApi.typeThumb;
+      default:
+        return JellyfinImagesApi.typeThumb;
+    }
   }
 }
 
-const String vtPoster = 'poster';
-const String vtThumb = 'thumb';
-const String vtSquare = 'square';
+enum ViewType { poster, thumb, square }
