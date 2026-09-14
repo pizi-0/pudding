@@ -76,7 +76,9 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
           key: ValueKey(widget.id),
           itemCount: data.items.length,
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: prefs.itemWidth(widget.id).toDouble(),
+            maxCrossAxisExtent: prefs
+                .itemWidth(prefs.viewType(widget.id))
+                .toDouble(),
             childAspectRatio: prefs.aspectRatio(widget.id),
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,

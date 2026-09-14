@@ -88,16 +88,18 @@ class LibraryPrefs {
     return view.viewType;
   }
 
-  int itemWidth(String id) {
+  int itemWidth(ViewType type) {
     final size = itemSizePrefs;
-    final view = userviewPrefs[id] ?? UserViewPrefs();
 
-    if (view.isThumb) {
-      return size.thumbWidth;
-    } else if (view.isSquare) {
-      return size.squareWidth;
-    } else {
-      return size.posterWidth;
+    switch (type) {
+      case .thumb:
+        return size.thumbWidth;
+
+      case .square:
+        return size.squareWidth;
+
+      default:
+        return size.posterWidth;
     }
   }
 
