@@ -119,7 +119,9 @@ class _DetailScaffoldState<T> extends ConsumerState<DetailScaffold<T>> {
                       return false;
                     }
 
-                    widget.onscroll!(notification);
+                    if (widget.onscroll != null) {
+                      widget.onscroll!(notification);
+                    }
                     return false;
                   },
                   child: ScrollConfiguration(
@@ -128,6 +130,7 @@ class _DetailScaffoldState<T> extends ConsumerState<DetailScaffold<T>> {
                       platform: .windows,
                     ),
                     child: SilkyCustomScrollView(
+                      scrollSpeed: 1.5,
                       controller: scrollController,
                       slivers: [
                         if (widget.headerSliver != null) widget.headerSliver!,
