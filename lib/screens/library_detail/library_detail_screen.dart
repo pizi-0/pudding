@@ -3,14 +3,14 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:awesome_extensions/awesome_extensions.dart'
-    show WidgetCommonExtension, StringExtension;
+    show StringExtension, WidgetCommonExtension;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/const/const.dart';
+import 'package:pudding/models/settings/library/library_prefs.dart';
 import 'package:pudding/models/settings/library/pudding_settings.dart';
 import 'package:pudding/providers/settings_provider.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
@@ -89,7 +89,10 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
                 child: Text('${libAsync.value?.name}'),
               ),
             ),
-          LibraryPrefsButton(id: widget.id!),
+          LibraryPrefsButton(
+            id: widget.id!,
+            name: libAsync.value?.name,
+          ),
         ],
       ),
       sideChick: Column(
@@ -332,7 +335,8 @@ class _LibraryDetailState extends ConsumerState<LibraryDetail> {
 
 class LibraryPrefsButton extends ConsumerStatefulWidget {
   final String id;
-  const new({super.key, required this.id});
+  final String? name;
+  const new({super.key, required this.id, this.name});
 
   @override
   ConsumerState<LibraryPrefsButton> createState() => _LibraryPrefsButtonState();
@@ -370,9 +374,11 @@ class _LibraryPrefsButtonState extends ConsumerState<LibraryPrefsButton> {
   @override
   Widget build(BuildContext context) {
     final theme = context.theme;
-    final settings = ref.watch(settingsProvider).value ?? PuddingSettings();
-    final prefs = settings.libraryPrefs;
-    final settNotifier = ref.read(settingsProvider.notifier);
+    final prefs = ref.watch(
+      settingsProvider.select((s) => s.value!.libraryPrefs),
+    );
+
+    final settNotifier = ref.watch(settingsProvider.notifier);
 
     return FPopover(
       style: .delta(
@@ -385,91 +391,149 @@ class _LibraryPrefsButtonState extends ConsumerState<LibraryPrefsButton> {
           ),
         ),
       ),
-      childAnchor: .bottomLeft,
-      popoverAnchor: .topLeft,
       cutoutBuilder: FModalBarrier.defaultCutoutBuilder,
-      constraints: FPortalConstraints(maxWidth: 300),
+      constraints: FPortalConstraints(maxWidth: 400),
       popoverBuilder: (context, controller) => Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
           spacing: 10,
           children: [
-            FSlider(
-              control: .managedContinuous(
-                controller: sliderController,
-                onChange: (value) {
-                  final newWidth = lerpDouble(
-                    sliderMin,
-                    sliderMax,
-                    value.max,
-                  )!.round();
-
-                  settNotifier.setSettings(
-                    (current) => current.copyWith(
-                      libraryPrefs: current.libraryPrefs.updateItemSize(
-                        current.libraryPrefs.viewType(widget.id),
-                        newWidth,
+            FTileGroup(
+              label: Text(widget.name ?? 'View'),
+              children: [
+                FTile(
+                  title: Row(
+                    children: [
+                      Expanded(child: Text('View type')),
+                      SizedBox(
+                        width: 150,
+                        child: Row(
+                          spacing: 10,
+                          mainAxisAlignment: .spaceAround,
+                          children: ViewType.values
+                              .map(
+                                (t) => FButton.icon(
+                                  variant: prefs.viewType(widget.id) == t
+                                      ? .primary
+                                      : .outline,
+                                  onPress: () => settNotifier.setLibraryPrefs(
+                                    (current) =>
+                                        current.updateViewType(widget.id, t),
+                                  ),
+                                  child: _icon(t),
+                                ),
+                              )
+                              .toList(),
+                        ),
                       ),
-                    ),
-                  );
-
-                  widthTextController.text = newWidth.toString();
-                },
-              ),
-              tooltipControls: FSliderTooltipControls.disabled(),
-              label: Row(
-                mainAxisAlignment: .spaceBetween,
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            FTileGroup(
+              label: Column(
+                crossAxisAlignment: .start,
+                spacing: 10,
                 children: [
-                  Text('Item width'),
-                  SizedBox(
-                    width: 100,
-                    height: 33,
-                    child: FTextField(
-                      keyboardType: .number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      control: .managed(controller: widthTextController),
-                      onSubmit: (width) => _setSlider(
-                        width,
-                        prefs.itemWidth(prefs.viewType(widget.id)),
-                      ),
-                      textAlign: .center,
-                      style: .delta(constraints: .new(maxHeight: 33)),
+                  Text('Item size'),
+                  Text(
+                    'All libraries, include [Detail Screen]',
+                    style: theme.typography.body.xs.copyWith(
+                      color: theme.colors.mutedForeground,
                     ),
                   ),
                 ],
               ),
-            ),
-            FSelect<ViewType>.rich(
-              label: Text('View type'),
-              control: .managed(
-                initial: prefs.viewType(widget.id),
-                onChange: (type) async {
-                  if (type != null) {
-                    final sett = await settNotifier.setSettings(
-                      (current) => current.copyWith(
-                        libraryPrefs: current.libraryPrefs.updateViewType(
-                          widget.id,
-                          type,
-                        ),
-                      ),
-                    );
-                    _setSlider(
-                      sett.libraryPrefs.itemWidth(type).toString(),
-                      prefs.itemWidth(type),
-                    );
-                  }
-                },
-              ),
-              format: (value) => value.name.capitalize,
               children: ViewType.values
                   .map(
-                    (t) =>
-                        FSelectItem(title: Text(t.name.capitalize), value: t),
+                    (t) => FTile.raw(
+                      child: ItemSizeTile(type: t),
+                    ),
                   )
                   .toList(),
             ),
           ],
         ),
+        // child: Column(
+        //   spacing: 10,
+        //   children: [
+        //     FSlider(
+        //       control: .managedContinuous(
+        //         controller: sliderController,
+        //         onChange: (value) {
+        //           final newWidth = lerpDouble(
+        //             sliderMin,
+        //             sliderMax,
+        //             value.max,
+        //           )!.round();
+
+        //           settNotifier.setSettings(
+        //             (current) => current.copyWith(
+        //               libraryPrefs: current.libraryPrefs.updateItemSize(
+        //                 current.libraryPrefs.viewType(widget.id),
+        //                 newWidth,
+        //               ),
+        //             ),
+        //           );
+
+        //           widthTextController.text = newWidth.toString();
+        //         },
+        //       ),
+        //       tooltipControls: FSliderTooltipControls.disabled(),
+        //       label: Row(
+        //         mainAxisAlignment: .spaceBetween,
+        //         children: [
+        //           Text('Item width'),
+        //           SizedBox(
+        //             width: 100,
+        //             height: 33,
+        //             child: FTextField(
+        //               keyboardType: .number,
+        //               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        //               control: .managed(controller: widthTextController),
+        //               onSubmit: (width) => _setSlider(
+        //                 width,
+        //                 prefs.itemWidth(prefs.viewType(widget.id)),
+        //               ),
+        //               textAlign: .center,
+        //               style: .delta(constraints: .new(maxHeight: 33)),
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //     ),
+        //     FSelect<ViewType>.rich(
+        //       label: Text('View type'),
+        //       control: .managed(
+        //         initial: prefs.viewType(widget.id),
+        //         onChange: (type) async {
+        //           if (type != null) {
+        //             final sett = await settNotifier.setSettings(
+        //               (current) => current.copyWith(
+        //                 libraryPrefs: current.libraryPrefs.updateViewType(
+        //                   widget.id,
+        //                   type,
+        //                 ),
+        //               ),
+        //             );
+        //             _setSlider(
+        //               sett.libraryPrefs.itemWidth(type).toString(),
+        //               prefs.itemWidth(type),
+        //             );
+        //           }
+        //         },
+        //       ),
+        //       format: (value) => value.name.capitalize,
+        //       children: ViewType.values
+        //           .map(
+        //             (t) =>
+        //                 FSelectItem(title: Text(t.name.capitalize), value: t),
+        //           )
+        //           .toList(),
+        //     ),
+        //   ],
+        // ),
       ),
       builder: (context, controller, child) => FButton.icon(
         variant: .ghost,
@@ -479,16 +543,110 @@ class _LibraryPrefsButtonState extends ConsumerState<LibraryPrefsButton> {
     );
   }
 
-  void _setSlider(String width, int current) {
-    final extent = sliderController.value.pixelConstraints.max;
+  Icon _icon(ViewType type) {
+    switch (type) {
+      case .poster:
+        return Icon(FLucideIcons.rectangleVertical);
+      case .thumb:
+        return Icon(FLucideIcons.rectangleHorizontal);
+      case .square:
+        return Icon(FLucideIcons.square);
+    }
+  }
+}
 
-    int w = (int.tryParse(width) ?? current).clamp(
-      sliderMin,
-      sliderMax,
+class ItemSizeTile extends ConsumerStatefulWidget {
+  final ViewType type;
+  const new({super.key, required this.type});
+
+  @override
+  ConsumerState<ItemSizeTile> createState() => _ItemSizeTileState();
+}
+
+class _ItemSizeTileState extends ConsumerState<ItemSizeTile> {
+  final int sliderMin = 100;
+  final int sliderMax = 1000;
+
+  late TextEditingController textController;
+  late FContinuousSliderController sliderController;
+
+  @override
+  void initState() {
+    final prefs = ref.watch(
+      settingsProvider.select((s) => s.value!.libraryPrefs),
     );
 
-    final to = ((w - sliderMin) / (sliderMax - sliderMin)) * extent;
+    final width = prefs.itemWidth(widget.type);
 
-    sliderController.tap(to);
+    textController = TextEditingController(text: width.toString());
+    sliderController = FContinuousSliderController(
+      value: FSliderValue(max: (width - sliderMin) / (sliderMax - sliderMin)),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    textController.dispose();
+    sliderController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final prefs = ref.watch(
+      settingsProvider.select((s) => s.value!.libraryPrefs),
+    );
+
+    final settNotifier = ref.read(settingsProvider.notifier);
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(child: Text(widget.type.name.capitalize)),
+            SizedBox(
+              width: 150,
+              child: FTextField(
+                control: .managed(controller: textController),
+                onSubmit: (w) => _onSubmit(w, prefs, settNotifier),
+              ),
+            ),
+          ],
+        ),
+        FSlider(
+          tooltipControls: .disabled(),
+          control: .managedContinuous(
+            controller: sliderController,
+            onChange: (w) => _onSlide(w, settNotifier),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _onSubmit(String val, LibraryPrefs prefs, SettingsNotifier notifier) {
+    final width =
+        int.tryParse(val) ??
+        prefs.itemWidth(widget.type).clamp(sliderMin, sliderMax);
+    final sliderExtent = sliderController.value.pixelConstraints.extent;
+
+    notifier.setLibraryPrefs(
+      (current) => current.updateItemSize(widget.type, width),
+    );
+
+    sliderController.tap(
+      (width / sliderMax) * sliderExtent,
+    );
+  }
+
+  void _onSlide(FSliderValue val, SettingsNotifier notifier) {
+    final width = (val.max * sliderMax).clamp(sliderMin, sliderMax).round();
+
+    notifier.setLibraryPrefs(
+      (current) => current.updateItemSize(widget.type, width),
+    );
+
+    textController.value = TextEditingValue(text: width.toString());
   }
 }
