@@ -363,7 +363,7 @@ class _ItemSizeTileState extends ConsumerState<ItemSizeTile> {
 
     textController = TextEditingController(text: width.toString());
     sliderController = FContinuousSliderController(
-      value: FSliderValue(max: (width - sliderMin) / (sliderMax - sliderMin)),
+      value: FSliderValue(max: width / sliderMax),
     );
     super.initState();
   }
