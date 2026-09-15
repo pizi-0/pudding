@@ -76,7 +76,7 @@ class _CollectionDetailScreenState
                   child: Text('Movies'),
                 ),
                 slivers: [
-                  SliverItemGrid(items: c.movies),
+                  SliverItemGrid(items: c.movies, shouldReplace: false),
                 ],
               ),
             if (c.series.isNotEmpty)
@@ -87,7 +87,7 @@ class _CollectionDetailScreenState
                   child: Text('Series'),
                 ),
                 slivers: [
-                  SliverItemGrid(items: c.series),
+                  SliverItemGrid(items: c.series, shouldReplace: false),
                 ],
               ),
             if (c.seasons.isNotEmpty)
@@ -98,7 +98,7 @@ class _CollectionDetailScreenState
                   child: Text('Seasons'),
                 ),
                 slivers: [
-                  SliverItemGrid(items: c.seasons),
+                  SliverItemGrid(items: c.seasons, shouldReplace: false),
                 ],
               ),
             if (c.episodes.isNotEmpty)
@@ -109,7 +109,7 @@ class _CollectionDetailScreenState
                   child: Text('Episodes'),
                 ),
                 slivers: [
-                  SliverItemGrid(items: c.episodes),
+                  SliverItemGrid(items: c.episodes, shouldReplace: false),
                 ],
               ),
             if (c.videos.isNotEmpty)
@@ -120,7 +120,7 @@ class _CollectionDetailScreenState
                   child: Text('Videos'),
                 ),
                 slivers: [
-                  SliverItemGrid(items: c.videos),
+                  SliverItemGrid(items: c.videos, shouldReplace: false),
                 ],
               ),
           ];

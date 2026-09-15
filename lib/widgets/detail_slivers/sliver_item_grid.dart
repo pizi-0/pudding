@@ -15,12 +15,14 @@ class SliverItemGrid extends ConsumerWidget {
   final bool showBottom;
   final bool dimPlayed;
   final ViewType viewType;
+  final bool shouldReplace;
   const new({
     super.key,
     this.items = const [],
     this.showBottom = false,
     this.dimPlayed = false,
     this.viewType = .poster,
+    this.shouldReplace = true,
   });
 
   @override
@@ -46,9 +48,7 @@ class SliverItemGrid extends ConsumerWidget {
         return NewMediaCard(
           item: item,
           onPressed: () {
-            if (item.isMovie) {
-              context.pushReplacement('/movie/${item.id}');
-            }
+            item.push(context, shouldReplace: shouldReplace);
           },
           dimPlayed: dimPlayed ? (item.userData?.played ?? false) : false,
           bottom: AspectRatio(aspectRatio: 16 / 4)
@@ -56,5 +56,27 @@ class SliverItemGrid extends ConsumerWidget {
         );
       },
     );
+  }
+}
+
+extension JellyItemNavigator on JellyfinItem {
+  void push(BuildContext context, {bool shouldReplace = true}) {
+    if (shouldReplace) {
+      context.pushReplacement(_destination());
+    } else {
+      context.push(_destination());
+    }
+  }
+
+  String _destination() {
+    if (isMovie) {
+      return '/movie/$id';
+    } else if (isSeries) {
+      return '/show/$id';
+    } else if (isBoxsets) {
+      return '/collection/$id';
+    } else {
+      return '/home';
+    }
   }
 }
