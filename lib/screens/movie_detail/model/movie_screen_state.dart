@@ -81,11 +81,11 @@ class MovieScreenState {
     if (isMultipart) {
       final total =
           multipart.fold(0, (p, e) => p + (e.mediaSources.single.size ?? 0)) +
-          (movie?.mediaSources.single.size ?? 0);
+          (movie?.mediaSources.firstOrNull?.size ?? 0);
 
       return total.toLocalizedSize();
     } else {
-      return movie?.mediaSources.single.size?.toLocalizedSize();
+      return movie?.mediaSources.firstOrNull?.size?.toLocalizedSize();
     }
   }
 }
