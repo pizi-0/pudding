@@ -92,7 +92,8 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
               key: seasonKey,
               id: widget.id,
             ),
-            SliverCollections(items: tv.collections),
+            if (tv.collections.isNotEmpty)
+              SliverCollections(items: tv.collections),
             SliverPeople(
               key: peopleKey,
               media: tv.tvshow!,
