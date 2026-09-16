@@ -169,7 +169,7 @@ class _DetailScaffoldState<T> extends ConsumerState<DetailScaffold<T>> {
     final viewport = scrollController.position.viewportDimension;
     final threshold = viewport * 0.2;
 
-    scrollOffset.value = max(0, (offset - threshold) / viewport);
+    scrollOffset.value = max(0, ((offset - threshold) / viewport).clamp(0, 1));
   }
 }
 
