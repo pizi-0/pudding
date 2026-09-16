@@ -70,9 +70,12 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
 
     state = await AsyncValue.guard(() async {
       final current = state.value ?? TvshowScreenState();
-      final res = await getSimilar();
+      final (similars, collections) = await (
+        getSimilar(),
+        getCollection(),
+      ).wait;
 
-      return current.copyWith(similars: res);
+      return current.copyWith(similars: similars, collections: collections);
     });
 
     return state.value!;
@@ -220,6 +223,16 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
     );
 
     return res.items;
+  }
+
+  Future<List<JellyfinItem>> getCollection() async {
+    try {
+      final res = await client.library.collections(itemId: id);
+
+      return res.items;
+    } catch (e) {
+      throw Exception(['getSeason:', '$e']);
+    }
   }
 }
 

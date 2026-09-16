@@ -7,6 +7,7 @@ class TvshowScreenState {
   final List<JellyfinItem> seasons;
   final List<JellyfinItem> episodes;
   final List<JellyfinItem> similars;
+  final List<JellyfinItem> collections;
   final JellyfinItem? selectedSeason;
 
   TvshowScreenState({
@@ -15,6 +16,7 @@ class TvshowScreenState {
     this.seasons = const [],
     this.episodes = const [],
     this.similars = const [],
+    this.collections = const [],
     this.selectedSeason,
   });
 
@@ -24,6 +26,7 @@ class TvshowScreenState {
     List<JellyfinItem>? seasons,
     List<JellyfinItem>? episodes,
     List<JellyfinItem>? similars,
+    List<JellyfinItem>? collections,
     JellyfinItem? selectedSeason,
   }) {
     return TvshowScreenState(
@@ -32,6 +35,7 @@ class TvshowScreenState {
       seasons: seasons ?? this.seasons,
       episodes: episodes ?? this.episodes,
       similars: similars ?? this.similars,
+      collections: collections ?? this.collections,
       selectedSeason: selectedSeason ?? this.selectedSeason,
     );
   }

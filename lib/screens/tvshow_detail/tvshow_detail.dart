@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
 import 'package:pudding/widgets/detail_scaffold.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_collections.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_episode.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_people.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_showcase.dart';
@@ -91,6 +92,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
               key: seasonKey,
               id: widget.id,
             ),
+            SliverCollections(items: tv.collections),
             SliverPeople(
               key: peopleKey,
               media: tv.tvshow!,
