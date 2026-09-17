@@ -9,22 +9,26 @@ class MovieScreenState {
   final JellyfinItem? movie;
   final List<JellyfinItem> multipart;
   final List<JellyfinItem> similars;
+  final List<JellyfinItem> collections;
 
   const MovieScreenState({
     this.movie,
     this.multipart = const [],
     this.similars = const [],
+    this.collections = const [],
   });
 
   MovieScreenState copyWith({
     JellyfinItem? movie,
     List<JellyfinItem>? multipart,
     List<JellyfinItem>? similars,
+    List<JellyfinItem>? collections,
   }) {
     return MovieScreenState(
       movie: movie ?? this.movie,
       multipart: multipart ?? this.multipart,
       similars: similars ?? this.similars,
+      collections: collections ?? this.collections,
     );
   }
 
