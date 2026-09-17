@@ -225,6 +225,10 @@ extension JellyInfo on JellyfinItem {
     }
   }
 
+  String getStatus() {
+    return raw['Status'];
+  }
+
   bool get isSeries => type == JellyfinItemKind.series;
   bool get isMovie => type == JellyfinItemKind.movie;
   bool get isEpisode => type == JellyfinItemKind.episode;
@@ -240,6 +244,8 @@ extension JellyInfo on JellyfinItem {
       ((premiereDate?.millisecondsSinceEpoch ?? 0) >
           DateTime.now().millisecondsSinceEpoch) &&
       isPlaceholder;
+
+  bool get isContinuing => raw['Status'] == 'Continuing';
 
   bool get showRuntime =>
       (durationMs != null || durationMs != 0) && (isMovie || isEpisode);

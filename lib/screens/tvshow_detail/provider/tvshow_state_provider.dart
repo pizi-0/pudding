@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:pudding/screens/tvshow_detail/model/tvshow_screen_state.dart';
 import 'package:pudding/services/di.dart';
+import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
 //"AirTime" "CanDelete" "CanDownload" "ChannelInfo" "Chapters" "Trickplay" "ChildCount" "CumulativeRunTimeTicks" "CustomRating" "DateCreated" "DateLastMediaAdded" "DisplayPreferencesId" "Etag" "ExternalUrls" "Genres" "ItemCounts" "MediaSourceCount" "MediaSources" "OriginalTitle" "Overview" "ParentId" "Path" "People" "PlayAccess" "ProductionLocations" "ProviderIds" "PrimaryImageAspectRatio" "RecursiveItemCount" "Settings" "SeriesStudio" "SortName" "SpecialEpisodeNumbers" "Studios" "Taglines" "Tags" "RemoteTrailers" "MediaStreams" "SeasonUserData" "DateLastRefreshed" "DateLastSaved" "RefreshState" "ChannelImage" "EnableMediaSourceDisplay" "Width" "Height" "ExtraIds" "LocalTrailerCount" "IsHD" "SpecialFeatureCount"
 
@@ -56,7 +57,15 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
 
       final selectedSeason = seasons.firstWhere(
         (s) => s.id == current.nextup?.seasonId,
-        orElse: () => seasons.first,
+        orElse: () {
+          final tv = current.tvshow;
+
+          if (tv?.isContinuing ?? false) {
+            return seasons.lastWhere((s) => !s.isPlaceholder);
+          } else {
+            return seasons.first;
+          }
+        },
       );
 
       final episodes = await getEpisodesForSeason(seasonId: selectedSeason.id);
@@ -108,21 +117,23 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
         fields: ['Overview'],
       );
 
-      if (next.items.isEmpty) {
-        final first = await client.items.list(
-          parentId: id,
-          fields: ['Overview'],
-          includeItemTypes: [JellyfinItemKind.episode],
-        );
+      // if (next.items.isEmpty) {
+      //   final first = await client.items.list(
+      //     parentId: id,
+      //     fields: ['Overview'],
+      //     includeItemTypes: [JellyfinItemKind.episode],
+      //   );
 
-        if (first.items.isEmpty) {
-          if (first.items.isEmpty) {
-            return null;
-          }
-        }
+      //   if (first.items.isEmpty) {
+      //     if (first.items.isEmpty) {
+      //       return null;
+      //     }
+      //   }
 
-        return first.items.firstOrNull;
-      }
+      //   print('last: ${first.items.lastOrNull?.name}');
+
+      //   return first.items.firstOrNull;
+      // }
       return next.items.firstOrNull;
     } catch (e) {
       debugPrint(e.toString());
