@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:forui_phosphor/forui_phosphor.dart';
+import 'package:pudding/screens/tvshow_detail/model/tvshow_screen_state.dart';
 import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
+import 'package:pudding/utils/scroll_to_key_extension.dart';
 import 'package:pudding/widgets/detail_scaffold.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_collections.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_episode.dart';
@@ -21,12 +24,17 @@ class TvshowDetail extends ConsumerStatefulWidget {
 }
 
 class _TvshowDetailState extends ConsumerState<TvshowDetail> {
-  final GlobalKey seasonKey = GlobalKey(debugLabel: 'season-section');
+  final GlobalKey infoKey = GlobalKey(debugLabel: 'info-section');
+  final GlobalKey episodeKey = GlobalKey(debugLabel: 'episode-section');
   final GlobalKey peopleKey = GlobalKey(debugLabel: 'people-section');
   final GlobalKey similarKey = GlobalKey(debugLabel: 'similar-section');
+  final GlobalKey collectionKey = GlobalKey(debugLabel: 'collection-section');
+
+  List<(GlobalKey, String, IconData)> destinations = [];
 
   bool favoriteLoading = false;
   bool playedLoading = false;
+  bool destinationSet = false;
 
   @override
   void initState() {
@@ -41,6 +49,16 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final tvAsync = ref.watch(tvshowStateProvider((widget.id)));
+
+    ref.listen(tvshowStateProvider(widget.id), (p, n) {
+      n.whenOrNull(
+        data: (data) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _buildDestinations(data);
+          });
+        },
+      );
+    });
 
     return DetailScaffold(
       backdrop: DetailBackdrop(id: widget.id),
@@ -63,6 +81,17 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
             ),
         ],
       ),
+      sideChick: Column(
+        spacing: 10,
+        children: destinations
+            .map(
+              (d) => FButton.icon(
+                onPress: () => d.$1.scrollToKey(),
+                child: Icon(d.$3),
+              ),
+            )
+            .toList(),
+      ),
       sliverBuilder: (context, controller) => tvAsync.when(
         skipLoadingOnReload: true,
         loading: () => [
@@ -82,6 +111,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
         data: (tv) {
           return [
             SliverShowcase.tv(
+              key: infoKey,
               item: tv.tvshow!,
               nextup: tv.nextup,
               maxExtent: size.height - 76 - 96,
@@ -89,11 +119,14 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
               onTogglePlayed: _togglePlayed,
             ),
             SliverEpisodes(
-              key: seasonKey,
+              key: episodeKey,
               id: widget.id,
             ),
             if (tv.collections.isNotEmpty)
-              SliverCollections(items: tv.collections),
+              SliverCollections(
+                key: collectionKey,
+                items: tv.collections,
+              ),
             SliverPeople(
               key: peopleKey,
               media: tv.tvshow!,
@@ -107,6 +140,19 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
         },
       ),
     );
+  }
+
+  void _buildDestinations(TvshowScreenState state) {
+    destinations = [
+      (infoKey, 'Info', FPhosphorBoldIcons.info),
+      (episodeKey, 'Episode', FPhosphorBoldIcons.television),
+      if (state.collections.isNotEmpty)
+        (collectionKey, 'Collections', FPhosphorBoldIcons.package),
+      (peopleKey, 'Cast & Crew', FPhosphorBoldIcons.user),
+      (similarKey, 'More', FPhosphorBoldIcons.starFour),
+    ];
+
+    setState(() {});
   }
 
   Future<void> _toggleFavorite() async {
