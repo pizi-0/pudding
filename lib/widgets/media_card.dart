@@ -464,17 +464,23 @@ class InfoLayer extends StatelessWidget {
           crossAxisAlignment: .start,
           mainAxisSize: .min,
           children: [
-            if (missing) FBadge(variant: .destructive, child: Text('Missing')),
-            if (upcoming) FBadge(variant: .secondary, child: Text('Upcoming')),
-            Spacer(),
-            if (favorite)
-              Align(
-                alignment: .centerRight,
-                child: Icon(
-                  FPhosphorFillIcons.heart,
-                  color: Colors.pink,
-                ),
-              ),
+            Row(
+              children: [
+                if (missing)
+                  FBadge(variant: .destructive, child: Text('Missing')),
+                if (upcoming)
+                  FBadge(variant: .secondary, child: Text('Upcoming')),
+                Spacer(),
+                if (favorite)
+                  Align(
+                    alignment: .centerRight,
+                    child: Icon(
+                      FPhosphorFillIcons.heart,
+                      color: Colors.pink,
+                    ),
+                  ),
+              ],
+            ),
             Spacer(),
             if (item.isResumable)
               FDeterminateProgress(
@@ -546,7 +552,7 @@ class InfoLayer extends StatelessWidget {
       final date = item.premiereDate;
 
       if (date != null) {
-        return fmt.format(date);
+        return fmt.format(date.toLocal());
       }
     }
 
