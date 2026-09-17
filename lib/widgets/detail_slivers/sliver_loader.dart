@@ -7,10 +7,16 @@ class SliverLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverFillViewport(
-      delegate: SliverChildListDelegate.fixed([
-        Center(child: LogoShimmer(id: id)),
-      ]),
+    final size = MediaQuery.sizeOf(context);
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.only(right: 56.0),
+        child: SizedBox(
+          height: size.height - 76 - 76,
+          child: Center(child: LogoShimmer(id: id)),
+        ),
+      ),
     );
   }
 }

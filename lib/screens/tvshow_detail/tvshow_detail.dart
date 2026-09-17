@@ -8,11 +8,12 @@ import 'package:pudding/utils/scroll_to_key_extension.dart';
 import 'package:pudding/widgets/detail_scaffold.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_collections.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_episode.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_error.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_loader.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_people.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_showcase.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_similar.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_topbar.dart';
-import 'package:pudding/widgets/logo_shimmer.dart';
 
 class TvshowDetail extends ConsumerStatefulWidget {
   final String id;
@@ -94,20 +95,8 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
       ),
       sliverBuilder: (context, controller) => tvAsync.when(
         skipLoadingOnReload: true,
-        loading: () => [
-          SliverFillViewport(
-            delegate: SliverChildListDelegate.fixed([
-              Center(child: LogoShimmer(id: widget.id)),
-            ]),
-          ),
-        ],
-        error: (error, stackTrace) => [
-          SliverFillViewport(
-            delegate: SliverChildListDelegate.fixed([
-              Center(child: Text(error.toString())),
-            ]),
-          ),
-        ],
+        loading: () => [SliverLoader(id: widget.id)],
+        error: (error, stackTrace) => [SliverError(error: error.toString())],
         data: (tv) {
           return [
             SliverShowcase.tv(
