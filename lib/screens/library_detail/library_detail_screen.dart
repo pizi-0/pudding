@@ -363,7 +363,7 @@ class _ItemSizeTileState extends ConsumerState<ItemSizeTile> {
 
     textController = TextEditingController(text: width.toString());
     sliderController = FContinuousSliderController(
-      value: FSliderValue(max: width / sliderMax),
+      value: FSliderValue(max: (width - sliderMin) / (sliderMax - sliderMin)),
     );
     super.initState();
   }
@@ -419,12 +419,12 @@ class _ItemSizeTileState extends ConsumerState<ItemSizeTile> {
     );
 
     sliderController.tap(
-      (width / sliderMax) * sliderExtent,
+      ((width - sliderMin) / (sliderMax - sliderMin)) * sliderExtent,
     );
   }
 
   void _onSlide(FSliderValue val, SettingsNotifier notifier) {
-    final width = (val.max * sliderMax).clamp(sliderMin, sliderMax).round();
+    final width = sliderMin + (val.max * ((sliderMax - sliderMin))).round();
 
     notifier.setLibraryPrefs(
       (current) => current.updateItemSize(widget.type, width),
