@@ -144,6 +144,7 @@ extension JellyInfo on JellyfinItem {
         JellyfinImagesApi.typePrimary,
         JellyfinImagesApi.typeThumb,
         JellyfinImagesApi.typeBackdrop,
+        JellyfinImagesApi.typeLogo,
       ];
 
       for (final t in preferred) {
@@ -157,30 +158,30 @@ extension JellyInfo on JellyfinItem {
     return services<JellyfinClient>().images.url(itemId: id, type: type0);
   }
 
-  String getParentImage({
-    String type = JellyfinImagesApi.typePrimary,
-  }) {
-    String type0 = type;
-    if (!imageTags.containsKey(type)) {
-      final preferred = [
-        JellyfinImagesApi.typePrimary,
-        JellyfinImagesApi.typeThumb,
-        JellyfinImagesApi.typeBackdrop,
-      ];
+  // String getParentImage({
+  //   String type = JellyfinImagesApi.typePrimary,
+  // }) {
+  //   String type0 = type;
+  //   if (!imageTags.containsKey(type)) {
+  //     final preferred = [
+  //       JellyfinImagesApi.typePrimary,
+  //       JellyfinImagesApi.typeThumb,
+  //       JellyfinImagesApi.typeBackdrop,
+  //     ];
 
-      for (final t in preferred) {
-        if (imageTags.containsKey(t)) {
-          type0 = t;
-          break;
-        }
-      }
-    }
+  //     for (final t in preferred) {
+  //       if (imageTags.containsKey(t)) {
+  //         type0 = t;
+  //         break;
+  //       }
+  //     }
+  //   }
 
-    return services<JellyfinClient>().images.url(
-      itemId: seriesId ?? parentId ?? id,
-      type: type0,
-    );
-  }
+  //   return services<JellyfinClient>().images.url(
+  //     itemId: seriesId ?? parentId ?? id,
+  //     type: type0,
+  //   );
+  // }
 
   String? getOfficialRating() {
     return raw['OfficialRating'];

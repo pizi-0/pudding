@@ -373,10 +373,24 @@ class _NewMediaCardState extends State<NewMediaCard> {
                                   child: CachedNetworkImage(
                                     memCacheHeight: (height * 2).ceil(),
                                     fit: item.isPlaceholder ? .contain : .cover,
+                                    imageBuilder: (context, imageProvider) {
+                                      if (item.isPlaceholder) {
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image(
+                                            image: imageProvider,
+                                            fit: .contain,
+                                          ),
+                                        );
+                                      } else {
+                                        return Image(
+                                          image: imageProvider,
+                                          fit: .cover,
+                                        );
+                                      }
+                                    },
                                     imageUrl: item.isPlaceholder
-                                        ? item.getParentImage(
-                                            type: JellyfinImagesApi.typeLogo,
-                                          )
+                                        ? item.getLogo()
                                         : item.getImage(type: imageType),
                                     errorBuilder:
                                         (
