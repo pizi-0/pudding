@@ -294,7 +294,6 @@ class NewMediaCard extends StatefulWidget {
   final bool selected;
   final bool isNext;
   final Widget? bottom;
-  final bool useSeriesImg;
   final bool showSeriesName;
   const NewMediaCard({
     super.key,
@@ -304,7 +303,6 @@ class NewMediaCard extends StatefulWidget {
     this.onPressed,
     this.selected = false,
     this.isNext = false,
-    this.useSeriesImg = false,
     this.showSeriesName = false,
     this.bottom,
   });
@@ -395,10 +393,7 @@ class _NewMediaCardState extends State<NewMediaCard> {
                                     },
                                     imageUrl: item.isPlaceholder
                                         ? item.getLogo()
-                                        : item.getImage(
-                                            type: imageType,
-                                            useSeriesImg: widget.useSeriesImg,
-                                          ),
+                                        : item.getImage(type: imageType),
                                     errorBuilder:
                                         (
                                           context,

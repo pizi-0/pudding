@@ -100,9 +100,8 @@ class _HomeState extends ConsumerState<Home> {
                       final item = data.continueWatching[index];
 
                       return NewMediaCard(
-                        key: ValueKey(item.id),
-                        useSeriesImg: item.isEpisode,
                         showSeriesName: item.isEpisode,
+                        key: ValueKey(item.id),
                         imageType: JellyfinImagesApi.typeThumb,
                         item: item,
                         onPressed: () {
@@ -142,7 +141,6 @@ class _HomeState extends ConsumerState<Home> {
 
                       return NewMediaCard(
                         key: ValueKey(item.id),
-                        useSeriesImg: item.isEpisode,
                         showSeriesName: item.isEpisode,
                         imageType: JellyfinImagesApi.typeThumb,
                         item: item,
