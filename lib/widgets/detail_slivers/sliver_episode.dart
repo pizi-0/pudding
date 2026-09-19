@@ -18,6 +18,7 @@ class SliverEpisodes extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = context.theme;
     final tvAsync = ref.watch(tvshowStateProvider(id));
     final prefs = ref.watch(
       settingsProvider.select((s) => s.value!.libraryPrefs),
@@ -69,9 +70,32 @@ class SliverEpisodes extends ConsumerWidget {
                   bottom: AspectRatio(
                     aspectRatio: 16 / 4,
                     child:
-                        Container(
-                          padding: .all(8),
-                          child: Text(tv.getOverview() ?? 'No overview'),
+                        LayoutBuilder(
+                          builder: (context, size) {
+                            final ov = tv.getOverview() ?? 'No overview';
+                            final style = theme.typography.body.sm.copyWith(
+                              color: theme.colors.mutedForeground,
+                            );
+
+                            final textPainter = TextPainter(
+                              text: TextSpan(text: ov, style: style),
+                              textDirection: .ltr,
+                            );
+
+                            final lineheight = textPainter.preferredLineHeight;
+                            final maxlines =
+                                ((size.maxHeight - 16) / lineheight).floor();
+
+                            return Container(
+                              padding: .all(8),
+                              child: Text(
+                                tv.getOverview() ?? 'No overview',
+                                maxLines: maxlines > 0 ? maxlines : 1,
+                                overflow: .ellipsis,
+                                style: style,
+                              ),
+                            );
+                          },
                         ).showIf(
                           (tv.userData?.played ?? false) ||
                               ((tv.id == data.nextup?.id) || index == 0) &&
