@@ -101,7 +101,7 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
   }
 
   Future<List<JellyfinItem>> _getContinueWatching({int limit = 10}) async {
-    final res = await client.items.resume(limit: limit);
+    final res = await client.items.resume(limit: limit, mediaTypes: ['Video']);
 
     return res.items;
   }

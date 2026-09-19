@@ -1,11 +1,22 @@
+import 'dart:async';
+
+import 'package:awesome_extensions/awesome_extensions.dart' show TxtStyle;
+import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/screens/home/home_provider.dart';
-import 'package:pudding/screens/home/models/home_data_model.dart';
+import 'package:pudding/screens/home/providers/showcase_provider.dart';
 import 'package:pudding/screens/home/widgets/library_card.dart';
 import 'package:pudding/screens/home/widgets/showcase.dart';
+import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/widgets/detail_scaffold.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_error.dart';
+
+import 'package:pudding/widgets/detail_slivers/sliver_loader.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_section.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_topbar.dart';
 import 'package:pudding/widgets/media_card.dart';
 
 class Home extends ConsumerStatefulWidget {
@@ -16,169 +27,247 @@ class Home extends ConsumerStatefulWidget {
 }
 
 class _HomeState extends ConsumerState<Home> {
-  final ScrollController scrollController = ScrollController();
-  int alpha = 0;
-  final int targetAlpha = 240;
+  @override
+  Widget build(BuildContext context) {
+    final theme = FTheme.of(context);
+    final homeAsync = ref.watch(homeProvider);
+    final size = MediaQuery.sizeOf(context);
+
+    return DetailScaffold(
+      backdrop: ShowcaseItemBackdrop(),
+      headerSliver: SliverTopbar(nested: false),
+      sliverBuilder: (context, controller) {
+        return homeAsync.when(
+          skipLoadingOnReload: true,
+          loading: () => [SliverLoader(id: '')],
+          error: (error, stackTrace) => [SliverError(error: error.toString())],
+          data: (data) {
+            return [
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  width: size.width,
+                  height: size.height - 76 - 76,
+                  child: ShowcaseCarousel(data: data.showcaseItem),
+                ),
+              ),
+              SliverSection(
+                header: FButton(
+                  variant: .ghost,
+                  onPress: () {},
+                  child: Text(
+                    'Libraries',
+                    style: theme.typography.display.xl.copyWith(height: 1).bold,
+                  ),
+                ),
+                slivers: [
+                  SliverGrid.builder(
+                    itemCount: data.libraries.length,
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 350,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 16 / 10,
+                    ),
+                    itemBuilder: (context, index) {
+                      final view = data.libraries[index];
+                      return LibraryCard(
+                        view: view,
+                        onPress: () => context.push('/library/${view.id}'),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              SliverSection(
+                header: FButton(
+                  variant: .ghost,
+                  onPress: () {},
+                  child: Text(
+                    'Continue watching',
+                    style: theme.typography.display.xl.copyWith(height: 1).bold,
+                  ),
+                ),
+                slivers: [
+                  SliverGrid.builder(
+                    itemCount: data.continueWatching.length,
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 350,
+                      childAspectRatio: 16 / 10,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                    ),
+                    itemBuilder: (context, index) {
+                      final item = data.continueWatching[index];
+
+                      return NewMediaCard(
+                        key: ValueKey(item.id),
+                        useSeriesImg: item.isEpisode,
+                        showSeriesName: item.isEpisode,
+                        imageType: JellyfinImagesApi.typeThumb,
+                        item: item,
+                        onPressed: () {
+                          if (item.isEpisode) {
+                            context.push('/show/${item.seriesId}');
+                          }
+
+                          if (item.isMovie) {
+                            context.push('/movie/${item.id}');
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
+              SliverSection(
+                header: FButton(
+                  variant: .ghost,
+                  onPress: () {},
+                  child: Text(
+                    'Next up',
+                    style: theme.typography.display.xl.copyWith(height: 1).bold,
+                  ),
+                ),
+                slivers: [
+                  SliverGrid.builder(
+                    itemCount: data.nextup.length,
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 350,
+                      childAspectRatio: 16 / 10,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                    ),
+                    itemBuilder: (context, index) {
+                      final item = data.nextup[index];
+
+                      return NewMediaCard(
+                        key: ValueKey(item.id),
+                        useSeriesImg: item.isEpisode,
+                        showSeriesName: item.isEpisode,
+                        imageType: JellyfinImagesApi.typeThumb,
+                        item: item,
+                        onPressed: () {
+                          if (item.isEpisode) {
+                            context.push('/show/${item.seriesId}');
+                          }
+
+                          if (item.isMovie) {
+                            context.push('/movie/${item.id}');
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ];
+          },
+        );
+      },
+    );
+  }
+}
+
+class ShowcaseCarousel extends ConsumerStatefulWidget {
+  final List<JellyfinItem> data;
+
+  const ShowcaseCarousel({super.key, required this.data});
+
+  @override
+  ConsumerState<ShowcaseCarousel> createState() => _ShowcaseCarouselState();
+}
+
+class _ShowcaseCarouselState extends ConsumerState<ShowcaseCarousel> {
+  late final CarouselController _controller;
+  Timer? autoScrollTimer;
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _controller = CarouselController();
+    _controller.addListener(_handleScroll);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollController.addListener(_onScroll);
+      _startAutoScroll();
     });
   }
 
   @override
   void dispose() {
-    scrollController.dispose();
+    _controller.removeListener(_handleScroll);
+    _controller.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    final scrollPercentage =
-        scrollController.offset /
-        (scrollController.position.maxScrollExtent - 300);
-
-    if (alpha < targetAlpha) {
-      alpha = (scrollPercentage * targetAlpha).toInt().clamp(0, targetAlpha);
-    } else {
-      alpha = (scrollPercentage * targetAlpha).toInt().clamp(0, targetAlpha);
-    }
-
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = FTheme.of(context);
-    final data = ref.watch(homeProvider).value ?? HomeData();
-    final size = MediaQuery.sizeOf(context);
-    final double horizontalPad = size.width < theme.breakpoints.md ? 10 : 30;
+    final theme = context.theme;
 
-    return TapRegion(
-      onTapInside: (event) => FocusScope.of(context).unfocus(),
-      child: Stack(
-        fit: .expand,
-        children: [
-          if (data.showcaseItem.isNotEmpty)
-            ShaderMask(
-              shaderCallback: (rect) => LinearGradient(
-                colors: [
-                  Colors.black.withAlpha(alpha),
-                  Colors.black.withAlpha(targetAlpha),
-                ],
-                stops: [0.3, 1],
-                begin: .topCenter,
-                end: .bottomCenter,
-              ).createShader(rect),
-              blendMode: .dstOut,
-              child: const ShowcaseItemBackdrop(),
-            ),
-          CustomScrollView(
-            controller: scrollController,
-            slivers: [
-              SliverMainAxisGroup(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Showcase(),
-                  ),
-                  SliverPadding(padding: .all(20)),
-                  SliverPadding(
-                    padding: .symmetric(horizontal: horizontalPad),
-                    sliver: SliverMainAxisGroup(
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: Text(
-                            'Libraries',
-                            style: theme.typography.display.xl2.copyWith(
-                              fontWeight: .bold,
-                              height: 1.5,
-                            ),
-                          ),
-                        ),
-                        SliverPadding(padding: .all(10)),
-                        SliverGrid.builder(
-                          itemCount: data.libraries.length,
-                          gridDelegate:
-                              SliverGridDelegateWithMaxCrossAxisExtent(
-                                maxCrossAxisExtent: 310,
-                                childAspectRatio: 16 / 9,
-                                mainAxisSpacing: 10,
-                                crossAxisSpacing: 10,
-                              ),
-                          itemBuilder: (context, index) => LibraryCard(
-                            view: data.libraries[index],
-                            onPress: () {
-                              final loc = Uri(
-                                path: '/library/${data.libraries[index].id}',
-                                queryParameters: {
-                                  'type': data.libraries[index].collectionType,
-                                },
-                              );
-                              context.push(loc.toString());
-                            },
-                          ),
-                        ),
-                        SliverPadding(padding: .all(20)),
-
-                        SliverToBoxAdapter(
-                          child: Text(
-                            'Continue watching',
-                            style: theme.typography.display.xl2.copyWith(
-                              fontWeight: .bold,
-                              height: 1.5,
-                            ),
-                          ),
-                        ),
-                        SliverPadding(padding: .all(10)),
-                        SliverGrid.builder(
-                          itemCount: data.continueWatching.length,
-                          gridDelegate:
-                              SliverGridDelegateWithMaxCrossAxisExtent(
-                                maxCrossAxisExtent: 310,
-                                childAspectRatio: 3 / 2,
-                                mainAxisSpacing: 10,
-                                crossAxisSpacing: 10,
-                              ),
-                          itemBuilder: (context, index) => MediaCard(
-                            item: data.continueWatching[index],
-                          ),
-                        ),
-                        SliverPadding(padding: .all(20)),
-
-                        SliverToBoxAdapter(
-                          child: Text(
-                            'Next up',
-                            style: theme.typography.display.xl2.copyWith(
-                              fontWeight: .bold,
-                              height: 1.5,
-                            ),
-                          ),
-                        ),
-                        SliverPadding(padding: .all(10)),
-                        SliverGrid.builder(
-                          itemCount: data.nextup.length,
-                          gridDelegate:
-                              SliverGridDelegateWithMaxCrossAxisExtent(
-                                maxCrossAxisExtent: 310,
-                                childAspectRatio: 3 / 2,
-                                mainAxisSpacing: 10,
-                                crossAxisSpacing: 10,
-                              ),
-                          itemBuilder: (context, index) => MediaCard(
-                            item: data.nextup[index],
-                          ),
-                        ),
-                        SliverPadding(padding: .all(10)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+    return GestureDetector(
+      onPanDown: (_) => autoScrollTimer?.cancel(),
+      onPanCancel: () => _startAutoScroll(),
+      onPanEnd: (_) => _startAutoScroll(),
+      child: CarouselView.weighted(
+        padding: .zero,
+        controller: _controller,
+        infinite: true,
+        itemSnapping: true,
+        elevation: 0,
+        enableSplash: false,
+        backgroundColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: theme.style.borderRadius.md,
+        ),
+        flexWeights: [1],
+        children: widget.data.map((item) {
+          return Column();
+        }).toList(),
       ),
     );
+  }
+
+  void _handleScroll() {
+    if (!_controller.position.hasPixels) return;
+
+    final double itemWidth = _controller.position.viewportDimension;
+    if (itemWidth <= 0) return;
+
+    final int rawIndex = (_controller.position.pixels / itemWidth).round();
+
+    final int totalItems = widget.data.length;
+    if (totalItems == 0) return;
+
+    final int normalizedIndex = rawIndex % totalItems;
+
+    if (normalizedIndex != _currentIndex) {
+      _currentIndex = normalizedIndex;
+
+      ref
+          .read(showcaseProvider.notifier)
+          .setItem(
+            widget.data[_currentIndex],
+          );
+    }
+  }
+
+  void _startAutoScroll() {
+    autoScrollTimer?.cancel();
+
+    autoScrollTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      if (!_controller.position.hasPixels) return;
+
+      final double itemWidth = _controller.position.viewportDimension;
+      if (itemWidth <= 0) return;
+
+      final int nextTargetIndex =
+          (_controller.position.pixels / itemWidth).round() + 1;
+
+      _controller.animateTo(
+        nextTargetIndex * itemWidth,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    });
   }
 }

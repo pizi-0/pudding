@@ -1,14 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:go_transitions/go_transitions.dart';
-import 'package:pudding/navigation_shell.dart';
 import 'package:pudding/screens/auth/auth_provider.dart';
 import 'package:pudding/screens/auth/auth_screen.dart';
 import 'package:pudding/screens/collection_detail/collection_detail_screen.dart';
 import 'package:pudding/screens/movie_detail/movies_detail_screen.dart';
 import 'package:pudding/screens/home/home.dart';
 import 'package:pudding/screens/library_detail/library_detail_screen.dart';
-import 'package:pudding/screens/settings/settings.dart';
 import 'package:pudding/screens/splash/splash.dart';
 import 'package:pudding/screens/tvshow_detail/tvshow_detail.dart';
 
@@ -38,11 +36,19 @@ final routeProvider = Provider<GoRouter>(
         name: 'Splash',
         path: '/splash',
         builder: (context, state) => Splash(),
+        pageBuilder: GoTransitions.fade.call,
       ),
       GoRoute(
         name: 'Login',
         path: '/login',
         builder: (context, state) => AuthScreen(),
+        pageBuilder: GoTransitions.fade.call,
+      ),
+      GoRoute(
+        name: 'Home',
+        path: '/',
+        builder: (context, state) => Home(),
+        pageBuilder: GoTransitions.fade.call,
       ),
       GoRoute(
         path: '/library/:id',
@@ -77,64 +83,63 @@ final routeProvider = Provider<GoRouter>(
         ),
         pageBuilder: GoTransitions.fade.call,
       ),
-      StatefulShellRoute(
-        builder: (context, state, navigationShell) => navigationShell,
-        navigatorContainerBuilder: (context, navigationShell, children) =>
-            MainNavigationShell(
-              navigationShell: navigationShell,
-              children: children,
-            ),
-        branches: [
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                name: 'Home',
-                path: '/',
-                builder: (context, state) => Home(),
-                routes: [],
-              ),
-            ],
-          ),
-          // StatefulShellBranch(
-          //   routes: [
-          //     GoRoute(
-          //       name: 'Library',
-          //       path: '/library',
-          //       builder: (context, state) => Library(),
-          //       routes: [
-          //         GoRoute(
-          //           path: ':id',
-          //           builder: (context, state) {
-          //             final id = state.pathParameters['id'];
+      // StatefulShellRoute(
+      //   builder: (context, state, navigationShell) => navigationShell,
+      //   navigatorContainerBuilder: (context, navigationShell, children) =>
+      //       MainNavigationShell(
+      //         navigationShell: navigationShell,
+      //         children: children,
+      //       ),
+      //   branches: [
+      //     StatefulShellBranch(
+      //       routes: [
+      //         GoRoute(
+      //           name: 'Home',
+      //           path: '/',
+      //           builder: (context, state) => Home(),
+      //         ),
+      //       ],
+      //     ),
+      //     // StatefulShellBranch(
+      //     //   routes: [
+      //     //     GoRoute(
+      //     //       name: 'Library',
+      //     //       path: '/library',
+      //     //       builder: (context, state) => Library(),
+      //     //       routes: [
+      //     //         GoRoute(
+      //     //           path: ':id',
+      //     //           builder: (context, state) {
+      //     //             final id = state.pathParameters['id'];
 
-          //             return LibraryDetail(id: id);
-          //           },
-          //           pageBuilder: GoTransitions.fade.call,
-          //         ),
-          //       ],
-          //     ),
-          //   ],
-          // ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                name: 'Settings',
-                path: '/settings',
-                builder: (context, state) => Settings(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                name: 'User',
-                path: '/user',
-                builder: (context, state) => Settings(),
-              ),
-            ],
-          ),
-        ],
-      ),
+      //     //             return LibraryDetail(id: id);
+      //     //           },
+      //     //           pageBuilder: GoTransitions.fade.call,
+      //     //         ),
+      //     //       ],
+      //     //     ),
+      //     //   ],
+      //     // ),
+      //     StatefulShellBranch(
+      //       routes: [
+      //         GoRoute(
+      //           name: 'Settings',
+      //           path: '/settings',
+      //           builder: (context, state) => Settings(),
+      //         ),
+      //       ],
+      //     ),
+      //     StatefulShellBranch(
+      //       routes: [
+      //         GoRoute(
+      //           name: 'User',
+      //           path: '/user',
+      //           builder: (context, state) => Settings(),
+      //         ),
+      //       ],
+      //     ),
+      //   ],
+      // ),
     ],
   ),
 );
