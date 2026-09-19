@@ -217,12 +217,13 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
         await client.userData.markPlayed(id);
       }
 
-      final (tv, eps) = await (
+      final (tv, seasons, eps) = await (
         getTvshow(),
+        getSeasons(),
         getEpisodesForSeason(seasonId: state.value!.selectedSeason!.id),
       ).wait;
 
-      return current.copyWith(tvshow: tv, episodes: eps);
+      return current.copyWith(tvshow: tv, episodes: eps, seasons: seasons);
     });
   }
 
