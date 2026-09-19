@@ -29,6 +29,14 @@ class _SliverPeopleState extends State<SliverPeople> {
   late List<JellyPeople> selectedList = widget.media.getPeoples();
 
   @override
+  void didUpdateWidget(covariant SliverPeople oldWidget) {
+    if (oldWidget.altMedia?.id != widget.altMedia?.id) {
+      selectedList = widget.media.getPeoples();
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isAltList = listEquals(selectedList, widget.altMedia?.getPeoples());
 
