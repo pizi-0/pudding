@@ -294,6 +294,8 @@ class NewMediaCard extends StatefulWidget {
   final bool selected;
   final bool isNext;
   final Widget? bottom;
+  final bool useSeriesImg;
+  final bool showSeriesName;
   const NewMediaCard({
     super.key,
     required this.item,
@@ -302,6 +304,8 @@ class NewMediaCard extends StatefulWidget {
     this.onPressed,
     this.selected = false,
     this.isNext = false,
+    this.useSeriesImg = false,
+    this.showSeriesName = false,
     this.bottom,
   });
 
@@ -391,7 +395,10 @@ class _NewMediaCardState extends State<NewMediaCard> {
                                     },
                                     imageUrl: item.isPlaceholder
                                         ? item.getLogo()
-                                        : item.getImage(type: imageType),
+                                        : item.getImage(
+                                            type: imageType,
+                                            useSeriesImg: widget.useSeriesImg,
+                                          ),
                                     errorBuilder:
                                         (
                                           context,
@@ -415,6 +422,7 @@ class _NewMediaCardState extends State<NewMediaCard> {
                                 item: item,
                                 hover: hover,
                                 isNext: widget.isNext,
+                                showSeriesName: widget.showSeriesName,
                               ),
                             ),
                           ],
@@ -441,11 +449,13 @@ class InfoLayer extends StatelessWidget {
   final JellyfinItem item;
   final bool isNext;
   final bool hover;
+  final bool showSeriesName;
   const InfoLayer({
     super.key,
     required this.item,
     this.hover = false,
     this.isNext = false,
+    this.showSeriesName = false,
   });
 
   @override
@@ -528,7 +538,9 @@ class InfoLayer extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: .spaceBetween,
                 children: [
-                  if (_getYear(context) != null) Text(_getYear(context)!),
+                  if (_getYear(context) != null && !showSeriesName)
+                    Text(_getYear(context)!),
+                  if (showSeriesName) Text(item.seriesName ?? ''),
                   if (item.getCommunityRating() != null)
                     StarRatingContainer(
                       rating: item.getCommunityRating()!.toStringAsFixed(

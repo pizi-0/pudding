@@ -137,6 +137,7 @@ extension JellyInfo on JellyfinItem {
 
   String getImage({
     String type = JellyfinImagesApi.typePrimary,
+    bool useSeriesImg = false,
   }) {
     String type0 = type;
     if (!imageTags.containsKey(type)) {
@@ -155,7 +156,10 @@ extension JellyInfo on JellyfinItem {
       }
     }
 
-    return services<JellyfinClient>().images.url(itemId: id, type: type0);
+    return services<JellyfinClient>().images.url(
+      itemId: useSeriesImg ? (seriesId ?? id) : id,
+      type: useSeriesImg ? type : type0,
+    );
   }
 
   // String getParentImage({
