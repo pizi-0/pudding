@@ -64,7 +64,7 @@ class SliverEpisodes extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final tv = data.episodes[index];
 
-                return NewMediaCard(
+                return MediaCard(
                   item: tv,
                   dimPlayed: tv.userData?.played ?? false,
                   bottom: AspectRatio(

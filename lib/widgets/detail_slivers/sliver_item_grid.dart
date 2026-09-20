@@ -45,7 +45,7 @@ class SliverItemGrid extends ConsumerWidget {
       ),
       itemBuilder: (context, index) {
         final item = items[index];
-        return NewMediaCard(
+        return MediaCard(
           item: item,
           onPressed: () {
             item.push(context, shouldReplace: shouldReplace);

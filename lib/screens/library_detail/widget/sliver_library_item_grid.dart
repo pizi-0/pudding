@@ -86,7 +86,7 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
           itemBuilder: (context, index) {
             final item = data.items[index];
 
-            return NewMediaCard(
+            return MediaCard(
               key: ValueKey(item.id),
               item: item,
               imageType: prefs.imageType(widget.id),

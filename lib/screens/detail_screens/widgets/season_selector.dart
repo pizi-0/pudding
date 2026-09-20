@@ -148,7 +148,7 @@ class _SeasonSelectorState extends ConsumerState<SeasonSelector> {
 
                 return Stack(
                   children: [
-                    NewMediaCard(
+                    MediaCard(
                       item: season,
                       selected: season.id == data.selectedSeason!.id,
                       isNext: data.nextup?.seasonId == season.id,
