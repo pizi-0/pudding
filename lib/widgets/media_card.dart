@@ -136,6 +136,29 @@ class _MediaCardState extends State<MediaCard>
                                 ),
                               ),
                             ),
+
+                            Positioned.fill(
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: AnimatedContainer(
+                                  duration: kDefaultAnimationDuration,
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    color: Colors
+                                        .transparent, // Solid overlay shadow
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: theme.colors.background
+                                            .withAlpha(245),
+                                        blurRadius: height / (hover ? 3 : 4),
+                                        spreadRadius: height / (hover ? 3 : 4), // This blur mimics the soft edge of a gradient!
+                                        offset: const Offset(0, 52),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
                             Positioned.fill(
                               bottom: -1,
                               top: -1,
@@ -192,92 +215,83 @@ class InfoLayer extends StatelessWidget {
     final missing = item.isMissing;
     final upcoming = item.isUpcoming;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.transparent, theme.colors.background],
-          begin: .center,
-          end: .bottomCenter,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(9),
-        child: Column(
-          spacing: 4,
-          crossAxisAlignment: .start,
-          mainAxisSize: .min,
-          children: [
-            Row(
+    return Padding(
+      padding: const EdgeInsets.all(9),
+      child: Column(
+        spacing: 4,
+        crossAxisAlignment: .start,
+        mainAxisSize: .min,
+        children: [
+          Row(
+            children: [
+              if (missing)
+                FBadge(variant: .destructive, child: Text('Missing')),
+              if (upcoming)
+                FBadge(variant: .secondary, child: Text('Upcoming')),
+              Spacer(),
+              if (favorite)
+                Align(
+                  alignment: .centerRight,
+                  child: Icon(
+                    FPhosphorFillIcons.heart,
+                    color: Colors.pink,
+                  ),
+                ),
+            ],
+          ),
+          Spacer(),
+          if (item.isResumable)
+            FDeterminateProgress(
+              value: item.getPlayProgress(),
+            ).fadeOut(
+              animate: hover,
+              duration: kDefaultAnimationDuration,
+            ),
+          Row(
+            spacing: 4,
+            crossAxisAlignment: .end,
+            children: [
+              Expanded(
+                child: AnimatedSize(
+                  duration: kDefaultAnimationDuration,
+                  alignment: .topCenter,
+                  child: Column(
+                    crossAxisAlignment: .start,
+                    children: [
+                      Text(
+                        item.getTitle(),
+                        maxLines: hover ? 5 : 1,
+                        overflow: .ellipsis,
+                      ).bold(),
+                    ],
+                  ),
+                ),
+              ),
+              if (!placeholder) _playStatusIndicator(theme),
+            ],
+          ),
+          DefaultTextStyle(
+            style: theme.typography.body.xs.copyWith(
+              color: theme.colors.foreground.withAlpha(
+                200,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: .spaceBetween,
               children: [
-                if (missing)
-                  FBadge(variant: .destructive, child: Text('Missing')),
-                if (upcoming)
-                  FBadge(variant: .secondary, child: Text('Upcoming')),
-                Spacer(),
-                if (favorite)
-                  Align(
-                    alignment: .centerRight,
-                    child: Icon(
-                      FPhosphorFillIcons.heart,
-                      color: Colors.pink,
+                if (_getYear(context) != null && !showSeriesName)
+                  Text(_getYear(context)!),
+                if (showSeriesName) Text(item.seriesName ?? ''),
+                if (item.getCommunityRating() != null)
+                  StarRatingContainer(
+                    rating: item.getCommunityRating()!.toStringAsFixed(
+                      2,
                     ),
                   ),
               ],
             ),
-            Spacer(),
-            if (item.isResumable)
-              FDeterminateProgress(
-                value: item.getPlayProgress(),
-              ).fadeOut(
-                animate: hover,
-                duration: kDefaultAnimationDuration,
-              ),
-            Row(
-              spacing: 4,
-              crossAxisAlignment: .end,
-              children: [
-                Expanded(
-                  child: AnimatedSize(
-                    duration: kDefaultAnimationDuration,
-                    alignment: .topCenter,
-                    child: Column(
-                      crossAxisAlignment: .start,
-                      children: [
-                        Text(
-                          item.getTitle(),
-                          maxLines: hover ? 8 : 1,
-                          overflow: hover ? null : .ellipsis,
-                        ).bold(),
-                      ],
-                    ),
-                  ),
-                ),
-                if (!placeholder) _playStatusIndicator(theme),
-              ],
-            ),
-            DefaultTextStyle(
-              style: theme.typography.body.xs.copyWith(
-                color: theme.colors.foreground.withAlpha(
-                  200,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: .spaceBetween,
-                children: [
-                  if (_getYear(context) != null && !showSeriesName)
-                    Text(_getYear(context)!),
-                  if (showSeriesName) Text(item.seriesName ?? ''),
-                  if (item.getCommunityRating() != null)
-                    StarRatingContainer(
-                      rating: item.getCommunityRating()!.toStringAsFixed(
-                        2,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
