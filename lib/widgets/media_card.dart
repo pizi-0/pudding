@@ -35,13 +35,10 @@ class MediaCard extends StatefulWidget {
   State<MediaCard> createState() => _MediaCardState();
 }
 
-class _MediaCardState extends State<MediaCard>
-    with AutomaticKeepAliveClientMixin {
+class _MediaCardState extends State<MediaCard> {
   bool hover = false;
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     final item = widget.item;
     final imageType = widget.imageType;
     final theme = FTheme.of(context);
@@ -189,9 +186,6 @@ class _MediaCardState extends State<MediaCard>
       ),
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
 
 class InfoLayer extends StatelessWidget {
