@@ -3,38 +3,30 @@ import 'dart:async';
 
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pudding/providers/jelly_cache_provider.dart';
 import 'package:pudding/screens/home/models/home_data_model.dart';
 import 'package:pudding/screens/home/providers/showcase_provider.dart';
 import 'package:pudding/screens/library_detail/user_views_provider.dart';
 
 import 'package:pudding/services/di.dart';
-import 'package:pudding/utils/list_extensions.dart';
+
+//"AirTime" "CanDelete" "CanDownload" "ChannelInfo" "Chapters" "Trickplay" "ChildCount" "CumulativeRunTimeTicks" "CustomRating" "DateCreated" "DateLastMediaAdded" "DisplayPreferencesId" "Etag" "ExternalUrls" "Genres" "ItemCounts" "MediaSourceCount" "MediaSources" "OriginalTitle" "Overview" "ParentId" "Path" "People" "PlayAccess" "ProductionLocations" "ProviderIds" "PrimaryImageAspectRatio" "RecursiveItemCount" "Settings" "SeriesStudio" "SortName" "SpecialEpisodeNumbers" "Studios" "Taglines" "Tags" "RemoteTrailers" "MediaStreams" "SeasonUserData" "DateLastRefreshed" "DateLastSaved" "RefreshState" "ChannelImage" "EnableMediaSourceDisplay" "Width" "Height" "ExtraIds" "LocalTrailerCount" "IsHD" "SpecialFeatureCount"
 
 class HomeNotifier extends AsyncNotifier<HomeData> {
   final client = services<JellyfinClient>();
   @override
   FutureOr<HomeData> build() async {
-    return await getData();
+    return getData();
   }
 
   Future<HomeData> getData() async {
-    final (nextup, latest, libraries, continueWatching, suggestions) = await (
+    final (nextup, libraries, continueWatching, showcase) = await (
       _getNextUp(limit: 10),
-      _getLatest(),
       ref.read(userviewsProvider.notifier).getUserviews(),
       _getContinueWatching(),
-      _getSuggestions(),
+      _getShowcaseItems(),
     ).wait;
 
-    final showcase = [
-      ...nextup.sublist(0, 5),
-      ...latest,
-      ...suggestions,
-    ].uniqueBy((e) => e.id).toList();
-
     ref.read(showcaseProvider.notifier).setItem(showcase.first);
-    ref.read(jellyCacheProvider.notifier).addAll(showcase);
 
     return HomeData(
       showcaseItem: showcase,
@@ -72,32 +64,48 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
     return items;
   }
 
-  Future<List<JellyfinItem>> _getLatest({int limit = 5}) async {
-    final res = await client.items.latest(limit: limit);
+  // Future<List<JellyfinItem>> _getLatest({int limit = 5}) async {
+  //   final res = await client.items.latest(limit: limit);
 
-    final items = List<JellyfinItem>.from(res);
+  //   final items = List<JellyfinItem>.from(res);
 
-    for (int i = 0; i < items.length; i++) {
-      if (items[i].overview == null) {
-        final newItem = await client.items.byId(items[i].id);
+  //   for (int i = 0; i < items.length; i++) {
+  //     if (items[i].overview == null) {
+  //       final newItem = await client.items.byId(items[i].id);
 
-        if (newItem == null) continue;
-        if (newItem.overview == null) continue;
+  //       if (newItem == null) continue;
+  //       if (newItem.overview == null) continue;
 
-        items.removeAt(i);
-        items.insert(i, newItem);
-      }
-    }
-    return items;
-  }
+  //       items.removeAt(i);
+  //       items.insert(i, newItem);
+  //     }
+  //   }
+  //   return items;
+  // }
 
-  Future<List<JellyfinItem>> _getSuggestions({int limit = 10}) async {
-    final res = await client.suggestions.list(
+  Future<List<JellyfinItem>> _getShowcaseItems({int limit = 20}) async {
+    final res = await client.items.list(
       limit: limit,
-      type: [JellyfinItemKind.movie, JellyfinItemKind.series],
+      sortBy: ['Random'],
+      fields: ['Overview', 'Genres', 'ChildCount'],
+      includeItemTypes: [JellyfinItemKind.movie, JellyfinItemKind.series],
     );
 
     return res.items;
+  }
+
+  Future<void> refreshShowcase() async {
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final current = state.value ?? HomeData();
+
+      final res = await _getShowcaseItems();
+
+      return current.copyWith(showcaseItem: res);
+    });
+    ref
+        .read(showcaseProvider.notifier)
+        .setItem(state.value!.showcaseItem.first);
   }
 
   Future<List<JellyfinItem>> _getContinueWatching({int limit = 10}) async {
