@@ -101,6 +101,9 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
                     children: [
                       Expanded(
                         child: CachedNetworkImage(
+                          cacheKey: item.getImageTag(
+                            type: JellyfinImagesApi.typeLogo,
+                          ),
                           imageUrl: item.getLogo(),
                           alignment: .bottomLeft,
                           width: 400,

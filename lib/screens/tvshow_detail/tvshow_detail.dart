@@ -64,7 +64,9 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
     return DetailScaffold(
       backdrop: DetailBackdrop(id: widget.id),
       headerSliver: SliverTopbar(
-        suffix: PDetailRefreshButton(),
+        suffix: PDetailRefreshButton(
+          onPress: () => ref.invalidate(tvshowStateProvider(widget.id)),
+        ),
         children: [
           if (tvAsync.hasValue && tvAsync.value?.tvshow != null)
             FButton(

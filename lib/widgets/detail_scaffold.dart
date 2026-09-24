@@ -200,7 +200,8 @@ class PDetailRefreshButton extends StatelessWidget {
 
 class DetailBackdrop extends StatelessWidget {
   final String id;
-  const new({super.key, required this.id});
+  final String? cacheKey;
+  const new({super.key, required this.id, this.cacheKey});
 
   @override
   Widget build(BuildContext context) {
@@ -209,6 +210,7 @@ class DetailBackdrop extends StatelessWidget {
     final theme = context.theme;
 
     return CachedNetworkImage(
+      cacheKey: cacheKey,
       imageUrl: client.images.url(
         itemId: id,
         type: JellyfinImagesApi.typeBackdrop,

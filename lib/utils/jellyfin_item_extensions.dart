@@ -162,6 +162,29 @@ extension JellyInfo on JellyfinItem {
     );
   }
 
+  String? getImageTag({
+    String type = JellyfinImagesApi.typePrimary,
+  }) {
+    String type0 = type;
+    if (!imageTags.containsKey(type)) {
+      final preferred = [
+        JellyfinImagesApi.typePrimary,
+        JellyfinImagesApi.typeThumb,
+        JellyfinImagesApi.typeBackdrop,
+        JellyfinImagesApi.typeLogo,
+      ];
+
+      for (final t in preferred) {
+        if (imageTags.containsKey(t)) {
+          type0 = t;
+          break;
+        }
+      }
+    }
+
+    return imageTags[type0];
+  }
+
   // String getParentImage({
   //   String type = JellyfinImagesApi.typePrimary,
   // }) {
