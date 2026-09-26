@@ -4,7 +4,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pudding/models/settings/library/library_prefs.dart';
-import 'package:pudding/models/settings/library/pudding_settings.dart';
+import 'package:pudding/models/settings/pudding_settings.dart';
 import 'package:pudding/services/di.dart';
 
 class SettingsNotifier extends AsyncNotifier<PuddingSettings> {

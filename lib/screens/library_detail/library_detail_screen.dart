@@ -11,7 +11,7 @@ import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/models/settings/library/library_prefs.dart';
-import 'package:pudding/models/settings/library/pudding_settings.dart';
+import 'package:pudding/models/settings/pudding_settings.dart';
 import 'package:pudding/providers/settings_provider.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
 import 'package:pudding/screens/library_detail/user_views_provider.dart';
