@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
+import 'package:morphnext/morphnext.dart';
 import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/screens/home/providers/showcase_provider.dart';
 import 'package:pudding/screens/home/widgets/library_card.dart';
@@ -240,6 +241,7 @@ class _ShowcaseCarouselState extends ConsumerState<ShowcaseCarousel> {
                   final overview = item.getOverview();
                   final seasons = item.getSeasons();
                   final durations = item.getRuntime();
+                  final played = item.userData?.played ?? false;
 
                   return FTheme(
                     data: theme,
@@ -249,28 +251,77 @@ class _ShowcaseCarouselState extends ConsumerState<ShowcaseCarousel> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Column(
-                          spacing: 10,
+                          spacing: 20,
                           crossAxisAlignment: .start,
                           mainAxisAlignment: .end,
                           children: [
                             ConstrainedBox(
                               constraints: BoxConstraints(
-                                maxWidth: 400,
+                                maxWidth: 450,
                               ),
-                              child: CachedNetworkImage(
-                                memCacheWidth: 400,
-                                fit: .contain,
-                                imageUrl: item.getLogo(),
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Text(
-                                      item.getTitle(),
-                                      style: theme.typography.display.xl2
-                                          .copyWith(
-                                            height: 1.3,
-                                            fontWeight: .bold,
-                                          ),
+                              child: Align(
+                                alignment: .bottomLeft,
+                                child: CachedNetworkImage(
+                                  cacheKey: item
+                                      .imageTags[JellyfinImagesApi.typeLogo],
+                                  memCacheWidth: 450,
+                                  maxHeightDiskCache: 300,
+                                  fit: .contain,
+                                  imageUrl: item.getLogo(),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Text(
+                                        item.getTitle(),
+                                        style: theme.typography.display.xl2
+                                            .copyWith(
+                                              height: 1.3,
+                                              fontWeight: .bold,
+                                            ),
+                                      ),
+                                ),
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                FButton.icon(
+                                  onPress: () {},
+                                  child: Icon(FPhosphorBoldIcons.info),
+                                ),
+                                FButton(
+                                  onPress: () {},
+                                  prefix: Icon(FPhosphorBoldIcons.play),
+                                  child: Text('Play'),
+                                ),
+                                Row(
+                                  spacing: 10,
+                                  children: [
+                                    FButton.icon(
+                                      onPress: () {},
+                                      child: AnimatedMorphIcon(
+                                        icon: item.isFavorite
+                                            ? FPhosphorFillIcons.heart
+                                            : FPhosphorBoldIcons.heart,
+                                        color: item.isFavorite
+                                            ? theme.colors.primary
+                                            : null,
+                                      ),
                                     ),
-                              ),
+                                    FButton.icon(
+                                      onPress: () {},
+                                      child: AnimatedMorphIcon(
+                                        icon: played
+                                            ? FPhosphorBoldIcons.checks
+                                            : FPhosphorBoldIcons.check,
+                                        color: played ? Colors.green : null,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
+                            ),
+                            Row(
+                              children: [
+                                ...item.genresShort().map((g) => Text(g)),
+                              ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
                             ),
                             Row(
                               children: [
@@ -297,17 +348,19 @@ class _ShowcaseCarouselState extends ConsumerState<ShowcaseCarousel> {
                                   ),
                               ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
                             ),
-                            if (overview != null)
-                              ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth: 500,
-                                ),
-                                child: Text(
-                                  overview,
-                                  maxLines: 3,
-                                  overflow: .ellipsis,
-                                ),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: theme.breakpoints.md,
+                                minHeight:
+                                    (theme.typography.body.sm.fontSize ?? 0) *
+                                    3,
                               ),
+                              child: Text(
+                                overview ?? '',
+                                maxLines: 3,
+                                overflow: .ellipsis,
+                              ),
+                            ),
                           ],
                         ),
                       ),
