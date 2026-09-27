@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
@@ -8,12 +9,14 @@ class SliverTopbar extends StatefulWidget {
   final double? extent;
   final Widget? suffix;
   final List<Widget> children;
+  final bool showShadowOnPrefix;
   const new({
     super.key,
     this.nested = true,
     this.suffix,
     this.children = const [],
     this.extent,
+    this.showShadowOnPrefix = true,
   });
 
   @override
@@ -33,27 +36,34 @@ class _SliverTopbarState extends State<SliverTopbar> {
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Row(
-              children: [
-                if (widget.nested) ...[
-                  PBackButton(),
-                  Icon(FPhosphorBoldIcons.dot),
-                ],
-                Expanded(
-                  child: Row(
-                    spacing: 8,
-                    children: widget.children
-                        .map(
-                          (c) => Flexible(
-                            fit: .loose,
-                            child: c.addShadowLerp(context, percent),
-                          ),
-                        )
-                        .toList(),
+              children:
+                  [
+                    if (widget.nested) ...[
+                      PBackButton(),
+                      Icon(FPhosphorBoldIcons.dot),
+                    ],
+                    Expanded(
+                      child: Row(
+                        spacing: 10,
+                        children: widget.children
+                            .map(
+                              (c) => Flexible(
+                                fit: .loose,
+                                child: c.addShadowLerp(context, percent),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                    if (widget.suffix != null) ...[
+                      Icon(FPhosphorBoldIcons.dot),
+                      ?widget.suffix,
+                    ],
+                  ].addShadowLerp(
+                    context,
+                    percent,
+                    excludedIndex: widget.showShadowOnPrefix ? [] : [0],
                   ),
-                ),
-                Icon(FPhosphorBoldIcons.dot),
-                ?widget.suffix,
-              ].addShadowLerp(context, percent),
             ),
           ),
         );
@@ -86,10 +96,14 @@ extension WidgetShadowLerp on Widget {
 }
 
 extension WidgetListShadowLerp on List<Widget> {
-  List<Widget> addShadowLerp(BuildContext context, double value) {
+  List<Widget> addShadowLerp(
+    BuildContext context,
+    double value, {
+    List<int> excludedIndex = const [],
+  }) {
     final theme = context.theme;
-    return map((w) {
-      if (w is Icon || w is Expanded) {
+    return mapIndexed((i, w) {
+      if (w is Icon || w is Expanded || excludedIndex.contains(i)) {
         return w;
       }
       return DecoratedBox(

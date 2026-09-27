@@ -63,6 +63,7 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
     return DetailScaffold(
       backdrop: DetailBackdrop(id: widget.id),
       headerSliver: SliverTopbar(
+        showShadowOnPrefix: false,
         suffix: PDetailRefreshButton(),
         children: [
           if (movieAsync.hasValue)
