@@ -15,6 +15,7 @@ import 'package:pudding/screens/home/providers/showcase_provider.dart';
 import 'package:pudding/screens/home/widgets/library_card.dart';
 import 'package:pudding/screens/home/widgets/showcase_backdrop.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/utils/jellyfin_item_navigator.dart';
 import 'package:pudding/widgets/detail_scaffold.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_error.dart';
 
@@ -212,6 +213,7 @@ class _ShowcaseCarouselState extends ConsumerState<ShowcaseCarousel> {
   Widget build(BuildContext context) {
     final theme = context.theme;
     final homeAsync = ref.watch(homeProvider);
+    final homeNotifier = ref.read(homeProvider.notifier);
 
     return GestureDetector(
       onPanDown: (_) => autoScrollTimer?.cancel(),
@@ -283,7 +285,8 @@ class _ShowcaseCarouselState extends ConsumerState<ShowcaseCarousel> {
                             Row(
                               children: [
                                 FButton.icon(
-                                  onPress: () {},
+                                  onPress: () =>
+                                      item.push(context, shouldReplace: false),
                                   child: Icon(FPhosphorBoldIcons.info),
                                 ),
                                 FButton(
@@ -295,7 +298,8 @@ class _ShowcaseCarouselState extends ConsumerState<ShowcaseCarousel> {
                                   spacing: 10,
                                   children: [
                                     FButton.icon(
-                                      onPress: () {},
+                                      onPress: () =>
+                                          homeNotifier.toggleFavorite(item.id),
                                       child: AnimatedMorphIcon(
                                         icon: item.isFavorite
                                             ? FPhosphorFillIcons.heart
@@ -306,7 +310,8 @@ class _ShowcaseCarouselState extends ConsumerState<ShowcaseCarousel> {
                                       ),
                                     ),
                                     FButton.icon(
-                                      onPress: () {},
+                                      onPress: () =>
+                                          homeNotifier.togglePlayed(item.id),
                                       child: AnimatedMorphIcon(
                                         icon: played
                                             ? FPhosphorBoldIcons.checks
