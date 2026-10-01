@@ -93,7 +93,7 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
           mainAxisSize: .max,
           children: [
             ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 375),
+              constraints: BoxConstraints(maxHeight: 250 * 16 / 11),
               child: Row(
                 crossAxisAlignment: .end,
                 children: [
@@ -109,10 +109,11 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
                         constraints: BoxConstraints(
                           maxWidth: 250,
                           minWidth: 250,
-                          minHeight: 250,
+                          minHeight: 250 * 16 / 11,
                         ),
                         child: CachedNetworkImage(
                           imageUrl: item.getPrimary(),
+                          maxHeightDiskCache: (250 * 16 / 11).toInt(),
                           filterQuality: .medium,
                           fit: .cover,
                         ),
