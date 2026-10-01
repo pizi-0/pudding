@@ -13,7 +13,7 @@ import 'package:morphnext/morphnext.dart';
 import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/screens/home/providers/showcase_provider.dart';
 import 'package:pudding/screens/home/widgets/library_card.dart';
-import 'package:pudding/screens/home/widgets/showcase.dart';
+import 'package:pudding/screens/home/widgets/showcase_backdrop.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/detail_scaffold.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_error.dart';
