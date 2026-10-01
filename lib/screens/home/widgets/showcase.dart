@@ -507,7 +507,7 @@ class _ShowcaseItemBackdropState extends ConsumerState<ShowcaseItemBackdrop>
                 CachedNetworkImage(
                   imageUrl: _prevItem!.getImage(
                     type: JellyfinImagesApi.typeBackdrop,
-                    useSeriesImg: true,
+                    useSeriesImg: _prevItem!.isSeries,
                   ),
                   imageBuilder: (context, imageProvider) {
                     final prevImageScale = _newImageLoaded
@@ -530,7 +530,7 @@ class _ShowcaseItemBackdropState extends ConsumerState<ShowcaseItemBackdrop>
                 child: CachedNetworkImage(
                   imageUrl: _currentItem!.getImage(
                     type: JellyfinImagesApi.typeBackdrop,
-                    useSeriesImg: true,
+                    useSeriesImg: _currentItem!.isSeries,
                   ),
                   errorBuilder: (context, error, stackTrace) =>
                       Center(child: Text(error.toString())),
