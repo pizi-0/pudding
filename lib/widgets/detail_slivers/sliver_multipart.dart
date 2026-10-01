@@ -23,6 +23,33 @@ class SliverMultipart extends StatelessWidget {
       ),
       slivers: [
         SliverItemGrid(
+          viewType: .thumb,
+          items: items,
+        ),
+      ],
+    );
+  }
+}
+
+class SliverExtras extends StatelessWidget {
+  final List<JellyfinItem> items;
+  const new({super.key, this.items = const []});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverSection(
+      header: FButton(
+        variant: .outline,
+        onPress: () {
+          if (key is GlobalKey) {
+            (key as GlobalKey).scrollToKey();
+          }
+        },
+        child: Text('Special features'),
+      ),
+      slivers: [
+        SliverItemGrid(
+          viewType: .thumb,
           items: items,
         ),
       ],

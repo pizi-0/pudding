@@ -27,6 +27,7 @@ class MovieDetailScreen extends ConsumerStatefulWidget {
 class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
   final GlobalKey infoKey = GlobalKey(debugLabel: 'info-section');
   final GlobalKey multipartKey = GlobalKey(debugLabel: 'multipart-section');
+  final GlobalKey extrasKey = GlobalKey(debugLabel: 'extras-section');
   final GlobalKey collectionsKey = GlobalKey(debugLabel: 'collections-section');
   final GlobalKey peopleKey = GlobalKey(debugLabel: 'people-section');
   final GlobalKey similarKey = GlobalKey(debugLabel: 'similar-section');
@@ -114,6 +115,12 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
                 items: m.multipart,
               ),
 
+            if (m.hasExtras)
+              SliverExtras(
+                key: extrasKey,
+                items: m.extras,
+              ),
+
             if (m.collections.isNotEmpty)
               SliverCollections(
                 key: collectionsKey,
@@ -134,6 +141,8 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
       (infoKey, 'Info', FPhosphorBoldIcons.info),
       if (state.isMultipart)
         (multipartKey, 'Additional parts', FPhosphorBoldIcons.television),
+      if (state.hasExtras)
+        (extrasKey, 'Special features', FPhosphorBoldIcons.cookie),
       if (state.collections.isNotEmpty)
         (collectionsKey, 'Collections', FPhosphorBoldIcons.package),
       (peopleKey, 'Cast & Crew', FPhosphorBoldIcons.user),

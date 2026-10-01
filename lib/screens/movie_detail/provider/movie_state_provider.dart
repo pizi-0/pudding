@@ -17,6 +17,7 @@ final fields = [
   'LocalTrailerCount',
   'MediaSources',
   'MediaSourceCount',
+  'SpecialFeatureCount',
 ];
 
 class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
@@ -54,6 +55,18 @@ class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
         final parts = await getAdditionalParts();
 
         return current.copyWith(multipart: parts);
+      });
+    }
+
+    if (state.value!.hasExtras) {
+      state = AsyncLoading();
+
+      state = await AsyncValue.guard(() async {
+        final current = state.value ?? MovieScreenState();
+
+        final res = await getExtras();
+
+        return current.copyWith(extras: res);
       });
     }
 
@@ -118,6 +131,12 @@ class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
     final res = await client.videos.additionalParts(id);
 
     return res.map((e) => JellyfinItem.fromJson(e)).toList();
+  }
+
+  Future<List<JellyfinItem>> getExtras() async {
+    final res = await client.items.specialFeatures(id);
+
+    return res;
   }
 
   Future<List<JellyfinItem>> getSimilar() async {

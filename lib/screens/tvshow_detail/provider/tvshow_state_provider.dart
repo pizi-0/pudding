@@ -25,6 +25,7 @@ final defaultField = [
   'People',
   'LocalTrailerCount',
   'RemoteTrailers',
+  'SpecialFeatureCount',
 ];
 
 class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
@@ -50,7 +51,6 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
     });
 
     state = AsyncLoading();
-
     state = await AsyncValue.guard(() async {
       final current = state.value ?? TvshowScreenState();
       final seasons = await getSeasons();
@@ -77,6 +77,18 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
       );
     });
 
+    if (state.value!.hasExtras) {
+      state = AsyncLoading();
+      state = await AsyncValue.guard(() async {
+        final current = state.value ?? TvshowScreenState();
+
+        final res = await getExtras();
+
+        return current.copyWith(extras: res);
+      });
+    }
+
+    state = AsyncLoading();
     state = await AsyncValue.guard(() async {
       final current = state.value ?? TvshowScreenState();
       final (similars, collections) = await (
@@ -152,6 +164,12 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
     } catch (e) {
       throw Exception(['getSeason:', '$e']);
     }
+  }
+
+  Future<List<JellyfinItem>> getExtras() async {
+    final res = await client.items.specialFeatures(id);
+
+    return res;
   }
 
   Future<List<JellyfinItem>> getEpisodesForSeason({

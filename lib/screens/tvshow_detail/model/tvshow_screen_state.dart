@@ -8,6 +8,7 @@ class TvshowScreenState {
   final List<JellyfinItem> episodes;
   final List<JellyfinItem> similars;
   final List<JellyfinItem> collections;
+  final List<JellyfinItem> extras;
   final JellyfinItem? selectedSeason;
 
   TvshowScreenState({
@@ -17,6 +18,7 @@ class TvshowScreenState {
     this.episodes = const [],
     this.similars = const [],
     this.collections = const [],
+    this.extras = const [],
     this.selectedSeason,
   });
 
@@ -27,6 +29,7 @@ class TvshowScreenState {
     List<JellyfinItem>? episodes,
     List<JellyfinItem>? similars,
     List<JellyfinItem>? collections,
+    List<JellyfinItem>? extras,
     JellyfinItem? selectedSeason,
   }) {
     return TvshowScreenState(
@@ -36,7 +39,10 @@ class TvshowScreenState {
       episodes: episodes ?? this.episodes,
       similars: similars ?? this.similars,
       collections: collections ?? this.collections,
+      extras: extras ?? this.extras,
       selectedSeason: selectedSeason ?? this.selectedSeason,
     );
   }
+
+  bool get hasExtras => (tvshow?.raw['SpecialFeatureCount'] ?? 0) > 0;
 }

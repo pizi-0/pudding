@@ -10,12 +10,14 @@ class MovieScreenState {
   final List<JellyfinItem> multipart;
   final List<JellyfinItem> similars;
   final List<JellyfinItem> collections;
+  final List<JellyfinItem> extras;
 
   const MovieScreenState({
     this.movie,
     this.multipart = const [],
     this.similars = const [],
     this.collections = const [],
+    this.extras = const [],
   });
 
   MovieScreenState copyWith({
@@ -23,12 +25,14 @@ class MovieScreenState {
     List<JellyfinItem>? multipart,
     List<JellyfinItem>? similars,
     List<JellyfinItem>? collections,
+    List<JellyfinItem>? extras,
   }) {
     return MovieScreenState(
       movie: movie ?? this.movie,
       multipart: multipart ?? this.multipart,
       similars: similars ?? this.similars,
       collections: collections ?? this.collections,
+      extras: extras ?? this.extras,
     );
   }
 
@@ -62,6 +66,8 @@ class MovieScreenState {
 
   bool get isMultipart => (movie!.raw['PartCount'] ?? 1) > 1;
   String? get duration => _getDuration();
+
+  bool get hasExtras => (movie?.raw['SpecialFeatureCount'] ?? 0) > 0;
 
   String? get size => _getSize();
 

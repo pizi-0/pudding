@@ -10,6 +10,7 @@ import 'package:pudding/widgets/detail_slivers/sliver_collections.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_episode.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_error.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_loader.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_multipart.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_people.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_showcase.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_similar.dart';
@@ -27,6 +28,7 @@ class TvshowDetail extends ConsumerStatefulWidget {
 class _TvshowDetailState extends ConsumerState<TvshowDetail> {
   final GlobalKey infoKey = GlobalKey(debugLabel: 'info-section');
   final GlobalKey episodeKey = GlobalKey(debugLabel: 'episode-section');
+  final GlobalKey extrasKey = GlobalKey(debugLabel: 'extras-section');
   final GlobalKey peopleKey = GlobalKey(debugLabel: 'people-section');
   final GlobalKey similarKey = GlobalKey(debugLabel: 'similar-section');
   final GlobalKey collectionKey = GlobalKey(debugLabel: 'collection-section');
@@ -114,6 +116,11 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
               key: episodeKey,
               id: widget.id,
             ),
+            if (tv.hasExtras)
+              SliverExtras(
+                key: extrasKey,
+                items: tv.extras,
+              ),
             if (tv.collections.isNotEmpty)
               SliverCollections(
                 key: collectionKey,
@@ -138,6 +145,8 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
     destinations = [
       (infoKey, 'Info', FPhosphorBoldIcons.info),
       (episodeKey, 'Episode', FPhosphorBoldIcons.television),
+      if (state.hasExtras)
+        (extrasKey, 'Special features', FPhosphorBoldIcons.cookie),
       if (state.collections.isNotEmpty)
         (collectionKey, 'Collections', FPhosphorBoldIcons.package),
       (peopleKey, 'Cast & Crew', FPhosphorBoldIcons.user),
