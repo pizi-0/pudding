@@ -39,200 +39,216 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
     final totalWeight = sortedWeight.fold(0, (prev, e) => prev + e);
     final resumable = widget.item.isResumable;
 
-    return FButton.raw(
-      variant: .outline,
-      onPress: () {},
-      onHoverChange: (value) => setState(() => hover = value),
-      child: Padding(
-        padding: const EdgeInsets.all(2.0),
-        child: ClipRRect(
-          borderRadius: theme.style.borderRadius.sm,
-          child: Stack(
-            alignment: .bottomStart,
-            fit: .expand,
-            children: <Widget>[
-              Positioned(
-                top: -1,
-                left: -1,
-                right: -1,
-                bottom: -1,
-                child: AnimatedScale(
-                  alignment: .bottomCenter,
-                  duration: kDefaultAnimationDuration,
-                  scale: hover ? 1.01 : 1,
-                  child: OverflowBox(
-                    maxWidth: size.width * weight / totalWeight,
-                    minWidth: size.width * weight / totalWeight,
-                    child: AnimatedOpacity(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final height = constraints.maxHeight;
+        return FButton.raw(
+          variant: .outline,
+          onPress: () {},
+          onHoverChange: (value) => setState(() => hover = value),
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: ClipRRect(
+              borderRadius: theme.style.borderRadius.sm,
+              child: Stack(
+                alignment: .bottomStart,
+                fit: .expand,
+                children: <Widget>[
+                  Positioned(
+                    top: -1,
+                    left: -1,
+                    right: -1,
+                    bottom: -1,
+                    child: AnimatedScale(
+                      alignment: .bottomCenter,
                       duration: kDefaultAnimationDuration,
-                      opacity: hover ? 0.8 : 1,
-                      child: CachedNetworkImage(
-                        imageUrl: widget.item.getImage(
-                          type: widget.item.isEpisode
-                              ? JellyfinImagesApi.typePrimary
-                              : JellyfinImagesApi.typeThumb,
-                        ),
-                        fit: .cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            CachedNetworkImage(
-                              imageUrl: widget.item.getImage(
-                                type: JellyfinImagesApi.typeBackdrop,
-                              ),
-                              fit: .cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  CachedNetworkImage(
-                                    imageUrl: widget.item.getImage(
-                                      type: JellyfinImagesApi.typePrimary,
-                                    ),
-                                    fit: .cover,
-                                    errorBuilder:
-                                        (
-                                          context,
-                                          error,
-                                          stackTrace,
-                                        ) => Center(
-                                          child: Icon(
-                                            FPhosphorBoldIcons.imageBroken,
-                                          ),
-                                        ),
-                                  ),
+                      scale: hover ? 1.01 : 1,
+                      child: OverflowBox(
+                        maxWidth: size.width * weight / totalWeight,
+                        minWidth: size.width * weight / totalWeight,
+                        child: AnimatedOpacity(
+                          duration: kDefaultAnimationDuration,
+                          opacity: hover ? 0.8 : 1,
+                          child: CachedNetworkImage(
+                            imageUrl: widget.item.getImage(
+                              type: widget.item.isEpisode
+                                  ? JellyfinImagesApi.typePrimary
+                                  : JellyfinImagesApi.typeThumb,
                             ),
+                            fit: .cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                CachedNetworkImage(
+                                  imageUrl: widget.item.getImage(
+                                    type: JellyfinImagesApi.typeBackdrop,
+                                  ),
+                                  fit: .cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      CachedNetworkImage(
+                                        imageUrl: widget.item.getImage(
+                                          type: JellyfinImagesApi.typePrimary,
+                                        ),
+                                        fit: .cover,
+                                        errorBuilder:
+                                            (
+                                              context,
+                                              error,
+                                              stackTrace,
+                                            ) => Center(
+                                              child: Icon(
+                                                FPhosphorBoldIcons.imageBroken,
+                                              ),
+                                            ),
+                                      ),
+                                ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-
-              Positioned(
-                top: -1,
-                bottom: -1,
-                left: -1,
-                right: -1,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.transparent, theme.colors.background],
-                      begin: .center,
-                      end: .bottomCenter,
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: AnimatedContainer(
+                        duration: kDefaultAnimationDuration,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent, // Solid overlay shadow
+                          boxShadow: [
+                            BoxShadow(
+                              color: theme.colors.background.withAlpha(245),
+                              blurRadius: height / (hover ? 3 : 4),
+                              spreadRadius: height / (hover ? 3 : 4), // This blur mimics the soft edge of a gradient!
+                              offset: const Offset(0, 52),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(9.0),
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: .topRight,
-                          child: Text('${widget.index + 1}/${widget.total}'),
-                        ),
-                        if (widget.item.isEpisode)
-                          Expanded(
-                            child: Align(
-                              alignment: AlignmentGeometry.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.all(10),
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(maxHeight: 150),
-                                  child: Opacity(
-                                    opacity: 0.8,
-                                    child: CachedNetworkImage(
-                                      imageUrl: widget.item.getLogo(),
-                                      width: 150,
-                                      errorBuilder: (
-                                        context,
-                                        error,
-                                        stackTrace,
-                                      ) => SizedBox.shrink(),
+                  Positioned(
+                    top: -1,
+                    bottom: -1,
+                    left: -1,
+                    right: -1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(9.0),
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: .topRight,
+                            child: Text('${widget.index + 1}/${widget.total}'),
+                          ),
+                          if (widget.item.isEpisode)
+                            Expanded(
+                              child: Align(
+                                alignment: AlignmentGeometry.centerLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(maxHeight: 150),
+                                    child: Opacity(
+                                      opacity: 0.8,
+                                      child: CachedNetworkImage(
+                                        imageUrl: widget.item.getLogo(),
+                                        width: 150,
+                                        errorBuilder: (
+                                          context,
+                                          error,
+                                          stackTrace,
+                                        ) => SizedBox.shrink(),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          )
-                        else
-                          Spacer(),
-                        Column(
-                          spacing: 4,
-                          crossAxisAlignment: .start,
-                          mainAxisSize: .min,
-                          children: <Widget>[
-                            if (resumable)
-                              Opacity(
-                                opacity: 0.8,
-                                child: FDeterminateProgress(
-                                  style: .delta(
-                                    motion: .delta(duration: .zero),
+                            )
+                          else
+                            Spacer(),
+                          Column(
+                            spacing: 4,
+                            crossAxisAlignment: .start,
+                            mainAxisSize: .min,
+                            children: <Widget>[
+                              if (resumable)
+                                Opacity(
+                                  opacity: 0.8,
+                                  child: FDeterminateProgress(
+                                    style: .delta(
+                                      motion: .delta(duration: .zero),
+                                    ),
+                                    value: widget.item.getPlayProgress(),
                                   ),
-                                  value: widget.item.getPlayProgress(),
+                                ).fadeOut(
+                                  animate: hover,
+                                  duration: kDefaultAnimationDuration,
                                 ),
-                              ).fadeOut(
-                                animate: hover,
-                                duration: kDefaultAnimationDuration,
-                              ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: AnimatedSize(
-                                    duration: kDefaultAnimationDuration,
-                                    child: Text(
-                                      widget.item.getTitle(),
-                                      overflow: .ellipsis,
-                                      maxLines: hover ? 3 : 1,
-                                    ).bold(),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            DefaultTextStyle(
-                              style: theme.typography.display.sm.copyWith(
-                                color: theme.colors.mutedForeground,
-                              ),
-                              child: Row(
+                              Row(
                                 children: [
-                                  if (widget.item.seriesName != null ||
-                                      widget.item.isSeries)
-                                    Expanded(
-                                      flex: weight,
-                                      child: Padding(
-                                        padding: const EdgeInsetsGeometry.only(
-                                          right: 8,
+                                  Expanded(
+                                    child: AnimatedSize(
+                                      duration: kDefaultAnimationDuration,
+                                      child: Text(
+                                        widget.item.getTitle(),
+                                        overflow: .ellipsis,
+                                        maxLines: hover ? 3 : 1,
+                                      ).bold(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              DefaultTextStyle(
+                                style: theme.typography.display.sm.copyWith(
+                                  color: theme.colors.mutedForeground,
+                                ),
+                                child: Row(
+                                  children: [
+                                    if (widget.item.seriesName != null ||
+                                        widget.item.isSeries)
+                                      Expanded(
+                                        flex: weight,
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsetsGeometry.only(
+                                                right: 8,
+                                              ),
+                                          child: Text(
+                                            '${widget.item.seriesName ?? widget.item.name} (${widget.item.productionYear})',
+                                            overflow: .clip,
+                                            softWrap: false,
+                                          ),
                                         ),
+                                      ),
+                                    if (widget.item.isMovie)
+                                      Expanded(
+                                        flex: 3,
                                         child: Text(
-                                          '${widget.item.seriesName ?? widget.item.name} (${widget.item.productionYear})',
+                                          widget.item.productionYear.toString(),
                                           overflow: .clip,
                                           softWrap: false,
                                         ),
                                       ),
+                                    Text(
+                                      widget.item.getRemaining(),
+                                      textAlign: .end,
+                                      overflow: .clip,
+                                      maxLines: 1,
                                     ),
-                                  if (widget.item.isMovie)
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        widget.item.productionYear.toString(),
-                                        overflow: .clip,
-                                        softWrap: false,
-                                      ),
-                                    ),
-                                  Text(
-                                    widget.item.getRemaining(),
-                                    textAlign: .end,
-                                    overflow: .clip,
-                                    maxLines: 1,
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
