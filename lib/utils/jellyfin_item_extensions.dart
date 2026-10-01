@@ -265,12 +265,14 @@ extension JellyInfo on JellyfinItem {
   bool get isVideo => type == 'Video';
   bool get isPlaceholder => raw['LocationType'] == 'Virtual';
   bool get isMissing =>
-      ((premiereDate?.millisecondsSinceEpoch ?? 0) <
-          DateTime.now().millisecondsSinceEpoch) &&
+      (premiereDate != null &&
+          (premiereDate?.millisecondsSinceEpoch ?? 0) <
+              DateTime.now().millisecondsSinceEpoch) &&
       isPlaceholder;
   bool get isUpcoming =>
-      ((premiereDate?.millisecondsSinceEpoch ?? 0) >
-          DateTime.now().millisecondsSinceEpoch) &&
+      (premiereDate == null ||
+          ((premiereDate?.millisecondsSinceEpoch ?? 0) >
+              DateTime.now().millisecondsSinceEpoch)) &&
       isPlaceholder;
 
   bool get isContinuing => raw['Status'] == 'Continuing';
