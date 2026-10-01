@@ -282,5 +282,7 @@ extension JellyInfo on JellyfinItem {
 
   bool get showRuntime =>
       (durationMs != null || durationMs != 0) && (isMovie || isEpisode);
+
+  bool get isPlayed => userData?.played ?? false;
   bool get isResumable => userData?.playbackPositionTicks != 0;
 }
