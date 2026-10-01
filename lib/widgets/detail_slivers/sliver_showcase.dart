@@ -1,5 +1,4 @@
-import 'package:awesome_extensions/awesome_extensions.dart'
-    show ListExtension, StyledText;
+import 'package:awesome_extensions/awesome_extensions.dart' show ListExtension;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
@@ -77,6 +76,8 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
     final parentalRating = item.getOfficialRating();
     final rating = item.getCommunityRating();
     final duration = (next ?? item).getRuntime();
+    final hasLogo = item.imageTags[JellyfinImagesApi.typeLogo] != null;
+    final endsAt = item.getEndsAt(context);
 
     return SliverToBoxAdapter(
       child: ConstrainedBox(
@@ -84,102 +85,139 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
           maxHeight: widget.maxExtent ?? size.height,
           maxWidth: overviewWidth,
         ),
+
         child: Column(
           spacing: 10,
           mainAxisAlignment: .end,
           crossAxisAlignment: crossAxisAlignment,
+          mainAxisSize: .max,
           children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 400, maxHeight: 500),
-                  child: Column(
-                    spacing: 20,
-                    crossAxisAlignment: crossAxisAlignment,
-                    mainAxisAlignment: .end,
-                    children: [
-                      Expanded(
+            ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: 375),
+              child: Row(
+                crossAxisAlignment: .end,
+                children: [
+                  Container(
+                    clipBehavior: .hardEdge,
+                    decoration: BoxDecoration(
+                      borderRadius: theme.style.borderRadius.md,
+                      border: .all(color: theme.colors.border, width: 2),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: theme.style.borderRadius.sm,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: 250,
+                          minWidth: 250,
+                          minHeight: 250,
+                        ),
                         child: CachedNetworkImage(
-                          cacheKey: item.getImageTag(
-                            type: JellyfinImagesApi.typeLogo,
-                          ),
-                          imageUrl: item.getLogo(),
-                          alignment: .bottomLeft,
-                          width: 400,
-                          errorBuilder: (context, error, stackTrace) => Column(
-                            mainAxisAlignment: .end,
-                            crossAxisAlignment: .start,
-                            children: [
-                              Text(
-                                item.name,
-                                style: theme.typography.display.xl,
-                              ).bold(),
-                            ],
-                          ),
+                          imageUrl: item.getPrimary(),
+                          filterQuality: .medium,
+                          fit: .cover,
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: .center,
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        spacing: 10,
+                        mainAxisAlignment: .end,
+                        crossAxisAlignment: .start,
                         children: [
-                          Expanded(
-                            child: FButton(
-                              mainAxisSize: .max,
-                              onPress: () {},
-                              prefix: Icon(FPhosphorBoldIcons.play),
-                              child: _playButtonLabel(item, next),
-                            ),
-                          ),
-                          Icon(FPhosphorBoldIcons.dot),
-                          Row(
-                            spacing: 8,
-                            children: [
-                              FButton.icon(
-                                onPress: widget.onToggleFavorite,
-                                child: AnimatedMorphIcon(
-                                  icon: FPhosphorBoldIcons.heart,
-                                  color: item.isFavorite
-                                      ? theme.colors.primary
-                                      : null,
+                          if (hasLogo)
+                            Flexible(
+                              child: FittedBox(
+                                child: CachedNetworkImage(
+                                  memCacheWidth: 400,
+                                  fit: .contain,
+                                  imageUrl: item.getLogo(),
                                 ),
                               ),
-                              FButton.icon(
-                                onPress: widget.onTogglePlayed,
-                                child: AnimatedMorphIcon(
-                                  icon: FPhosphorBoldIcons.check,
-                                  color: (item.userData?.played ?? false)
-                                      ? Colors.green
-                                      : null,
+                            ),
+                          SizedBox(height: 10),
+                          Row(
+                            children: [
+                              FButton(
+                                size: .lg,
+                                style: .delta(
+                                  contentStyle: .delta(
+                                    constraints: BoxConstraints(
+                                      minWidth: 120,
+                                      maxWidth: 120,
+                                    ),
+                                  ),
                                 ),
+                                onPress: () {},
+                                prefix: Icon(FPhosphorBoldIcons.play),
+                                child: _playButtonLabel(item, next),
+                              ),
+                              Icon(FPhosphorBoldIcons.dot),
+                              Row(
+                                spacing: 8,
+                                children: [
+                                  FButton.icon(
+                                    size: .lg,
+                                    onPress: widget.onToggleFavorite,
+                                    child: AnimatedMorphIcon(
+                                      icon: item.isFavorite
+                                          ? FPhosphorFillIcons.heart
+                                          : FPhosphorBoldIcons.heart,
+                                      color: item.isFavorite
+                                          ? Colors.pink
+                                          : null,
+                                    ),
+                                  ),
+                                  FButton.icon(
+                                    size: .lg,
+                                    onPress: widget.onTogglePlayed,
+                                    child: AnimatedMorphIcon(
+                                      icon: item.userData?.played ?? false
+                                          ? FPhosphorBoldIcons.checks
+                                          : FPhosphorBoldIcons.check,
+                                      color: item.userData?.played ?? false
+                                          ? Colors.green
+                                          : null,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
+                          ),
+                          Row(
+                            children: [
+                              if (duration != null) Text(duration),
+                              Text('Ends at $endsAt'),
+                            ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
+                          ),
+                          Row(
+                            children: item.genres
+                                .map((g) => Text(g))
+                                .toList()
+                                .separatedBy(Icon(FPhosphorBoldIcons.dot)),
+                          ),
+                          Row(
+                            children: [
+                              if (year != null)
+                                IconText(
+                                  text: year.toString(),
+                                  icon: FPhosphorBoldIcons.calendar,
+                                ),
+                              if (parentalRating != null)
+                                RatingContainer(rating: parentalRating),
+                              if (rating != null)
+                                StarRatingContainer(
+                                  rating: rating.toStringAsFixed(2),
+                                ),
+                            ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
                           ),
                         ],
                       ),
-                      Row(
-                        mainAxisSize: .min,
-                        children: [
-                          if (year != null)
-                            IconText(
-                              text: year,
-                              icon: FPhosphorBoldIcons.calendar,
-                            ),
-                          if (parentalRating != null)
-                            RatingContainer(rating: parentalRating),
-                          if (rating != null)
-                            StarRatingContainer(
-                              rating: rating.toStringAsFixed(2),
-                            ),
-                          if (duration != null)
-                            IconText(
-                              text: duration,
-                              icon: FPhosphorBoldIcons.clock,
-                            ),
-                        ].separatedBy(Icon(FPhosphorBoldIcons.dot)),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
             Container(
