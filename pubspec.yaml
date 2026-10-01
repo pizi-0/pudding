@@ -33,30 +33,30 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  forui: ^0.26.0
+  cupertino_icons: ^2.0.0
+  forui: ^0.27.3
   forui_assets: ^0.25.0
   flutter_riverpod: ^3.4.3
-  dart_jellyfin: ^0.2.0
-  flutter_secure_storage: ^11.1.0
+  dart_jellyfin: ^0.2.1
+  flutter_secure_storage: ^11.2.0
   uuid: ^4.6.0
   shared_preferences: ^2.5.5
-  get_it: ^9.2.1
+  get_it: ^9.3.0
   device_info_plus: ^13.2.0
   awesome_extensions: ^2.1.1
-  go_router: ^18.0.1
+  go_router: ^18.0.2
   pretty_qr_code: ^3.6.0
-  google_fonts: ^8.2.1
+  google_fonts: ^9.0.0
   collection: ^1.19.1
   animate_do: ^5.1.0
-  cached_network_image_ce: ^4.12.0
+  cached_network_image_ce: ^4.13.1
   go_transitions: ^0.8.4
   quiver: ^3.2.2
   silky_scroll: ^2.6.4
   morphnext: ^0.6.1
   intl: ^0.20.3
-  material_ui: ^1.2.0
-  forui_phosphor: ^0.26.1
+  material_ui: ^1.5.0
+  forui_phosphor: ^0.27.0
   media_kit: ^1.2.6
   media_kit_video: ^2.0.1
   media_kit_libs_video: ^1.0.7
@@ -71,7 +71,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-  forui_cli: ^0.26.1
+  forui_cli: ^0.27.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
