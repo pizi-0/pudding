@@ -140,18 +140,21 @@ extension JellyInfo on JellyfinItem {
     bool useSeriesImg = false,
   }) {
     String type0 = type;
-    if (!imageTags.containsKey(type)) {
-      final preferred = [
-        JellyfinImagesApi.typePrimary,
-        JellyfinImagesApi.typeThumb,
-        JellyfinImagesApi.typeBackdrop,
-        JellyfinImagesApi.typeLogo,
-      ];
 
-      for (final t in preferred) {
-        if (imageTags.containsKey(t)) {
-          type0 = t;
-          break;
+    if (!imageTags.containsKey(type)) {
+      if (type != JellyfinImagesApi.typeBackdrop || backdropImageTags.isEmpty) {
+        final preferred = [
+          JellyfinImagesApi.typePrimary,
+          JellyfinImagesApi.typeThumb,
+          JellyfinImagesApi.typeBackdrop,
+          JellyfinImagesApi.typeLogo,
+        ];
+
+        for (final t in preferred) {
+          if (imageTags.containsKey(t)) {
+            type0 = t;
+            break;
+          }
         }
       }
     }
