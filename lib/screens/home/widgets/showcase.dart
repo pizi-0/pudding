@@ -505,7 +505,10 @@ class _ShowcaseItemBackdropState extends ConsumerState<ShowcaseItemBackdrop>
             children: [
               if (showPrev)
                 CachedNetworkImage(
-                  imageUrl: _prevItem!.getBackdrop(),
+                  imageUrl: _prevItem!.getImage(
+                    type: JellyfinImagesApi.typeBackdrop,
+                    useSeriesImg: true,
+                  ),
                   imageBuilder: (context, imageProvider) {
                     final prevImageScale = _newImageLoaded
                         ? _prevScale
@@ -525,7 +528,10 @@ class _ShowcaseItemBackdropState extends ConsumerState<ShowcaseItemBackdrop>
               Opacity(
                 opacity: _fadeController.value,
                 child: CachedNetworkImage(
-                  imageUrl: _currentItem!.getBackdrop(),
+                  imageUrl: _currentItem!.getImage(
+                    type: JellyfinImagesApi.typeBackdrop,
+                    useSeriesImg: true,
+                  ),
                   errorBuilder: (context, error, stackTrace) =>
                       Center(child: Text(error.toString())),
                   imageBuilder: (context, imageProvider) {
