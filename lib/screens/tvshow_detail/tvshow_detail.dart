@@ -52,6 +52,7 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final tvAsync = ref.watch(tvshowStateProvider((widget.id)));
+    final tvNotifier = ref.read(tvshowStateProvider(widget.id).notifier);
 
     ref.listen(tvshowStateProvider(widget.id), (p, n) {
       n.whenOrNull(
@@ -109,8 +110,9 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
               item: tv.tvshow!,
               nextup: tv.nextup,
               maxExtent: size.height - 76 - 96,
-              onToggleFavorite: _toggleFavorite,
-              onTogglePlayed: _togglePlayed,
+              onTogglePlayed: () async {
+                await tvNotifier.onTogglePlayed();
+              },
             ),
             SliverEpisodes(
               key: episodeKey,
@@ -154,33 +156,5 @@ class _TvshowDetailState extends ConsumerState<TvshowDetail> {
     ];
 
     setState(() {});
-  }
-
-  Future<void> _toggleFavorite() async {
-    if (favoriteLoading) return;
-
-    try {
-      favoriteLoading = true;
-
-      ref.read(tvshowStateProvider(widget.id).notifier).toggleSeriesFavorite();
-    } on Exception catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      favoriteLoading = false;
-    }
-  }
-
-  Future<void> _togglePlayed() async {
-    if (playedLoading) return;
-
-    try {
-      playedLoading = true;
-
-      ref.read(tvshowStateProvider(widget.id).notifier).toggleSeriesPlayed();
-    } on Exception catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      playedLoading = false;
-    }
   }
 }

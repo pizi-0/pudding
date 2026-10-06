@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
-import 'package:morphnext/morphnext.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/widgets/favorite_button.dart';
 import 'package:pudding/widgets/icon_text.dart';
+import 'package:pudding/widgets/played_button.dart';
 import 'package:pudding/widgets/rating_container.dart';
 import 'package:pudding/widgets/star_rating_container.dart';
 
@@ -19,8 +20,8 @@ class SliverShowcase extends ConsumerStatefulWidget {
   final double? maxExtent;
   final String? filesize;
   final _ShowcaseVariant _variant;
-  final void Function()? onToggleFavorite;
-  final void Function()? onTogglePlayed;
+  final Future Function()? onToggleFavorite;
+  final Future Function()? onTogglePlayed;
 
   const SliverShowcase({
     super.key,
@@ -159,29 +160,21 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
                               Row(
                                 spacing: 8,
                                 children: [
-                                  FButton.icon(
-                                    size: .lg,
-                                    onPress: widget.onToggleFavorite,
-                                    child: AnimatedMorphIcon(
-                                      icon: item.isFavorite
-                                          ? FPhosphorFillIcons.heart
-                                          : FPhosphorBoldIcons.heart,
-                                      color: item.isFavorite
-                                          ? Colors.pink
-                                          : null,
-                                    ),
+                                  FavoriteButton(
+                                    item: item,
+                                    onToggleFavorite: () async {
+                                      if (widget.onToggleFavorite != null) {
+                                        await widget.onToggleFavorite!();
+                                      }
+                                    },
                                   ),
-                                  FButton.icon(
-                                    size: .lg,
-                                    onPress: widget.onTogglePlayed,
-                                    child: AnimatedMorphIcon(
-                                      icon: item.userData?.played ?? false
-                                          ? FPhosphorBoldIcons.checks
-                                          : FPhosphorBoldIcons.check,
-                                      color: item.userData?.played ?? false
-                                          ? Colors.green
-                                          : null,
-                                    ),
+                                  PlayedButton(
+                                    item: item,
+                                    onTogglePlayed: () async {
+                                      if (widget.onTogglePlayed != null) {
+                                        await widget.onTogglePlayed!();
+                                      }
+                                    },
                                   ),
                                 ],
                               ),

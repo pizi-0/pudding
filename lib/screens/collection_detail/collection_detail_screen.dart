@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:morphnext/morphnext.dart';
 import 'package:pudding/screens/collection_detail/provider/collection_state_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/detail_scaffold.dart';
@@ -15,7 +14,9 @@ import 'package:pudding/widgets/detail_slivers/sliver_item_grid.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_loader.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_section.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_topbar.dart';
+import 'package:pudding/widgets/favorite_button.dart';
 import 'package:pudding/widgets/icon_text.dart';
+import 'package:pudding/widgets/played_button.dart';
 import 'package:pudding/widgets/rating_container.dart';
 
 class CollectionDetailScreen extends ConsumerStatefulWidget {
@@ -152,6 +153,7 @@ class _SliverCollectionStatsState extends ConsumerState<SliverCollectionStats> {
     final theme = context.theme;
 
     final collAsync = ref.watch(collectionStateProvider(widget.id));
+    final collNotifier = ref.read(collectionStateProvider(widget.id).notifier);
 
     final state = collAsync.value!;
     final item = state.collection!;
@@ -215,29 +217,12 @@ class _SliverCollectionStatsState extends ConsumerState<SliverCollectionStats> {
                               Row(
                                 spacing: 8,
                                 children: [
-                                  FButton.icon(
-                                    size: .lg,
-                                    onPress: _onToggleFavorite,
-                                    child: AnimatedMorphIcon(
-                                      icon: item.isFavorite
-                                          ? FPhosphorFillIcons.heart
-                                          : FPhosphorBoldIcons.heart,
-                                      color: item.isFavorite
-                                          ? Colors.pink
-                                          : null,
-                                    ),
-                                  ),
-                                  FButton.icon(
-                                    size: .lg,
-                                    onPress: _onTogglePlayed,
-                                    child: AnimatedMorphIcon(
-                                      icon: item.userData?.played ?? false
-                                          ? FPhosphorBoldIcons.checks
-                                          : FPhosphorBoldIcons.check,
-                                      color: item.userData?.played ?? false
-                                          ? Colors.green
-                                          : null,
-                                    ),
+                                  FavoriteButton(item: item),
+                                  PlayedButton(
+                                    item: item,
+                                    onTogglePlayed: () async {
+                                      await collNotifier.onTogglePlayed();
+                                    },
                                   ),
                                 ],
                               ),
@@ -315,38 +300,6 @@ class _SliverCollectionStatsState extends ConsumerState<SliverCollectionStats> {
         ),
       ),
     );
-  }
-
-  Future<void> _onToggleFavorite() async {
-    if (favLoading) return;
-
-    try {
-      favLoading = true;
-
-      await ref
-          .read(collectionStateProvider(widget.id).notifier)
-          .toggleFavorite();
-    } catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      favLoading = false;
-    }
-  }
-
-  Future<void> _onTogglePlayed() async {
-    if (playedLoading) return;
-
-    try {
-      playedLoading = true;
-
-      await ref
-          .read(collectionStateProvider(widget.id).notifier)
-          .togglePlayed();
-    } catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      playedLoading = false;
-    }
   }
 
   Size posterSize(double width) {

@@ -4,12 +4,11 @@ import 'package:awesome_extensions/awesome_extensions.dart'
     show TxtStyle, ListExtension;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:go_router/go_router.dart';
-import 'package:morphnext/morphnext.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:pudding/screens/home/home_provider.dart';
 import 'package:pudding/screens/home/providers/showcase_provider.dart';
 import 'package:pudding/screens/home/widgets/library_card.dart';
@@ -22,8 +21,10 @@ import 'package:pudding/widgets/detail_slivers/sliver_error.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_loader.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_section.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_topbar.dart';
+import 'package:pudding/widgets/favorite_button.dart';
 import 'package:pudding/widgets/icon_text.dart';
 import 'package:pudding/widgets/media_card.dart';
+import 'package:pudding/widgets/played_button.dart';
 import 'package:pudding/widgets/rating_container.dart';
 import 'package:pudding/widgets/star_rating_container.dart';
 
@@ -213,7 +214,6 @@ class _ShowcaseCarouselState extends ConsumerState<ShowcaseCarousel> {
   Widget build(BuildContext context) {
     final theme = context.theme;
     final homeAsync = ref.watch(homeProvider);
-    final homeNotifier = ref.read(homeProvider.notifier);
 
     return GestureDetector(
       onPanDown: (_) => autoScrollTimer?.cancel(),
@@ -243,7 +243,6 @@ class _ShowcaseCarouselState extends ConsumerState<ShowcaseCarousel> {
                   final overview = item.getOverview();
                   final seasons = item.getSeasons();
                   final durations = item.getRuntime();
-                  final played = item.userData?.played ?? false;
 
                   return FTheme(
                     data: theme,
@@ -297,28 +296,8 @@ class _ShowcaseCarouselState extends ConsumerState<ShowcaseCarousel> {
                                 Row(
                                   spacing: 10,
                                   children: [
-                                    FButton.icon(
-                                      onPress: () =>
-                                          homeNotifier.toggleFavorite(item.id),
-                                      child: AnimatedMorphIcon(
-                                        icon: item.isFavorite
-                                            ? FPhosphorFillIcons.heart
-                                            : FPhosphorBoldIcons.heart,
-                                        color: item.isFavorite
-                                            ? theme.colors.primary
-                                            : null,
-                                      ),
-                                    ),
-                                    FButton.icon(
-                                      onPress: () =>
-                                          homeNotifier.togglePlayed(item.id),
-                                      child: AnimatedMorphIcon(
-                                        icon: played
-                                            ? FPhosphorBoldIcons.checks
-                                            : FPhosphorBoldIcons.check,
-                                        color: played ? Colors.green : null,
-                                      ),
-                                    ),
+                                    FavoriteButton(item: item),
+                                    PlayedButton(item: item),
                                   ],
                                 ),
                               ].separatedBy(Icon(FPhosphorBoldIcons.dot)),

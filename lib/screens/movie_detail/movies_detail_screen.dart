@@ -104,8 +104,6 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
               key: infoKey,
               item: m.movie!,
               maxExtent: size.height - 76 - 96,
-              onToggleFavorite: _toggleFavorite,
-              onTogglePlayed: _togglePlayed,
               filesize: m.size,
             ),
 
@@ -150,33 +148,5 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
     ];
 
     setState(() {});
-  }
-
-  Future<void> _toggleFavorite() async {
-    if (favoriteLoading) return;
-
-    try {
-      favoriteLoading = true;
-
-      ref.read(movieStateProvider(widget.id).notifier).toggleFavorite();
-    } on Exception catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      favoriteLoading = false;
-    }
-  }
-
-  Future<void> _togglePlayed() async {
-    if (playedLoading) return;
-
-    try {
-      playedLoading = true;
-
-      ref.read(movieStateProvider(widget.id).notifier).togglePlayed();
-    } on Exception catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      playedLoading = false;
-    }
   }
 }
