@@ -8,7 +8,6 @@ import 'package:pudding/screens/home/providers/showcase_provider.dart';
 import 'package:pudding/screens/library_detail/user_views_provider.dart';
 
 import 'package:pudding/services/di.dart';
-import 'package:pudding/utils/jellyfin_item_extensions/item_operations.dart';
 
 //"AirTime" "CanDelete" "CanDownload" "ChannelInfo" "Chapters" "Trickplay" "ChildCount" "CumulativeRunTimeTicks" "CustomRating" "DateCreated" "DateLastMediaAdded" "DisplayPreferencesId" "Etag" "ExternalUrls" "Genres" "ItemCounts" "MediaSourceCount" "MediaSources" "OriginalTitle" "Overview" "ParentId" "Path" "People" "PlayAccess" "ProductionLocations" "ProviderIds" "PrimaryImageAspectRatio" "RecursiveItemCount" "Settings" "SeriesStudio" "SortName" "SpecialEpisodeNumbers" "Studios" "Taglines" "Tags" "RemoteTrailers" "MediaStreams" "SeasonUserData" "DateLastRefreshed" "DateLastSaved" "RefreshState" "ChannelImage" "EnableMediaSourceDisplay" "Width" "Height" "ExtraIds" "LocalTrailerCount" "IsHD" "SpecialFeatureCount"
 
@@ -65,25 +64,6 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
     return items;
   }
 
-  // Future<List<JellyfinItem>> _getLatest({int limit = 5}) async {
-  //   final res = await client.items.latest(limit: limit);
-
-  //   final items = List<JellyfinItem>.from(res);
-
-  //   for (int i = 0; i < items.length; i++) {
-  //     if (items[i].overview == null) {
-  //       final newItem = await client.items.byId(items[i].id);
-
-  //       if (newItem == null) continue;
-  //       if (newItem.overview == null) continue;
-
-  //       items.removeAt(i);
-  //       items.insert(i, newItem);
-  //     }
-  //   }
-  //   return items;
-  // }
-
   Future<List<JellyfinItem>> _getShowcaseItems({int limit = 20}) async {
     final res = await client.items.list(
       limit: limit,
@@ -113,34 +93,6 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
     final res = await client.items.resume(limit: limit, mediaTypes: ['Video']);
 
     return res.items;
-  }
-
-  Future<void> togglePlayed(String id) async {
-    final current = state.value ?? HomeData();
-    List<JellyfinItem> items = List<JellyfinItem>.from(current.showcaseItem);
-    final index = items.indexWhere((item) => item.id == id);
-
-    if (index != -1) {
-      state = await AsyncValue.guard(() async {
-        items[index] = await items[index].togglePlayed();
-
-        return current.copyWith(showcaseItem: items);
-      });
-    }
-  }
-
-  Future<void> toggleFavorite(String id) async {
-    final current = state.value ?? HomeData();
-    List<JellyfinItem> items = List<JellyfinItem>.from(current.showcaseItem);
-    final index = items.indexWhere((item) => item.id == id);
-
-    if (index != -1) {
-      state = await AsyncValue.guard(() async {
-        items[index] = await items[index].toggleFavorite();
-
-        return current.copyWith(showcaseItem: items);
-      });
-    }
   }
 }
 

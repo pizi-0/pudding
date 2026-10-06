@@ -1,69 +1,43 @@
 import 'package:dart_jellyfin/dart_jellyfin.dart';
-import 'package:flutter/rendering.dart';
 import 'package:pudding/services/di.dart';
-import 'package:pudding/utils/jellyfin_item_copywith_extension.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 
 final _client = services<JellyfinClient>();
 
 extension JellyUserDataExtension on JellyfinItem {
-  Future<JellyfinItem> setPlayed() async {
+  Future<JellyfinUserData> setPlayed() async {
     try {
-      final data = await _client.userData.markPlayed(id);
-      return copyWith(userData: data);
+      return await _client.userData.markPlayed(id);
     } catch (e) {
-      debugPrint(e.toString());
-      return this;
+      rethrow;
     }
   }
 
-  Future<JellyfinItem> setUnplayed() async {
+  Future<JellyfinUserData> setUnplayed() async {
     try {
-      final data = await _client.userData.markUnplayed(id);
-      return copyWith(userData: data);
+      return await _client.userData.markUnplayed(id);
     } catch (e) {
-      debugPrint(e.toString());
-      return this;
+      rethrow;
     }
   }
 
-  Future<JellyfinItem> togglePlayed() async {
-    if (isPlayed) {
-      return await setUnplayed();
-    } else {
-      return await setPlayed();
-    }
-  }
-
-  Future<JellyfinItem> setFavorite() async {
+  Future<JellyfinUserData> setFavorite() async {
     try {
-      final data = await _client.userData.markFavorite(id);
-      return copyWith(userData: data);
+      return await _client.userData.markFavorite(id);
     } catch (e) {
-      debugPrint(e.toString());
-      return this;
+      rethrow;
     }
   }
 
-  Future<JellyfinItem> unsetFavorite() async {
+  Future<JellyfinUserData> unsetFavorite() async {
     try {
-      final data = await _client.userData.unmarkFavorite(id);
-      return copyWith(userData: data);
+      return await _client.userData.unmarkFavorite(id);
     } catch (e) {
-      debugPrint(e.toString());
-      return this;
+      rethrow;
     }
   }
 
-  Future<JellyfinItem> toggleFavorite() async {
-    if (isFavorite) {
-      return await unsetFavorite();
-    } else {
-      return await setFavorite();
-    }
-  }
-
-  Future<void> updatePlaybackPosition(int ticks) async {
+  Future<JellyfinUserData> updatePlaybackPosition(int ticks) async {
     JellyfinUserData data =
         userData ??
         JellyfinUserData(
@@ -72,10 +46,18 @@ extension JellyUserDataExtension on JellyfinItem {
           played: isPlayed,
         );
 
-    await _client.userData.update(
-      itemId: id,
-      userData: data.copyWith(playbackPositionTicks: ticks),
-    );
+    try {
+      if (!isPlayed) {
+        return await _client.userData.update(
+          itemId: id,
+          userData: data.copyWith(playbackPositionTicks: ticks),
+        );
+      } else {
+        return await setPlayed();
+      }
+    } on Exception catch (_) {
+      rethrow;
+    }
   }
 }
 
