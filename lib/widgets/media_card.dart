@@ -325,6 +325,13 @@ class FavoriteIndicator extends ConsumerWidget {
           ? Icon(
               FPhosphorFillIcons.heart,
               color: Colors.pink,
+              shadows: [
+                BoxShadow(
+                  color: Colors.black,
+                  blurRadius: 10,
+                  spreadRadius: 5,
+                ),
+              ],
             )
           : SizedBox.shrink(),
     );
@@ -347,7 +354,7 @@ class PlayedIndicator extends ConsumerWidget {
     final isPlayed = override?.played ?? item.isPlayed;
 
     if (isPlayed) {
-      return Icon(FPhosphorBoldIcons.check, color: Colors.green);
+      return Icon(FPhosphorBoldIcons.checks, color: Colors.green);
     }
 
     if (item.isSeries || item.isSeason || item.isBoxsets) {
