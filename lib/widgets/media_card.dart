@@ -3,10 +3,12 @@ import 'package:awesome_extensions/awesome_extensions.dart' show StyledText;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:intl/intl.dart';
 import 'package:pudding/const/const.dart';
+import 'package:pudding/providers/userdata_registry_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/star_rating_container.dart';
 
@@ -204,7 +206,6 @@ class InfoLayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = context.theme;
-    final favorite = item.isFavorite;
     final placeholder = item.isPlaceholder;
     final missing = item.isMissing;
     final upcoming = item.isUpcoming;
@@ -223,24 +224,17 @@ class InfoLayer extends StatelessWidget {
               if (upcoming)
                 FBadge(variant: .secondary, child: Text('Upcoming')),
               Spacer(),
-              if (favorite)
-                Align(
-                  alignment: .centerRight,
-                  child: Icon(
-                    FPhosphorFillIcons.heart,
-                    color: Colors.pink,
-                  ),
-                ),
+              Align(
+                alignment: .centerRight,
+                child: FavoriteIndicator(item: item),
+              ),
             ],
           ),
           Spacer(),
-          if (item.isResumable)
-            FDeterminateProgress(
-              value: item.getPlayProgress(),
-            ).fadeOut(
-              animate: hover,
-              duration: kDefaultAnimationDuration,
-            ),
+          ProgressIndicator(item: item).fadeOut(
+            animate: hover,
+            duration: kDefaultAnimationDuration,
+          ),
           Row(
             spacing: 4,
             crossAxisAlignment: .end,
@@ -261,7 +255,7 @@ class InfoLayer extends StatelessWidget {
                   ),
                 ),
               ),
-              if (!placeholder) _playStatusIndicator(theme),
+              if (!placeholder) PlayedIndicator(item: item, isNext: isNext),
             ],
           ),
           DefaultTextStyle(
@@ -311,9 +305,48 @@ class InfoLayer extends StatelessWidget {
 
     return null;
   }
+}
 
-  Widget _playStatusIndicator(FThemeData theme) {
-    if (item.userData?.played ?? false) {
+class FavoriteIndicator extends ConsumerWidget {
+  final JellyfinItem item;
+  const FavoriteIndicator({super.key, required this.item});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final override = ref.watch(
+      userDataRegistryProvider.select((d) => d[item.id]),
+    );
+
+    final isFavorite = override?.isFavorite ?? item.isFavorite;
+
+    return AnimatedSwitcher(
+      duration: kDefaultAnimationDuration,
+      child: isFavorite
+          ? Icon(
+              FPhosphorFillIcons.heart,
+              color: Colors.pink,
+            )
+          : SizedBox.shrink(),
+    );
+  }
+}
+
+class PlayedIndicator extends ConsumerWidget {
+  final JellyfinItem item;
+  final bool isNext;
+  const PlayedIndicator({super.key, required this.item, this.isNext = false});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = context.theme;
+
+    final override = ref.watch(
+      userDataRegistryProvider.select((d) => d[item.id]),
+    );
+
+    final isPlayed = override?.played ?? item.isPlayed;
+
+    if (isPlayed) {
       return Icon(FPhosphorBoldIcons.check, color: Colors.green);
     }
 
@@ -351,5 +384,31 @@ class InfoLayer extends StatelessWidget {
     } else {
       return SizedBox();
     }
+  }
+}
+
+class ProgressIndicator extends ConsumerWidget {
+  final JellyfinItem item;
+  const ProgressIndicator({super.key, required this.item});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final override = ref.watch(
+      userDataRegistryProvider.select((d) => d[item.id]),
+    );
+
+    final ticks =
+        override?.playbackPositionTicks ??
+        item.userData?.playbackPositionTicks ??
+        0;
+
+    final progress = ticks / (item.runTimeTicks ?? 0);
+
+    return AnimatedSwitcher(
+      duration: kDefaultAnimationDuration,
+      child: item.isResumable
+          ? FDeterminateProgress(value: progress)
+          : SizedBox.shrink(),
+    );
   }
 }
