@@ -143,7 +143,6 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
                           Row(
                             children: [
                               FButton(
-                                size: .lg,
                                 style: .delta(
                                   contentStyle: .delta(
                                     constraints: BoxConstraints(

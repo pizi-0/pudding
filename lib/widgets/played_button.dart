@@ -15,7 +15,7 @@ class PlayedButton extends ConsumerStatefulWidget {
     super.key,
     required this.item,
     this.onTogglePlayed,
-    this.buttonSize = .lg,
+    this.buttonSize = .md,
   });
 
   @override

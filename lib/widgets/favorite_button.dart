@@ -15,7 +15,7 @@ class FavoriteButton extends ConsumerStatefulWidget {
     super.key,
     required this.item,
     this.onToggleFavorite,
-    this.buttonSize = .lg,
+    this.buttonSize = .md,
   });
 
   @override
