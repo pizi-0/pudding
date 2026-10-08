@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:awesome_extensions/awesome_extensions.dart';
-
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class AccessSchedule {
   final int id;
@@ -316,10 +314,14 @@ class UserPolicy {
       'authenticationProviderId': authenticationProviderId,
       'passwordResetProviderId': passwordResetProviderId,
       'syncPlayAccess': syncPlayAccess,
-    }.map((k, v) => MapEntry(k.capitalizeFirst, v));
+    }.map((k, v) => MapEntry('${k[0].toUpperCase()}${k.substring(1)}', v));
   }
 
-  factory UserPolicy.fromMap(Map<String, dynamic> map) {
+  factory UserPolicy.fromMap(Map<String, dynamic> map0) {
+    final map = map0.map(
+      (k, v) => MapEntry('${k[0].toUpperCase()}${k.substring(1)}', v),
+    );
+
     return UserPolicy(
       isAdministrator: map['isAdministrator'] ?? false,
       isHidden: map['isHidden'] ?? false,
