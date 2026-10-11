@@ -1,5 +1,8 @@
 import 'package:awesome_extensions/awesome_extensions.dart'
     show StringExtension;
+import 'package:awesome_extensions/awesome_extensions_flutter.dart'
+    show ExpandedExtension;
+import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,11 +12,14 @@ import 'package:go_router/go_router.dart';
 import 'package:morphnext/morphnext.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/models/jelly_filter.dart';
+import 'package:pudding/models/jelly_user_policy.dart';
 import 'package:pudding/providers/settings_provider.dart';
 import 'package:pudding/screens/library_detail/library_detail_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_section.dart';
+import 'package:pudding/widgets/favorite_button.dart';
 import 'package:pudding/widgets/media_card.dart';
+import 'package:pudding/widgets/played_button.dart';
 
 class SliverLibraryItemGrid extends ConsumerStatefulWidget {
   final String id;
@@ -87,6 +93,8 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
             final item = data.items[index];
 
             return MediaCard(
+              menuBuilder: (controller, policy) =>
+                  menu(item, controller, policy),
               key: ValueKey(item.id),
               item: item,
               imageType: prefs.imageType(widget.id),
@@ -108,6 +116,81 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
         ),
       ],
     );
+  }
+
+  List<FItemGroup> menu(
+    JellyfinItem item,
+    FPopoverController controller,
+    UserPolicy policy,
+  ) {
+    final theme = context.theme;
+
+    return [
+      FItemGroup(
+        children: [
+          FItem.raw(
+            child: Text(
+              item.getTitle(),
+              style: theme.typography.body.sm.copyWith(fontWeight: .bold),
+              maxLines: 2,
+            ),
+          ),
+        ],
+      ),
+      FItemGroup(
+        children: [
+          FItem.raw(
+            child: Row(
+              spacing: 10,
+              children: [
+                FavoriteButton(item: item).expanded(),
+                PlayedButton(item: item).expanded(),
+                FButton.icon(
+                  onPress: () {},
+                  child: Icon(FPhosphorBoldIcons.info),
+                ).expanded(),
+              ],
+            ),
+          ),
+        ],
+      ),
+      FItemGroup(
+        children: [
+          FItem(
+            title: Text('Play'),
+            prefix: Icon(FPhosphorBoldIcons.play),
+            onPress: () {
+              controller.hide();
+            },
+          ),
+          FItem(
+            title: Text('Play all from here'),
+            prefix: Icon(FPhosphorBoldIcons.play),
+            onPress: () {
+              controller.hide();
+            },
+          ),
+        ],
+      ),
+      FItemGroup(
+        children: [
+          FItem(
+            title: Text('Add to collection'),
+            prefix: Icon(FPhosphorBoldIcons.listPlus),
+            onPress: () {
+              controller.hide();
+            },
+          ),
+          FItem(
+            title: Text('Add to playlist'),
+            prefix: Icon(FPhosphorBoldIcons.listPlus),
+            onPress: () {
+              controller.hide();
+            },
+          ),
+        ],
+      ),
+    ];
   }
 }
 

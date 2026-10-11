@@ -1,10 +1,17 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:pudding/models/jelly_user_policy.dart';
+import 'package:pudding/screens/auth/auth_provider.dart';
 
-class FocusedMenu extends StatefulWidget {
-  final List<FItemGroupMixin>? menu;
+class FocusedMenu extends ConsumerStatefulWidget {
+  final List<FItemGroupMixin> Function(
+    FPopoverController controller,
+    UserPolicy policy,
+  )?
+  menuBuilder;
   final Widget Function(
     BuildContext context,
     FPopoverController control,
@@ -14,23 +21,43 @@ class FocusedMenu extends StatefulWidget {
 
   const FocusedMenu({
     super.key,
-    this.menu,
+    this.menuBuilder,
     required this.builder,
   });
 
   @override
-  State<FocusedMenu> createState() => _FocusedMenuState();
+  ConsumerState<FocusedMenu> createState() => _FocusedMenuState();
 }
 
-class _FocusedMenuState extends State<FocusedMenu>
+class _FocusedMenuState extends ConsumerState<FocusedMenu>
     with SingleTickerProviderStateMixin {
+  bool shown = false;
+  late final FPopoverController controller = FPopoverController(vsync: this);
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
     final borderRadius = theme.style.borderRadius.sm;
+    final user = ref.watch(authProvider).value;
+    final policy = UserPolicy.fromMap(user?.raw['Policy'] ?? {});
 
     return FPopoverMenu(
-      menu: widget.menu,
+      control: .managed(
+        controller: controller,
+        onChange: (b) {
+          shown = b;
+          setState(() {});
+        },
+      ),
+      menu: widget.menuBuilder == null
+          ? []
+          : widget.menuBuilder!(controller, policy),
       cutout: true,
       faded: false,
       menuAnchor: .topLeft,
@@ -52,8 +79,8 @@ class _FocusedMenuState extends State<FocusedMenu>
         barrierFilter: () =>
             (context, animation) => ImageFilter.compose(
               outer: ImageFilter.blur(
-                sigmaX: animation * 0,
-                sigmaY: animation * 0,
+                sigmaX: animation * 5,
+                sigmaY: animation * 5,
               ),
               inner: ColorFilter.mode(
                 Color.lerp(

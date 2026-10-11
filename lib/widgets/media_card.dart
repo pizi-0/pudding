@@ -8,8 +8,10 @@ import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:intl/intl.dart';
 import 'package:pudding/const/const.dart';
+import 'package:pudding/models/jelly_user_policy.dart';
 import 'package:pudding/providers/userdata_registry_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
+import 'package:pudding/widgets/focused_menu.dart';
 import 'package:pudding/widgets/star_rating_container.dart';
 
 class MediaCard extends StatefulWidget {
@@ -21,9 +23,15 @@ class MediaCard extends StatefulWidget {
   final bool isNext;
   final Widget? bottom;
   final bool showSeriesName;
+  final List<FItemGroup> Function(
+    FPopoverController controller,
+    UserPolicy policy,
+  )?
+  menuBuilder;
   const MediaCard({
     super.key,
     required this.item,
+    this.menuBuilder,
     this.imageType = JellyfinImagesApi.typePrimary,
     this.dimPlayed = false,
     this.onPressed,
@@ -47,142 +55,154 @@ class _MediaCardState extends State<MediaCard> {
     final style = theme.style;
 
     return RepaintBoundary(
-      child: LayoutBuilder(
-        builder: (context, size) {
-          final height = size.maxHeight;
+      child: FocusedMenu(
+        menuBuilder: widget.menuBuilder,
+        builder: (context, controller, child) {
+          return LayoutBuilder(
+            builder: (context, size) {
+              final height = size.maxHeight;
 
-          return Column(
-            children: [
-              Expanded(
-                child: FButton.raw(
-                  onHoverChange: (value) => setState(() => hover = value),
-                  onFocusChange: (value) => setState(() => hover = value),
-                  variant: .outline,
-                  onPress: widget.onPressed,
-                  style: .delta(
-                    decoration: .delta([
-                      .all(
-                        .boxDelta(
-                          border: .all(
-                            color: widget.selected
-                                ? theme.colors.primary
-                                : theme.colors.border,
-                            width: 2,
+              return Column(
+                children: [
+                  Expanded(
+                    child: FButton.raw(
+                      onHoverChange: (value) => setState(() => hover = value),
+                      onFocusChange: (value) => setState(() => hover = value),
+                      onSecondaryPress: controller.toggle,
+                      onLongPress: controller.toggle,
+                      variant: .outline,
+                      onPress: widget.onPressed,
+                      style: .delta(
+                        decoration: .delta([
+                          .all(
+                            .boxDelta(
+                              border: .all(
+                                color: widget.selected
+                                    ? theme.colors.primary
+                                    : theme.colors.border,
+                                width: 2,
+                              ),
+                            ),
                           ),
-                        ),
+                        ]),
                       ),
-                    ]),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(2.0),
-                    child: ClipRRect(
-                      borderRadius: style.borderRadius.sm,
-                      child: Container(
-                        color: Colors.black,
-                        child: Stack(
-                          fit: .expand,
-                          children: [
-                            Positioned(
-                              left: -1,
-                              top: -1,
-                              right: -1,
-                              bottom: -1,
-                              child: AnimatedOpacity(
-                                duration: kDefaultAnimationDuration,
-                                opacity: widget.dimPlayed && !hover
-                                    ? 0.4
-                                    : hover
-                                    ? 0.6
-                                    : 1,
-                                child: AnimatedScale(
-                                  duration: kDefaultAnimationDuration,
-                                  alignment: .bottomCenter,
-                                  scale: hover ? 1.01 : 1,
-                                  child: CachedNetworkImage(
-                                    disablePlaceholderOnCacheHit: false,
-                                    memCacheHeight: height.ceil(),
-                                    fit: item.isPlaceholder ? .contain : .cover,
-                                    imageBuilder: (context, imageProvider) {
-                                      if (item.isPlaceholder) {
-                                        return Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Image(
-                                            image: imageProvider,
-                                            fit: .contain,
-                                          ),
-                                        );
-                                      } else {
-                                        return Image(
-                                          image: imageProvider,
-                                          fit: .cover,
-                                        );
-                                      }
-                                    },
-                                    imageUrl: item.isPlaceholder
-                                        ? item.getLogo()
-                                        : item.getImage(type: imageType),
-                                    errorBuilder:
-                                        (
-                                          context,
-                                          error,
-                                          stackTrace,
-                                        ) => Center(
-                                          child: Icon(
-                                            FPhosphorBoldIcons.imageBroken,
-                                          ),
-                                        ),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            Positioned.fill(
-                              child: Align(
-                                alignment: Alignment.bottomCenter,
-                                child: AnimatedContainer(
-                                  duration: kDefaultAnimationDuration,
-                                  height: 52,
-                                  decoration: BoxDecoration(
-                                    color: Colors
-                                        .transparent, // Solid overlay shadow
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: theme.colors.background
-                                            .withAlpha(245),
-                                        blurRadius: height / (hover ? 3 : 4),
-                                        spreadRadius: height / (hover ? 3 : 4), // This blur mimics the soft edge of a gradient!
-                                        offset: const Offset(0, 52),
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: ClipRRect(
+                          borderRadius: style.borderRadius.sm,
+                          child: Container(
+                            color: Colors.black,
+                            child: Stack(
+                              fit: .expand,
+                              children: [
+                                Positioned(
+                                  left: -1,
+                                  top: -1,
+                                  right: -1,
+                                  bottom: -1,
+                                  child: AnimatedOpacity(
+                                    duration: kDefaultAnimationDuration,
+                                    opacity: widget.dimPlayed && !hover
+                                        ? 0.4
+                                        : hover
+                                        ? 0.6
+                                        : 1,
+                                    child: AnimatedScale(
+                                      duration: kDefaultAnimationDuration,
+                                      alignment: .bottomCenter,
+                                      scale: hover ? 1.01 : 1,
+                                      child: CachedNetworkImage(
+                                        disablePlaceholderOnCacheHit: false,
+                                        memCacheHeight: height.ceil(),
+                                        fit: item.isPlaceholder
+                                            ? .contain
+                                            : .cover,
+                                        imageBuilder: (context, imageProvider) {
+                                          if (item.isPlaceholder) {
+                                            return Padding(
+                                              padding: const EdgeInsets.all(
+                                                8.0,
+                                              ),
+                                              child: Image(
+                                                image: imageProvider,
+                                                fit: .contain,
+                                              ),
+                                            );
+                                          } else {
+                                            return Image(
+                                              image: imageProvider,
+                                              fit: .cover,
+                                            );
+                                          }
+                                        },
+                                        imageUrl: item.isPlaceholder
+                                            ? item.getLogo()
+                                            : item.getImage(type: imageType),
+                                        errorBuilder:
+                                            (
+                                              context,
+                                              error,
+                                              stackTrace,
+                                            ) => Center(
+                                              child: Icon(
+                                                FPhosphorBoldIcons.imageBroken,
+                                              ),
+                                            ),
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
-                              ),
+
+                                Positioned.fill(
+                                  child: Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: AnimatedContainer(
+                                      duration: kDefaultAnimationDuration,
+                                      height: 52,
+                                      decoration: BoxDecoration(
+                                        color: Colors.transparent, // Solid overlay shadow
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: theme.colors.background
+                                                .withAlpha(245),
+                                            blurRadius:
+                                                height / (hover ? 3 : 4),
+                                            spreadRadius:
+                                                height / (hover ? 3 : 4), // This blur mimics the soft edge of a gradient!
+                                            offset: const Offset(0, 52),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned.fill(
+                                  bottom: -1,
+                                  top: -1,
+                                  left: -1,
+                                  right: -1,
+                                  child: InfoLayer(
+                                    item: item,
+                                    hover: hover,
+                                    isNext: widget.isNext,
+                                    showSeriesName: widget.showSeriesName,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Positioned.fill(
-                              bottom: -1,
-                              top: -1,
-                              left: -1,
-                              right: -1,
-                              child: InfoLayer(
-                                item: item,
-                                hover: hover,
-                                isNext: widget.isNext,
-                                showSeriesName: widget.showSeriesName,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              if (widget.bottom != null)
-                AnimatedSize(
-                  duration: kDefaultAnimationDuration,
-                  child: widget.bottom!,
-                ),
-            ],
+                  if (widget.bottom != null)
+                    AnimatedSize(
+                      duration: kDefaultAnimationDuration,
+                      child: widget.bottom!,
+                    ),
+                ],
+              );
+            },
           );
         },
       ),
