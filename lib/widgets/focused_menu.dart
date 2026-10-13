@@ -13,7 +13,7 @@ class FocusedMenu extends ConsumerStatefulWidget {
   )?
   menuBuilder;
   final Widget Function(
-    BuildContext context,
+    bool shown,
     FPopoverController control,
     Widget? child,
   )
@@ -98,7 +98,8 @@ class _FocusedMenuState extends ConsumerState<FocusedMenu>
           borderRadius.bottomLeft,
         ),
       ),
-      builder: widget.builder,
+      builder: (context, controller, child) =>
+          widget.builder(shown, controller, child),
     );
   }
 }

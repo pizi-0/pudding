@@ -57,7 +57,7 @@ class _MediaCardState extends State<MediaCard> {
     return RepaintBoundary(
       child: FocusedMenu(
         menuBuilder: widget.menuBuilder,
-        builder: (context, controller, child) {
+        builder: (shown, controller, child) {
           return LayoutBuilder(
             builder: (context, size) {
               final height = size.maxHeight;
@@ -159,20 +159,22 @@ class _MediaCardState extends State<MediaCard> {
                                     child: AnimatedContainer(
                                       duration: kDefaultAnimationDuration,
                                       height: 52,
-                                      decoration: BoxDecoration(
-                                        color: Colors.transparent, // Solid overlay shadow
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: theme.colors.background
-                                                .withAlpha(245),
-                                            blurRadius:
-                                                height / (hover ? 3 : 4),
-                                            spreadRadius:
-                                                height / (hover ? 3 : 4), // This blur mimics the soft edge of a gradient!
-                                            offset: const Offset(0, 52),
-                                          ),
-                                        ],
-                                      ),
+                                      decoration: shown
+                                          ? null
+                                          : BoxDecoration(
+                                              color: Colors.transparent, // Solid overlay shadow
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: theme.colors.background
+                                                      .withAlpha(245),
+                                                  blurRadius:
+                                                      height / (hover ? 3 : 4),
+                                                  spreadRadius:
+                                                      height / (hover ? 3 : 4), // This blur mimics the soft edge of a gradient!
+                                                  offset: const Offset(0, 52),
+                                                ),
+                                              ],
+                                            ),
                                     ),
                                   ),
                                 ),
@@ -181,11 +183,17 @@ class _MediaCardState extends State<MediaCard> {
                                   top: -1,
                                   left: -1,
                                   right: -1,
-                                  child: InfoLayer(
-                                    item: item,
-                                    hover: hover,
-                                    isNext: widget.isNext,
-                                    showSeriesName: widget.showSeriesName,
+                                  child: AnimatedSwitcher(
+                                    duration: kDefaultAnimationDuration,
+                                    child: shown
+                                        ? SizedBox()
+                                        : InfoLayer(
+                                            item: item,
+                                            hover: hover,
+                                            isNext: widget.isNext,
+                                            showSeriesName:
+                                                widget.showSeriesName,
+                                          ),
                                   ),
                                 ),
                               ],
