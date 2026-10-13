@@ -125,6 +125,9 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
   ) {
     final theme = context.theme;
     final libNotifier = ref.read(libraryProvider(widget.id).notifier);
+    final filters = ref.watch(
+      libraryProvider(widget.id).select((data) => data.value?.filters),
+    );
 
     return [
       FItemGroup(
@@ -147,7 +150,11 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
                 FavoriteButton(item: item).expanded(),
                 PlayedButton(
                   item: item,
-                  onTogglePlayed: libNotifier.refresh,
+                  onTogglePlayed: () async {
+                    if (filters?.isNotEmpty ?? false) {
+                      libNotifier.refresh();
+                    }
+                  },
                 ).expanded(),
                 FButton.icon(
                   onPress: () {},
