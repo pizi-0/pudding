@@ -26,6 +26,13 @@ class PuddingFilters {
       filters.isEmpty &&
       parentalRating.isEmpty;
 
+  bool get isNotEmpty =>
+      genres.isNotEmpty ||
+      tags.isNotEmpty ||
+      years.isNotEmpty ||
+      filters.isNotEmpty ||
+      parentalRating.isNotEmpty;
+
   PuddingFilters copyWith({
     List<String>? genres,
     List<String>? tags,
