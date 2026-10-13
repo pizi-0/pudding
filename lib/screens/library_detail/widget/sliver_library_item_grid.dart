@@ -124,6 +124,7 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
     UserPolicy policy,
   ) {
     final theme = context.theme;
+    final libNotifier = ref.read(libraryProvider(widget.id).notifier);
 
     return [
       FItemGroup(
@@ -144,7 +145,10 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
               spacing: 10,
               children: [
                 FavoriteButton(item: item).expanded(),
-                PlayedButton(item: item).expanded(),
+                PlayedButton(
+                  item: item,
+                  onTogglePlayed: libNotifier.refresh,
+                ).expanded(),
                 FButton.icon(
                   onPress: () {},
                   child: Icon(FPhosphorBoldIcons.info),
