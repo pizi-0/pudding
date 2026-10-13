@@ -319,7 +319,7 @@ class UserPolicy {
 
   factory UserPolicy.fromMap(Map<String, dynamic> map0) {
     final map = map0.map(
-      (k, v) => MapEntry('${k[0].toUpperCase()}${k.substring(1)}', v),
+      (k, v) => MapEntry('${k[0].toLowerCase()}${k.substring(1)}', v),
     );
 
     return UserPolicy(
