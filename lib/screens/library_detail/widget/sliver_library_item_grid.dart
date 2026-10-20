@@ -174,13 +174,14 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
               controller.hide();
             },
           ),
-          FItem(
-            title: Text('Play all from here'),
-            prefix: Icon(FPhosphorBoldIcons.play),
-            onPress: () {
-              controller.hide();
-            },
-          ),
+          if (!item.isSeries && !item.isBoxsets)
+            FItem(
+              title: Text('Play all from here'),
+              prefix: Icon(FPhosphorBoldIcons.play),
+              onPress: () {
+                controller.hide();
+              },
+            ),
         ],
       ),
       FItemGroup(
