@@ -66,8 +66,11 @@ class SliverEpisodes extends ConsumerWidget {
                 final tv = data.episodes[index];
 
                 return MediaCard(
-                  menuBuilder: (controller, policy) =>
-                      tv.getMenu(controller: controller, policy: policy),
+                  menuBuilder: (controller, policy) => MenuBuilder(
+                    controller: controller,
+                    item: tv,
+                    policy: policy,
+                  ).getMenu(),
                   item: tv,
                   dimPlayed: tv.userData?.played ?? false,
                   bottom: AspectRatio(

@@ -10,13 +10,19 @@ import 'package:pudding/widgets/played_button.dart';
 
 import '../../utils/jellyfin_item_extensions.dart';
 
-extension JellyItemMenus on JellyfinItem {
+class MenuBuilder {
+  final FPopoverController controller;
+  final JellyfinItem item;
+  final UserPolicy policy;
+
+  new({required this.controller, required this.item, required this.policy});
+
   FItemGroup headerGroup() {
     return FItemGroup(
       children: [
         FItem.raw(
           child: Text(
-            getTitle(),
+            item.getTitle(),
             maxLines: 2,
           ).bold(),
         ),
@@ -35,11 +41,11 @@ extension JellyItemMenus on JellyfinItem {
             spacing: 10,
             children: [
               FavoriteButton(
-                item: this,
+                item: item,
                 onToggleFavorite: onToggleFavorite,
               ).expanded(),
               PlayedButton(
-                item: this,
+                item: item,
                 onTogglePlayed: onTogglePlayed,
               ).expanded(),
               FButton.icon(
@@ -57,23 +63,32 @@ extension JellyItemMenus on JellyfinItem {
     return FItem(
       prefix: Icon(FPhosphorBoldIcons.play),
       title: Text('Play'),
-      onPress: () {},
+      onPress: () {
+        controller.hide();
+      },
     );
   }
 
-  FItem playFromHere({required List<JellyfinItem> items}) {
+  FItem playFromHere({
+    required List<JellyfinItem> items,
+  }) {
     return FItem(
       prefix: Icon(FPhosphorBoldIcons.play),
       title: Text('Play all from here'),
-      onPress: () {},
+      onPress: () {
+        controller.hide();
+      },
     );
   }
 
-  FItemGroup playGroup({List<JellyfinItem> playFromList = const []}) {
+  FItemGroup playGroup({
+    List<JellyfinItem> playFromList = const [],
+  }) {
     return FItemGroup(
       children: [
         play(),
-        if (!isSeries && !isBoxsets) playFromHere(items: playFromList),
+        if (!item.isSeries && !item.isBoxsets)
+          playFromHere(items: playFromList),
       ],
     );
   }
@@ -82,7 +97,9 @@ extension JellyItemMenus on JellyfinItem {
     return FItem(
       prefix: Icon(FPhosphorBoldIcons.listPlus),
       title: Text('Add to collection'),
-      onPress: () {},
+      onPress: () {
+        controller.hide();
+      },
     );
   }
 
@@ -90,7 +107,9 @@ extension JellyItemMenus on JellyfinItem {
     return FItem(
       prefix: Icon(FPhosphorBoldIcons.listPlus),
       title: Text('Add to playlist'),
-      onPress: () {},
+      onPress: () {
+        controller.hide();
+      },
     );
   }
 
@@ -110,8 +129,6 @@ extension JellyItemMenus on JellyfinItem {
     Future<dynamic> Function()? onTogglePlayed,
     Future<dynamic> Function()? onToggleFavorite,
     List<JellyfinItem> playFromList = const [],
-    required FPopoverController controller,
-    required UserPolicy policy,
   }) {
     return [
       headerGroup(),

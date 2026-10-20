@@ -88,20 +88,23 @@ class _SliverLibraryItemGridState extends ConsumerState<SliverLibraryItemGrid> {
             final item = data.items[index];
 
             return MediaCard(
-              menuBuilder: (controller, policy) => item.getMenu(
-                controller: controller,
-                policy: policy,
-                onToggleFavorite: () async {
-                  if (data.filters.isNotEmpty) {
-                    libNotifier.refresh();
-                  }
-                },
-                onTogglePlayed: () async {
-                  if (data.filters.isNotEmpty) {
-                    libNotifier.refresh();
-                  }
-                },
-              ),
+              menuBuilder: (controller, policy) =>
+                  MenuBuilder(
+                    controller: controller,
+                    item: item,
+                    policy: policy,
+                  ).getMenu(
+                    onToggleFavorite: () async {
+                      if (data.filters.isNotEmpty) {
+                        libNotifier.refresh();
+                      }
+                    },
+                    onTogglePlayed: () async {
+                      if (data.filters.isNotEmpty) {
+                        libNotifier.refresh();
+                      }
+                    },
+                  ),
               key: ValueKey(item.id),
               item: item,
               imageType: prefs.imageType(widget.id),
