@@ -46,7 +46,7 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
               await dataNotifier.toggleFavorite(widget.item);
 
               if (widget.onToggleFavorite != null) {
-                widget.onToggleFavorite;
+                await widget.onToggleFavorite!();
               }
 
               loading = false;
