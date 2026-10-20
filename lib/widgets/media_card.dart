@@ -23,6 +23,7 @@ class MediaCard extends StatefulWidget {
   final bool isNext;
   final Widget? bottom;
   final bool showSeriesName;
+  final bool disableFocusedMenu;
   final List<FItemGroup> Function(
     FPopoverController controller,
     UserPolicy policy,
@@ -39,6 +40,7 @@ class MediaCard extends StatefulWidget {
     this.isNext = false,
     this.showSeriesName = false,
     this.bottom,
+    this.disableFocusedMenu = false,
   });
 
   @override
@@ -68,8 +70,12 @@ class _MediaCardState extends State<MediaCard> {
                     child: FButton.raw(
                       onHoverChange: (value) => setState(() => hover = value),
                       onFocusChange: (value) => setState(() => hover = value),
-                      onSecondaryPress: controller.toggle,
-                      onLongPress: controller.toggle,
+                      onSecondaryPress: widget.disableFocusedMenu
+                          ? null
+                          : controller.toggle,
+                      onLongPress: widget.disableFocusedMenu
+                          ? null
+                          : controller.toggle,
                       variant: .outline,
                       onPress: widget.onPressed,
                       style: .delta(
