@@ -8,6 +8,7 @@ import 'package:pudding/screens/detail_screens/widgets/season_selector.dart';
 import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/utils/scroll_to_key_extension.dart';
+import 'package:pudding/widgets/focused_menu/menu_items.dart';
 import 'package:pudding/widgets/media_card.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_section.dart';
 
@@ -65,6 +66,8 @@ class SliverEpisodes extends ConsumerWidget {
                 final tv = data.episodes[index];
 
                 return MediaCard(
+                  menuBuilder: (controller, policy) =>
+                      tv.getMenu(controller: controller, policy: policy),
                   item: tv,
                   dimPlayed: tv.userData?.played ?? false,
                   bottom: AspectRatio(
