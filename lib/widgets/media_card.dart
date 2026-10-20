@@ -11,7 +11,7 @@ import 'package:pudding/const/const.dart';
 import 'package:pudding/models/jelly_user_policy.dart';
 import 'package:pudding/providers/userdata_registry_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
-import 'package:pudding/widgets/focused_menu.dart';
+import 'package:pudding/widgets/focused_menu/focused_menu.dart';
 import 'package:pudding/widgets/star_rating_container.dart';
 
 class MediaCard extends StatefulWidget {
