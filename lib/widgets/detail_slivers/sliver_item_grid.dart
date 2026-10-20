@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/models/settings/library/user_view_prefs.dart';
 import 'package:pudding/providers/settings_provider.dart';
+import 'package:pudding/widgets/focused_menu/menu_items.dart';
 import 'package:pudding/widgets/media_card.dart';
 
 import '../../utils/jellyfin_item_navigator.dart';
@@ -46,6 +47,11 @@ class SliverItemGrid extends ConsumerWidget {
       itemBuilder: (context, index) {
         final item = items[index];
         return MediaCard(
+          menuBuilder: (controller, policy) => MenuBuilder(
+            controller: controller,
+            item: item,
+            policy: policy,
+          ).getMenu(),
           item: item,
           onPressed: () {
             item.push(context, shouldReplace: shouldReplace);
