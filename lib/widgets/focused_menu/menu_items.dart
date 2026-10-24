@@ -14,8 +14,25 @@ class MenuBuilder {
   final FPopoverController controller;
   final JellyfinItem item;
   final UserPolicy policy;
+  final bool isCollection;
+  final bool isPlaylist;
+  final List<JellyfinItem> playFromList;
 
-  new({required this.controller, required this.item, required this.policy});
+  final Future Function()? onTogglePlayed;
+  final Future Function()? onToggleFavorite;
+  final Future Function()? onRemoved;
+
+  new({
+    required this.controller,
+    required this.item,
+    required this.policy,
+    this.isCollection = false,
+    this.isPlaylist = false,
+    this.onTogglePlayed,
+    this.onToggleFavorite,
+    this.onRemoved,
+    this.playFromList = const [],
+  });
 
   FItemGroup headerGroup() {
     return FItemGroup(
@@ -30,10 +47,7 @@ class MenuBuilder {
     );
   }
 
-  FItemGroup actionGroup({
-    Future<dynamic> Function()? onTogglePlayed,
-    Future<dynamic> Function()? onToggleFavorite,
-  }) {
+  FItemGroup actionGroup() {
     return FItemGroup(
       children: [
         FItem.raw(
@@ -69,9 +83,7 @@ class MenuBuilder {
     );
   }
 
-  FItem playFromHere({
-    required List<JellyfinItem> items,
-  }) {
+  FItem playFromHere() {
     return FItem(
       prefix: Icon(FPhosphorBoldIcons.play),
       title: Text('Play all from here'),
@@ -81,14 +93,11 @@ class MenuBuilder {
     );
   }
 
-  FItemGroup playGroup({
-    List<JellyfinItem> playFromList = const [],
-  }) {
+  FItemGroup playGroup() {
     return FItemGroup(
       children: [
         play(),
-        if (!item.isSeries && !item.isBoxsets)
-          playFromHere(items: playFromList),
+        if (!item.isSeries && !item.isBoxsets) playFromHere(),
       ],
     );
   }
@@ -122,22 +131,67 @@ class MenuBuilder {
     );
   }
 
+  FItem removeCollection() {
+    return FItem(
+      prefix: Icon(FPhosphorBoldIcons.minus),
+      title: Text('Remove collection'),
+      onPress: () {},
+    );
+  }
+
+  FItem removeFromCollection() {
+    return FItem(
+      prefix: Icon(FPhosphorBoldIcons.archiveBox),
+      title: Text('Remove from collection'),
+      onPress: () {},
+    );
+  }
+
+  FItem removeFromPlaylist() {
+    return FItem(
+      title: Text('Remove from playlist'),
+      onPress: () {},
+    );
+  }
+
+  FItem deleteMedia() {
+    return FItem(
+      variant: .destructive,
+      prefix: Icon(FPhosphorBoldIcons.trash),
+      title: Text('Delete media'),
+      onPress: () {},
+    );
+  }
+
+  FItemGroup removeGroup() {
+    return FItemGroup(
+      children: [
+        if (item.isBoxsets) removeCollection(),
+        if (isCollection) removeFromCollection(),
+        if (isPlaylist) removeFromPlaylist(),
+      ],
+    );
+  }
+
+  FItemGroup deleteGroup() {
+    return FItemGroup(
+      children: [
+        if (policy.enableContentDeletion && (!item.isBoxsets)) deleteMedia(),
+      ],
+    );
+  }
+
   ///
   ///
 
-  List<FItemGroup> getMenu({
-    Future<dynamic> Function()? onTogglePlayed,
-    Future<dynamic> Function()? onToggleFavorite,
-    List<JellyfinItem> playFromList = const [],
-  }) {
+  List<FItemGroup> getMenu() {
     return [
       headerGroup(),
-      actionGroup(
-        onTogglePlayed: onTogglePlayed,
-        onToggleFavorite: onToggleFavorite,
-      ),
-      playGroup(playFromList: playFromList),
+      actionGroup(),
+      playGroup(),
       addToGroup(),
+      removeGroup(),
+      deleteGroup(),
     ];
   }
 }
