@@ -17,6 +17,7 @@ class SliverItemGrid extends ConsumerWidget {
   final bool dimPlayed;
   final ViewType viewType;
   final bool shouldReplace;
+  final bool isCollection;
   const new({
     super.key,
     this.items = const [],
@@ -24,6 +25,7 @@ class SliverItemGrid extends ConsumerWidget {
     this.dimPlayed = false,
     this.viewType = .poster,
     this.shouldReplace = true,
+    this.isCollection = false,
   });
 
   @override
@@ -50,6 +52,7 @@ class SliverItemGrid extends ConsumerWidget {
           menuBuilder: (controller, policy) => MenuBuilder(
             controller: controller,
             item: item,
+            isCollection: isCollection,
             policy: policy,
           ).getMenu(),
           item: item,

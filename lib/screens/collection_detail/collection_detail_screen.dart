@@ -77,7 +77,11 @@ class _CollectionDetailScreenState
                   child: Text('Movies'),
                 ),
                 slivers: [
-                  SliverItemGrid(items: c.movies, shouldReplace: false),
+                  SliverItemGrid(
+                    items: c.movies,
+                    shouldReplace: false,
+                    isCollection: true,
+                  ),
                 ],
               ),
             if (c.series.isNotEmpty)
@@ -88,7 +92,11 @@ class _CollectionDetailScreenState
                   child: Text('Series'),
                 ),
                 slivers: [
-                  SliverItemGrid(items: c.series, shouldReplace: false),
+                  SliverItemGrid(
+                    items: c.series,
+                    shouldReplace: false,
+                    isCollection: true,
+                  ),
                 ],
               ),
             if (c.seasons.isNotEmpty)
@@ -99,7 +107,11 @@ class _CollectionDetailScreenState
                   child: Text('Seasons'),
                 ),
                 slivers: [
-                  SliverItemGrid(items: c.seasons, shouldReplace: false),
+                  SliverItemGrid(
+                    items: c.seasons,
+                    shouldReplace: false,
+                    isCollection: true,
+                  ),
                 ],
               ),
             if (c.episodes.isNotEmpty)
@@ -110,7 +122,11 @@ class _CollectionDetailScreenState
                   child: Text('Episodes'),
                 ),
                 slivers: [
-                  SliverItemGrid(items: c.episodes, shouldReplace: false),
+                  SliverItemGrid(
+                    items: c.episodes,
+                    shouldReplace: false,
+                    isCollection: true,
+                  ),
                 ],
               ),
             if (c.videos.isNotEmpty)
@@ -121,7 +137,11 @@ class _CollectionDetailScreenState
                   child: Text('Videos'),
                 ),
                 slivers: [
-                  SliverItemGrid(items: c.videos, shouldReplace: false),
+                  SliverItemGrid(
+                    items: c.videos,
+                    shouldReplace: false,
+                    isCollection: true,
+                  ),
                 ],
               ),
           ];
