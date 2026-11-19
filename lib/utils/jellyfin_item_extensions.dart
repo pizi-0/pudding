@@ -7,6 +7,8 @@ import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/num_extensions.dart';
 
 extension JellyInfo on JellyfinItem {
+  Map<String, dynamic> get _userData => raw['UserData'] as Map<String, dynamic>;
+
   String getTitle({bool short = false}) {
     String title = '';
 
@@ -40,8 +42,8 @@ extension JellyInfo on JellyfinItem {
   }
 
   String getSeriesRunYears() {
-    final startYear = productionYear?.toString() ?? '';
-    final endYear = DateTime.tryParse((raw['EndDate'] ?? '') as String);
+    final startYear = productionYear ?? '';
+    final endYear = DateTime.tryParse(raw['EndDate'] as String? ?? '');
     final status = raw['Status'];
 
     if (status == 'Continuing') {
@@ -78,8 +80,7 @@ extension JellyInfo on JellyfinItem {
   }
 
   int getSeasonPlayPercentage() {
-    final unplayed =
-        (raw['UserData'] as Map<String, dynamic>)['UnplayedItemCount'] ?? 0;
+    final unplayed = _userData['UnplayedItemCount'] ?? 0;
     final totalEpisodes = childCount ?? 0;
 
     if (totalEpisodes == 0) {
@@ -91,8 +92,7 @@ extension JellyInfo on JellyfinItem {
 
   double getPlayProgress() {
     final played = userData?.played ?? false;
-    final percentage =
-        (raw['UserData'] as Map<String, dynamic>)['PlayedPercentage'] ?? 0;
+    final percentage = _userData['PlayedPercentage'] ?? 0;
 
     if (played) {
       return 1;
@@ -129,12 +129,8 @@ extension JellyInfo on JellyfinItem {
     );
   }
 
-  double getSeasonCoverAspectRatio() {
-    return (raw['PrimaryImageAspectRatio'] ?? 0.68) as double;
-  }
-
   int? getUnplayed() {
-    return (raw['UserData'] as Map<String, dynamic>)['UnplayedItemCount'];
+    return _userData['UnplayedItemCount'];
   }
 
   String getImage({
