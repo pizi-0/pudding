@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:dart_jellyfin/dart_jellyfin.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:pudding/models/jelly_people.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/num_extensions.dart';

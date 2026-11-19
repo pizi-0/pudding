@@ -1,7 +1,7 @@
 import 'package:awesome_extensions/awesome_extensions.dart' show StyledText;
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:morphnext/morphnext.dart';
