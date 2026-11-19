@@ -113,6 +113,7 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
                           minHeight: 250 * 16 / 11,
                         ),
                         child: CachedNetworkImage(
+                          cacheKey: item.primaryTag,
                           imageUrl: item.getPrimary(),
                           maxHeightDiskCache: (250 * 16 / 11).toInt(),
                           filterQuality: .medium,
@@ -135,6 +136,7 @@ class _SliverShowcaseState extends ConsumerState<SliverShowcase> {
                                 child: CachedNetworkImage(
                                   memCacheWidth: 400,
                                   fit: .contain,
+                                  cacheKey: item.logoTag,
                                   imageUrl: item.getLogo(),
                                 ),
                               ),

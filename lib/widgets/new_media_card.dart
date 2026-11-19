@@ -58,6 +58,7 @@ class _NewNewMediaCardState extends State<NewNewMediaCard>
                       child: CachedNetworkImage(
                         memCacheWidth: imgWidth,
                         disablePlaceholderOnCacheHit: false,
+                        cacheKey: item.getImageTag(type: imgType),
                         imageUrl: item.getImage(type: imgType),
                         fit: .cover,
                       ),

@@ -32,6 +32,7 @@ class _ImagesSlideshowState extends State<ImagesSlideshow> {
             duration: 500.milliseconds,
             opacity: currentIndex == index ? 1 : 0,
             child: CachedNetworkImage(
+              cacheKey: item.backdropTag,
               imageUrl: item.getBackdrop(),
               fit: .cover,
             ),

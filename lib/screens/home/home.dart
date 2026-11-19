@@ -263,8 +263,7 @@ class _ShowcaseCarouselState extends ConsumerState<ShowcaseCarousel> {
                               child: Align(
                                 alignment: .bottomLeft,
                                 child: CachedNetworkImage(
-                                  cacheKey: item
-                                      .imageTags[JellyfinImagesApi.typeLogo],
+                                  cacheKey: item.logoTag,
                                   memCacheWidth: 450,
                                   maxHeightDiskCache: 300,
                                   fit: .contain,

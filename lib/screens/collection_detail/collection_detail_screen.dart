@@ -210,6 +210,7 @@ class _SliverCollectionStatsState extends ConsumerState<SliverCollectionStats> {
                           minHeight: 250,
                         ),
                         child: CachedNetworkImage(
+                          cacheKey: item.primaryTag,
                           imageUrl: item.getPrimary(),
                           filterQuality: .medium,
                           fit: .cover,

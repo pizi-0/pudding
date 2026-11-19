@@ -39,6 +39,10 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
     final totalWeight = sortedWeight.fold(0, (prev, e) => prev + e);
     final resumable = widget.item.isResumable;
 
+    final imgType = widget.item.isEpisode
+        ? JellyfinImagesApi.typePrimary
+        : JellyfinImagesApi.typeThumb;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final height = constraints.maxHeight;
@@ -70,20 +74,23 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
                           duration: kDefaultAnimationDuration,
                           opacity: hover ? 0.8 : 1,
                           child: CachedNetworkImage(
-                            imageUrl: widget.item.getImage(
-                              type: widget.item.isEpisode
-                                  ? JellyfinImagesApi.typePrimary
-                                  : JellyfinImagesApi.typeThumb,
-                            ),
+                            cacheKey: widget.item.getImageTag(type: imgType),
+                            imageUrl: widget.item.getImage(type: imgType),
                             fit: .cover,
                             errorBuilder: (context, error, stackTrace) =>
                                 CachedNetworkImage(
+                                  cacheKey: widget.item.getImageTag(
+                                    type: JellyfinImagesApi.typeBackdrop,
+                                  ),
                                   imageUrl: widget.item.getImage(
                                     type: JellyfinImagesApi.typeBackdrop,
                                   ),
                                   fit: .cover,
                                   errorBuilder: (context, error, stackTrace) =>
                                       CachedNetworkImage(
+                                        cacheKey: widget.item.getImageTag(
+                                          type: JellyfinImagesApi.typePrimary,
+                                        ),
                                         imageUrl: widget.item.getImage(
                                           type: JellyfinImagesApi.typePrimary,
                                         ),
@@ -149,6 +156,7 @@ class _HeroCarouselCardState extends State<HeroCarouselCard> {
                                     child: Opacity(
                                       opacity: 0.8,
                                       child: CachedNetworkImage(
+                                        cacheKey: widget.item.logoTag,
                                         imageUrl: widget.item.getLogo(),
                                         width: 150,
                                         errorBuilder: (

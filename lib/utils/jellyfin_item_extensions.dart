@@ -6,7 +6,7 @@ import 'package:pudding/models/jelly_people.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/num_extensions.dart';
 
-extension JellyInfo on JellyfinItem {
+extension JellyItemInfo on JellyfinItem {
   Map<String, dynamic> get _userData => raw['UserData'] as Map<String, dynamic>;
 
   String getTitle({bool short = false}) {
@@ -101,89 +101,8 @@ extension JellyInfo on JellyfinItem {
     return percentage / 100;
   }
 
-  String getLogo() {
-    return services<JellyfinClient>().images.url(
-      itemId: seriesId ?? id,
-      type: JellyfinImagesApi.typeLogo,
-    );
-  }
-
-  String getBackdrop() {
-    return services<JellyfinClient>().images.url(
-      itemId: seriesId ?? id,
-      type: JellyfinImagesApi.typeBackdrop,
-    );
-  }
-
-  String getThumb() {
-    return services<JellyfinClient>().images.url(
-      itemId: id,
-      type: JellyfinImagesApi.typeThumb,
-    );
-  }
-
-  String getPrimary() {
-    return services<JellyfinClient>().images.url(
-      itemId: seriesId ?? id,
-      type: JellyfinImagesApi.typePrimary,
-    );
-  }
-
   int? getUnplayed() {
     return _userData['UnplayedItemCount'];
-  }
-
-  String getImage({
-    String type = JellyfinImagesApi.typePrimary,
-    bool useSeriesImg = false,
-  }) {
-    String type0 = type;
-
-    if (!imageTags.containsKey(type)) {
-      if (type != JellyfinImagesApi.typeBackdrop || backdropImageTags.isEmpty) {
-        final preferred = [
-          JellyfinImagesApi.typePrimary,
-          JellyfinImagesApi.typeThumb,
-          JellyfinImagesApi.typeBackdrop,
-          JellyfinImagesApi.typeLogo,
-        ];
-
-        for (final t in preferred) {
-          if (imageTags.containsKey(t)) {
-            type0 = t;
-            break;
-          }
-        }
-      }
-    }
-
-    return services<JellyfinClient>().images.url(
-      itemId: useSeriesImg ? (seriesId ?? id) : id,
-      type: useSeriesImg ? type : type0,
-    );
-  }
-
-  String? getImageTag({
-    String type = JellyfinImagesApi.typePrimary,
-  }) {
-    String type0 = type;
-    if (!imageTags.containsKey(type)) {
-      final preferred = [
-        JellyfinImagesApi.typePrimary,
-        JellyfinImagesApi.typeThumb,
-        JellyfinImagesApi.typeBackdrop,
-        JellyfinImagesApi.typeLogo,
-      ];
-
-      for (final t in preferred) {
-        if (imageTags.containsKey(t)) {
-          type0 = t;
-          break;
-        }
-      }
-    }
-
-    return imageTags[type0];
   }
 
   // String getParentImage({
@@ -283,4 +202,92 @@ extension JellyInfo on JellyfinItem {
 
   bool get isPlayed => userData?.played ?? false;
   bool get isResumable => userData?.playbackPositionTicks != 0;
+}
+
+extension JellyItemImageInfo on JellyfinItem {
+  String? get logoTag => imageTags['Logo'];
+  String? get primaryTag => imageTags['Primary'];
+  String? get thumbTag => imageTags['Thumb'];
+  String? get backdropTag => imageTags['Backdrop'];
+
+  String getLogo() {
+    return services<JellyfinClient>().images.url(
+      itemId: seriesId ?? id,
+      type: JellyfinImagesApi.typeLogo,
+    );
+  }
+
+  String getBackdrop() {
+    return services<JellyfinClient>().images.url(
+      itemId: seriesId ?? id,
+      type: JellyfinImagesApi.typeBackdrop,
+    );
+  }
+
+  String getThumb() {
+    return services<JellyfinClient>().images.url(
+      itemId: id,
+      type: JellyfinImagesApi.typeThumb,
+    );
+  }
+
+  String getPrimary() {
+    return services<JellyfinClient>().images.url(
+      itemId: seriesId ?? id,
+      type: JellyfinImagesApi.typePrimary,
+    );
+  }
+
+  String getImage({
+    String type = JellyfinImagesApi.typePrimary,
+    bool useSeriesImg = false,
+  }) {
+    String type0 = type;
+
+    if (!imageTags.containsKey(type)) {
+      if (type != JellyfinImagesApi.typeBackdrop || backdropImageTags.isEmpty) {
+        final preferred = [
+          JellyfinImagesApi.typePrimary,
+          JellyfinImagesApi.typeThumb,
+          JellyfinImagesApi.typeBackdrop,
+          JellyfinImagesApi.typeLogo,
+        ];
+
+        for (final t in preferred) {
+          if (imageTags.containsKey(t)) {
+            type0 = t;
+            break;
+          }
+        }
+      }
+    }
+
+    return services<JellyfinClient>().images.url(
+      itemId: useSeriesImg ? (seriesId ?? id) : id,
+      type: useSeriesImg ? type : type0,
+    );
+  }
+
+  String? getImageTag({
+    String type = JellyfinImagesApi.typePrimary,
+  }) {
+    String type0 = type;
+    if (!imageTags.containsKey(type)) {
+      final preferred = [
+        JellyfinImagesApi.typePrimary,
+        JellyfinImagesApi.typeThumb,
+        JellyfinImagesApi.typeBackdrop,
+        JellyfinImagesApi.typeLogo,
+      ];
+
+      for (final t in preferred) {
+        if (imageTags.containsKey(t)) {
+          type0 = t;
+          break;
+        }
+      }
+    }
+
+    return imageTags[type0];
+  }
 }

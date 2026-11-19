@@ -177,10 +177,8 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                 ).createShader(rect),
                 blendMode: .dstOut,
                 child: CachedNetworkImage(
-                  key: ValueKey(item.id),
-                  imageUrl: item.getImage(
-                    type: JellyfinImagesApi.typePrimary,
-                  ),
+                  cacheKey: item.getImageTag(),
+                  imageUrl: item.getImage(),
                   useOldImageOnUrlChange: true,
                   fit: .cover,
                   color: isPlayed

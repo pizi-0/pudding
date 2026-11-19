@@ -118,6 +118,9 @@ class _MediaCardState extends State<MediaCard> {
                                       alignment: .bottomCenter,
                                       scale: hover ? 1.01 : 1,
                                       child: CachedNetworkImage(
+                                        cacheKey: item.isPlaceholder
+                                            ? item.logoTag
+                                            : item.getImageTag(type: imageType),
                                         disablePlaceholderOnCacheHit: false,
                                         memCacheHeight: height.ceil(),
                                         fit: item.isPlaceholder

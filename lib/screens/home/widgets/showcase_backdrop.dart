@@ -85,6 +85,9 @@ class _ShowcaseItemBackdropState extends ConsumerState<ShowcaseItemBackdrop>
             children: [
               if (showPrev)
                 CachedNetworkImage(
+                  cacheKey: _prevItem!.getImageTag(
+                    type: JellyfinImagesApi.typeBackdrop,
+                  ),
                   imageUrl: _prevItem!.getImage(
                     type: JellyfinImagesApi.typeBackdrop,
                   ),
@@ -107,6 +110,9 @@ class _ShowcaseItemBackdropState extends ConsumerState<ShowcaseItemBackdrop>
               Opacity(
                 opacity: _fadeController.value,
                 child: CachedNetworkImage(
+                  cacheKey: _currentItem!.getImageTag(
+                    type: JellyfinImagesApi.typeBackdrop,
+                  ),
                   imageUrl: _currentItem!.getImage(
                     type: JellyfinImagesApi.typeBackdrop,
                   ),
