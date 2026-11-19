@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.13.0
+  sdk: ^3.14.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -34,7 +34,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^2.0.0
-  forui: ^0.27.7
+  forui: ^0.28.0
   forui_assets: ^0.25.0
   flutter_riverpod: ^3.5.0
   dart_jellyfin: ^0.4.3
@@ -56,7 +56,7 @@ dependencies:
   morphnext: ^0.7.1
   intl: ^0.20.3
   material_ui: ^1.11.1
-  forui_phosphor: ^0.27.0
+  forui_phosphor: ^0.28.0
   media_kit: ^1.2.6
   media_kit_video: ^2.0.1
   media_kit_libs_video: ^1.0.7
@@ -71,7 +71,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-  forui_cli: ^0.27.0
+  forui_cli: ^0.28.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
