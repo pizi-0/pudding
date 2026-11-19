@@ -27,9 +27,9 @@ class UserdataRegistryNotifier extends Notifier<Map<String, JellyfinUserData>> {
       JellyfinUserData data;
 
       if (isFavorite) {
-        data = await _client.userData.unmarkFavorite(item.id);
+        data = await _client.userData.unmarkFavorite(itemId: item.id);
       } else {
-        data = await _client.userData.markFavorite(item.id);
+        data = await _client.userData.markFavorite(itemId: item.id);
       }
 
       _upsert(item.id, data);
@@ -44,9 +44,9 @@ class UserdataRegistryNotifier extends Notifier<Map<String, JellyfinUserData>> {
       JellyfinUserData data;
 
       if (isPlayed) {
-        data = await _client.userData.markUnplayed(item.id);
+        data = await _client.userData.markUnplayed(itemId: item.id);
       } else {
-        data = await _client.userData.markPlayed(item.id);
+        data = await _client.userData.markPlayed(itemId: item.id);
       }
 
       _upsert(item.id, data);

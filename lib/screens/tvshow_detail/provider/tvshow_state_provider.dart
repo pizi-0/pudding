@@ -13,19 +13,19 @@ import 'package:pudding/utils/jellyfin_item_extensions.dart';
 //"AirTime" "CanDelete" "CanDownload" "ChannelInfo" "Chapters" "Trickplay" "ChildCount" "CumulativeRunTimeTicks" "CustomRating" "DateCreated" "DateLastMediaAdded" "DisplayPreferencesId" "Etag" "ExternalUrls" "Genres" "ItemCounts" "MediaSourceCount" "MediaSources" "OriginalTitle" "Overview" "ParentId" "Path" "People" "PlayAccess" "ProductionLocations" "ProviderIds" "PrimaryImageAspectRatio" "RecursiveItemCount" "Settings" "SeriesStudio" "SortName" "SpecialEpisodeNumbers" "Studios" "Taglines" "Tags" "RemoteTrailers" "MediaStreams" "SeasonUserData" "DateLastRefreshed" "DateLastSaved" "RefreshState" "ChannelImage" "EnableMediaSourceDisplay" "Width" "Height" "ExtraIds" "LocalTrailerCount" "IsHD" "SpecialFeatureCount"
 
 final defaultField = [
-  'AirtTime',
-  'ChildCount',
-  'CumulativeRunTimeTicks',
-  'CustomRating',
-  'ExternalUrls',
-  'Genres',
-  'Overview',
-  'RecursiveItemCount',
-  'SeasonUserData',
-  'People',
-  'LocalTrailerCount',
-  'RemoteTrailers',
-  'SpecialFeatureCount',
+  JellyfinItemField.airTime,
+  JellyfinItemField.childCount,
+  JellyfinItemField.cumulativeRunTimeTicks,
+  JellyfinItemField.customRating,
+  JellyfinItemField.externalUrls,
+  JellyfinItemField.genres,
+  JellyfinItemField.overview,
+  JellyfinItemField.recursiveItemCount,
+  JellyfinItemField.seasonUserData,
+  JellyfinItemField.people,
+  JellyfinItemField.localTrailerCount,
+  JellyfinItemField.remoteTrailers,
+  JellyfinItemField.specialFeatureCount,
 ];
 
 class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
@@ -126,7 +126,7 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
       final next = await client.tvShows.nextUp(
         seriesId: id,
         enableResumable: true,
-        fields: ['Overview'],
+        fields: [JellyfinItemField.overview],
       );
 
       // if (next.items.isEmpty) {
@@ -157,7 +157,7 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
     try {
       final res = await client.tvShows.seasons(
         seriesId: id,
-        fields: ['People', 'ChildCount'],
+        fields: [JellyfinItemField.people, JellyfinItemField.childCount],
       );
 
       return res.items;
@@ -167,7 +167,7 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
   }
 
   Future<List<JellyfinItem>> getExtras() async {
-    final res = await client.items.specialFeatures(id);
+    final res = await client.items.specialFeatures(itemId: id);
 
     return res;
   }
@@ -178,7 +178,7 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
     try {
       final res = await client.items.list(
         parentId: seasonId,
-        fields: ['Overview'],
+        fields: [JellyfinItemField.overview],
       );
 
       return res.items;
@@ -221,7 +221,7 @@ class TvshowStateNotifier extends AsyncNotifier<TvshowScreenState> {
     final res = await client.library.similarShows(
       itemId: id,
       limit: 10,
-      fields: ['SortName'],
+      fields: [JellyfinItemField.sortName],
     );
 
     return res.items;

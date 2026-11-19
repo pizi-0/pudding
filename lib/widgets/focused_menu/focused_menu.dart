@@ -45,7 +45,9 @@ class _FocusedMenuState extends ConsumerState<FocusedMenu>
     final theme = FTheme.of(context);
     final borderRadius = theme.style.borderRadius.sm;
     final user = ref.watch(authProvider).value;
-    final policy = UserPolicy.fromMap(user?.raw['Policy'] ?? {});
+    final policy = UserPolicy.fromMap(
+      (user?.raw['Policy'] as Map<String, dynamic>),
+    );
 
     return FPopoverMenu(
       control: .managed(

@@ -13,7 +13,7 @@ final itemDetailProvider = FutureProvider.family<JellyfinItem?, String>((
     return cache[id]!;
   }
 
-  final res = await services<JellyfinClient>().items.byId(id);
+  final res = await services<JellyfinClient>().items.byId(itemId: id);
 
   if (res != null) {
     ref.read(jellyCacheProvider.notifier).addSingle(res);

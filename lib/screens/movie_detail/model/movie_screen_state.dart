@@ -64,10 +64,10 @@ class MovieScreenState {
   String? get rating => movie!.getCommunityRating()?.toStringAsFixed(2);
   String? get parentalRating => movie!.getOfficialRating();
 
-  bool get isMultipart => (movie!.raw['PartCount'] ?? 1) > 1;
+  bool get isMultipart => (movie!.raw['PartCount'] ?? 1) as num > 1;
   String? get duration => _getDuration();
 
-  bool get hasExtras => (movie?.raw['SpecialFeatureCount'] ?? 0) > 0;
+  bool get hasExtras => ((movie?.raw['SpecialFeatureCount']) ?? 0) as num > 0;
 
   String? get size => _getSize();
 

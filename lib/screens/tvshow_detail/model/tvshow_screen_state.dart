@@ -44,5 +44,5 @@ class TvshowScreenState {
     );
   }
 
-  bool get hasExtras => (tvshow?.raw['SpecialFeatureCount'] ?? 0) > 0;
+  bool get hasExtras => (tvshow?.raw['SpecialFeatureCount'] ?? 0) as num > 0;
 }

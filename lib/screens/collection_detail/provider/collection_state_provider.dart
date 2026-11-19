@@ -45,7 +45,11 @@ class CollectionStateNotifier extends AsyncNotifier<CollectionScreenState> {
   Future<JellyfinItem> getCollection() async {
     final res = await client.items.list(
       ids: [id],
-      fields: ['Overview', 'Studios', 'Genres'],
+      fields: [
+        JellyfinItemField.overview,
+        JellyfinItemField.studios,
+        JellyfinItemField.genres,
+      ],
     );
 
     return res.items.first;
@@ -55,7 +59,10 @@ class CollectionStateNotifier extends AsyncNotifier<CollectionScreenState> {
     final res = await client.items.list(
       parentId: id,
       recursive: false,
-      fields: ['MediaSources', 'CumulativeRunTimeTicks'],
+      fields: [
+        JellyfinItemField.mediaSources,
+        JellyfinItemField.cumulativeRunTimeTicks,
+      ],
     );
 
     return res.items;

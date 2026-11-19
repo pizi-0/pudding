@@ -7,7 +7,7 @@ final _client = services<JellyfinClient>();
 extension JellyUserDataExtension on JellyfinItem {
   Future<JellyfinUserData> setPlayed() async {
     try {
-      return await _client.userData.markPlayed(id);
+      return await _client.userData.markPlayed(itemId: id);
     } catch (e) {
       rethrow;
     }
@@ -15,7 +15,7 @@ extension JellyUserDataExtension on JellyfinItem {
 
   Future<JellyfinUserData> setUnplayed() async {
     try {
-      return await _client.userData.markUnplayed(id);
+      return await _client.userData.markUnplayed(itemId: id);
     } catch (e) {
       rethrow;
     }
@@ -23,7 +23,7 @@ extension JellyUserDataExtension on JellyfinItem {
 
   Future<JellyfinUserData> setFavorite() async {
     try {
-      return await _client.userData.markFavorite(id);
+      return await _client.userData.markFavorite(itemId: id);
     } catch (e) {
       rethrow;
     }
@@ -31,7 +31,7 @@ extension JellyUserDataExtension on JellyfinItem {
 
   Future<JellyfinUserData> unsetFavorite() async {
     try {
-      return await _client.userData.unmarkFavorite(id);
+      return await _client.userData.unmarkFavorite(itemId: id);
     } catch (e) {
       rethrow;
     }

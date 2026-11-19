@@ -348,7 +348,9 @@ class _QuickConnectDialogState extends ConsumerState<QuickConnectDialog> {
       if (quickConnect != null) {
         while (true) {
           await Future.delayed(2.seconds);
-          final state = await jelly.quickConnect.state(quickConnect!.secret);
+          final state = await jelly.quickConnect.state(
+            secret: quickConnect!.secret,
+          );
 
           if (state.authenticated) break;
         }

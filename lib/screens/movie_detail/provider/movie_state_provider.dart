@@ -9,15 +9,15 @@ import 'package:pudding/utils/jellyfin_item_copywith_extension.dart';
 //"AirTime" "CanDelete" "CanDownload" "ChannelInfo" "Chapters" "Trickplay" "ChildCount" "CumulativeRunTimeTicks" "CustomRating" "DateCreated" "DateLastMediaAdded" "DisplayPreferencesId" "Etag" "ExternalUrls" "Genres" "ItemCounts" "MediaSourceCount" "MediaSources" "OriginalTitle" "Overview" "ParentId" "Path" "People" "PlayAccess" "ProductionLocations" "ProviderIds" "PrimaryImageAspectRatio" "RecursiveItemCount" "Settings" "SeriesStudio" "SortName" "SpecialEpisodeNumbers" "Studios" "Taglines" "Tags" "RemoteTrailers" "MediaStreams" "SeasonUserData" "DateLastRefreshed" "DateLastSaved" "RefreshState" "ChannelImage" "EnableMediaSourceDisplay" "Width" "Height" "ExtraIds" "LocalTrailerCount" "IsHD" "SpecialFeatureCount"
 
 final fields = [
-  'Overview',
-  'People',
-  'ExternalUrls',
-  'Genres',
-  'RemoteTrailers',
-  'LocalTrailerCount',
-  'MediaSources',
-  'MediaSourceCount',
-  'SpecialFeatureCount',
+  JellyfinItemField.overview,
+  JellyfinItemField.people,
+  JellyfinItemField.externalUrls,
+  JellyfinItemField.genres,
+  JellyfinItemField.remoteTrailers,
+  JellyfinItemField.localTrailerCount,
+  JellyfinItemField.mediaSources,
+  JellyfinItemField.mediaSourceCount,
+  JellyfinItemField.specialFeatureCount,
 ];
 
 class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
@@ -95,9 +95,9 @@ class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
       final current = state.value;
 
       if (isfav) {
-        newData = await client.userData.unmarkFavorite(id);
+        newData = await client.userData.unmarkFavorite(itemId: id);
       } else {
-        newData = await client.userData.markFavorite(id);
+        newData = await client.userData.markFavorite(itemId: id);
       }
 
       return current!.copyWith(
@@ -116,9 +116,9 @@ class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
       final current = state.value;
 
       if (isplayed) {
-        newData = await client.userData.markUnplayed(id);
+        newData = await client.userData.markUnplayed(itemId: id);
       } else {
-        newData = await client.userData.markPlayed(id);
+        newData = await client.userData.markPlayed(itemId: id);
       }
 
       return current!.copyWith(
@@ -128,13 +128,13 @@ class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
   }
 
   Future<List<JellyfinItem>> getAdditionalParts() async {
-    final res = await client.videos.additionalParts(id);
+    final res = await client.videos.additionalParts(itemId: id);
 
-    return res.map((e) => JellyfinItem.fromJson(e)).toList();
+    return res.items;
   }
 
   Future<List<JellyfinItem>> getExtras() async {
-    final res = await client.items.specialFeatures(id);
+    final res = await client.items.specialFeatures(itemId: id);
 
     return res;
   }
@@ -143,7 +143,7 @@ class MovieStateNotifier extends AsyncNotifier<MovieScreenState> {
     final res = await client.library.similarMovies(
       itemId: id,
       limit: 10,
-      fields: ['SortName'],
+      fields: [JellyfinItemField.sortName],
     );
 
     return res.items;

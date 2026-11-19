@@ -41,7 +41,7 @@ extension JellyInfo on JellyfinItem {
 
   String getSeriesRunYears() {
     final startYear = productionYear?.toString() ?? '';
-    final endYear = DateTime.tryParse(raw['EndDate'] ?? '');
+    final endYear = DateTime.tryParse((raw['EndDate'] ?? '') as String);
     final status = raw['Status'];
 
     if (status == 'Continuing') {
@@ -78,7 +78,8 @@ extension JellyInfo on JellyfinItem {
   }
 
   int getSeasonPlayPercentage() {
-    final unplayed = raw['UserData']['UnplayedItemCount'] ?? 0;
+    final unplayed =
+        (raw['UserData'] as Map<String, dynamic>)['UnplayedItemCount'] ?? 0;
     final totalEpisodes = childCount ?? 0;
 
     if (totalEpisodes == 0) {
@@ -89,8 +90,9 @@ extension JellyInfo on JellyfinItem {
   }
 
   double getPlayProgress() {
-    final played = raw['UserData']['Played'] ?? false;
-    final percentage = raw['UserData']['PlayedPercentage'] ?? 0;
+    final played = userData?.played ?? false;
+    final percentage =
+        (raw['UserData'] as Map<String, dynamic>)['PlayedPercentage'] ?? 0;
 
     if (played) {
       return 1;
@@ -128,11 +130,11 @@ extension JellyInfo on JellyfinItem {
   }
 
   double getSeasonCoverAspectRatio() {
-    return (raw['PrimaryImageAspectRatio'] ?? 0.68);
+    return (raw['PrimaryImageAspectRatio'] ?? 0.68) as double;
   }
 
   int? getUnplayed() {
-    return raw['UserData']?['UnplayedItemCount'];
+    return (raw['UserData'] as Map<String, dynamic>)['UnplayedItemCount'];
   }
 
   String getImage({
@@ -214,11 +216,11 @@ extension JellyInfo on JellyfinItem {
   // }
 
   String? getOfficialRating() {
-    return raw['OfficialRating'];
+    return raw['OfficialRating'] as String?;
   }
 
   num? getCommunityRating() {
-    return raw['CommunityRating'];
+    return raw['CommunityRating'] as num?;
   }
 
   int? getSeasons() {
@@ -257,7 +259,7 @@ extension JellyInfo on JellyfinItem {
   }
 
   String getStatus() {
-    return raw['Status'];
+    return raw['Status'] as String;
   }
 
   bool get isSeries => type == JellyfinItemKind.series;

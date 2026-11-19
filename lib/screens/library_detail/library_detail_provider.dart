@@ -50,7 +50,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
         includeItemTypes: _includeItemTypes(lib),
         limit: limit ?? this.limit,
         officialRatings: applied.parentalRating,
-        filters: applied.filters,
+        filters: applied.filters.map((f) => JellyfinItemFilter(f)).toList(),
         genres: applied.genres,
         years: applied.years,
         tags: applied.tags,
@@ -116,7 +116,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
         excludeItemTypes: [JellyfinItemKind.folder],
         includeItemTypes: _includeItemTypes(lib),
         officialRatings: applied.parentalRating,
-        filters: applied.filters,
+        filters: applied.filters.map((f) => JellyfinItemFilter(f)).toList(),
         genres: applied.genres,
         years: applied.years,
         tags: applied.tags,
@@ -190,7 +190,7 @@ class LibraryNotifier extends AsyncNotifier<LibraryData> {
     return PuddingFilters.fromLegacyJelly(res);
   }
 
-  List<String> _includeItemTypes(JellyfinView view) {
+  List<JellyfinItemKind> _includeItemTypes(JellyfinView view) {
     if (view.isTvShows) {
       return [JellyfinItemKind.series];
     } else if (view.isMovies) {

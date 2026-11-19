@@ -48,7 +48,7 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
 
     for (int i = 0; i < items.length; i++) {
       if (items[i].overview == null) {
-        refetch.add(client.items.byId(items[i].id));
+        refetch.add(client.items.byId(itemId: items[i].id));
       }
     }
 
@@ -67,8 +67,12 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
   Future<List<JellyfinItem>> _getShowcaseItems({int limit = 20}) async {
     final res = await client.items.list(
       limit: limit,
-      sortBy: ['Random'],
-      fields: ['Overview', 'Genres', 'ChildCount'],
+      sortBy: [JellyfinSortField.random],
+      fields: [
+        JellyfinItemField.overview,
+        JellyfinItemField.genres,
+        JellyfinItemField.childCount,
+      ],
       includeItemTypes: [JellyfinItemKind.movie, JellyfinItemKind.series],
     );
 
@@ -90,7 +94,10 @@ class HomeNotifier extends AsyncNotifier<HomeData> {
   }
 
   Future<List<JellyfinItem>> _getContinueWatching({int limit = 10}) async {
-    final res = await client.items.resume(limit: limit, mediaTypes: ['Video']);
+    final res = await client.items.resume(
+      limit: limit,
+      mediaTypes: [JellyfinMediaType.video],
+    );
 
     return res.items;
   }
