@@ -53,7 +53,7 @@ dependencies:
   go_transitions: ^0.8.4
   quiver: ^3.2.2
   silky_scroll: ^2.6.4
-  morphnext: ^0.7.1
+  morphnext: ^0.7.2
   intl: ^0.20.3
   material_ui: ^1.11.1
   forui_phosphor: ^0.28.0

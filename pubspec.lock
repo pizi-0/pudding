@@ -633,10 +633,10 @@ packages:
     dependency: "direct main"
     description:
       name: morphnext
-      sha256: "738457cb22674c6aaf900029f753f2693d2efa30156677a250fa6bbd5316f55c"
+      sha256: "30a7706356e0f7531685719779d5919584bce4a6a1b4ca0dce79a461d33f10fa"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.1"
+    version: "0.7.2"
   objective_c:
     dependency: transitive
     description:
