@@ -7,7 +7,7 @@ import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:morphnext/morphnext.dart';
 import 'package:pudding/const/const.dart';
-import 'package:pudding/screens/tvshow_detail/provider/tvshow_state_provider.dart';
+import 'package:pudding/screens/detail_screens/tvshow_detail/provider/tvshow_state_provider.dart';
 import 'package:pudding/widgets/media_card.dart';
 
 class SeasonSelector extends ConsumerStatefulWidget {

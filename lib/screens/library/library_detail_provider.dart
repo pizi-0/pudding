@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:pudding/models/pudding_filters.dart';
-import 'package:pudding/screens/library_detail/user_views_provider.dart';
+import 'package:pudding/screens/library/user_views_provider.dart';
 import 'package:pudding/services/di.dart';
 
 class LibraryNotifier extends AsyncNotifier<LibraryData> {

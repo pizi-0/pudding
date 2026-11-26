@@ -10,7 +10,7 @@ import 'package:morphnext/morphnext.dart';
 import 'package:pudding/const/const.dart';
 import 'package:pudding/models/jelly_filter.dart';
 import 'package:pudding/providers/settings_provider.dart';
-import 'package:pudding/screens/library_detail/library_detail_provider.dart';
+import 'package:pudding/screens/library/library_detail_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_section.dart';
 import 'package:pudding/widgets/focused_menu/menu_items.dart';

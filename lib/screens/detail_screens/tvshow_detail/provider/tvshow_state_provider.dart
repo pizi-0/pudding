@@ -6,7 +6,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:pudding/screens/tvshow_detail/model/tvshow_screen_state.dart';
+import 'package:pudding/screens/detail_screens/tvshow_detail/model/tvshow_screen_state.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 

@@ -2,11 +2,12 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
-import 'package:pudding/screens/movie_detail/model/movie_screen_state.dart';
-import 'package:pudding/screens/movie_detail/provider/movie_state_provider.dart';
+import 'package:pudding/screens/detail_screens/tvshow_detail/model/tvshow_screen_state.dart';
+import 'package:pudding/screens/detail_screens/tvshow_detail/provider/tvshow_state_provider.dart';
 import 'package:pudding/utils/scroll_to_key_extension.dart';
 import 'package:pudding/widgets/detail_scaffold.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_collections.dart';
+import 'package:pudding/widgets/detail_slivers/sliver_episode.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_error.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_loader.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_multipart.dart';
@@ -15,22 +16,23 @@ import 'package:pudding/widgets/detail_slivers/sliver_showcase.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_similar.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_topbar.dart';
 
-class MovieDetailScreen extends ConsumerStatefulWidget {
+class TvshowDetail extends ConsumerStatefulWidget {
   final String id;
-  const MovieDetailScreen({super.key, required this.id});
+
+  const TvshowDetail({super.key, required this.id});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _ShowsDetailScreensState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _TvshowDetailState();
 }
 
-class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
+class _TvshowDetailState extends ConsumerState<TvshowDetail> {
   final GlobalKey infoKey = GlobalKey(debugLabel: 'info-section');
-  final GlobalKey multipartKey = GlobalKey(debugLabel: 'multipart-section');
+  final GlobalKey episodeKey = GlobalKey(debugLabel: 'episode-section');
   final GlobalKey extrasKey = GlobalKey(debugLabel: 'extras-section');
-  final GlobalKey collectionsKey = GlobalKey(debugLabel: 'collections-section');
   final GlobalKey peopleKey = GlobalKey(debugLabel: 'people-section');
   final GlobalKey similarKey = GlobalKey(debugLabel: 'similar-section');
+  final GlobalKey collectionKey = GlobalKey(debugLabel: 'collection-section');
+
   List<(GlobalKey, String, IconData)> destinations = [];
 
   bool favoriteLoading = false;
@@ -40,16 +42,19 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      ref.invalidate(movieStateProvider(widget.id));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(tvshowStateProvider(widget.id));
     });
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    final movieAsync = ref.watch(movieStateProvider(widget.id));
+    final size = MediaQuery.sizeOf(context);
+    final tvAsync = ref.watch(tvshowStateProvider((widget.id)));
+    final tvNotifier = ref.read(tvshowStateProvider(widget.id).notifier);
 
-    ref.listen(movieStateProvider(widget.id), (p, n) {
+    ref.listen(tvshowStateProvider(widget.id), (p, n) {
       n.whenOrNull(
         data: (data) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -59,24 +64,24 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
       );
     });
 
-    final size = MediaQuery.sizeOf(context);
-
     return DetailScaffold(
       backdrop: DetailBackdrop(id: widget.id),
       headerSliver: SliverTopbar(
         showShadowOnPrefix: false,
-        suffix: PDetailRefreshButton(),
+        suffix: PDetailRefreshButton(
+          onPress: () => ref.invalidate(tvshowStateProvider(widget.id)),
+        ),
         children: [
-          if (movieAsync.hasValue)
+          if (tvAsync.hasValue && tvAsync.value?.tvshow != null)
             FButton(
               variant: .outline,
               mainAxisAlignment: .start,
               mainAxisSize: .min,
               onPress: () {},
-              suffix: movieAsync.isLoading ? FCircularProgress() : null,
+              suffix: tvAsync.isLoading ? FCircularProgress() : null,
               child: Flexible(
                 child: Text(
-                  movieAsync.value!.movie!.name,
+                  tvAsync.value!.tvshow!.name,
                   overflow: .ellipsis,
                 ),
               ),
@@ -94,55 +99,58 @@ class _ShowsDetailScreensState extends ConsumerState<MovieDetailScreen> {
             )
             .toList(),
       ),
-      sliverBuilder: (context, controller) => movieAsync.when(
+      sliverBuilder: (context, controller) => tvAsync.when(
         skipLoadingOnReload: true,
         loading: () => [SliverLoader(id: widget.id)],
         error: (error, stackTrace) => [SliverError(error: error.toString())],
-        data: (m) {
+        data: (tv) {
           return [
-            SliverShowcase(
+            SliverShowcase.tv(
               key: infoKey,
-              item: m.movie!,
+              item: tv.tvshow!,
+              nextup: tv.nextup,
               maxExtent: size.height - 76 - 96,
-              filesize: m.size,
+              onTogglePlayed: () async {
+                await tvNotifier.onTogglePlayed();
+              },
             ),
-
-            if (m.isMultipart)
-              SliverMultipart(
-                key: multipartKey,
-                items: m.multipart,
-              ),
-
-            if (m.hasExtras)
+            SliverEpisodes(
+              key: episodeKey,
+              id: widget.id,
+            ),
+            if (tv.hasExtras)
               SliverExtras(
                 key: extrasKey,
-                items: m.extras,
+                items: tv.extras,
               ),
-
-            if (m.collections.isNotEmpty)
+            if (tv.collections.isNotEmpty)
               SliverCollections(
-                key: collectionsKey,
-                items: m.collections,
+                key: collectionKey,
+                items: tv.collections,
               ),
-
-            SliverPeople(key: peopleKey, media: m.movie!),
-
-            SliverSimilar(key: similarKey, items: m.similars),
+            SliverPeople(
+              key: peopleKey,
+              media: tv.tvshow!,
+              altMedia: tv.selectedSeason,
+            ),
+            SliverSimilar(
+              key: similarKey,
+              items: tv.similars,
+            ),
           ];
         },
       ),
     );
   }
 
-  void _buildDestinations(MovieScreenState state) {
+  void _buildDestinations(TvshowScreenState state) {
     destinations = [
       (infoKey, 'Info', FPhosphorBoldIcons.info),
-      if (state.isMultipart)
-        (multipartKey, 'Additional parts', FPhosphorBoldIcons.television),
+      (episodeKey, 'Episode', FPhosphorBoldIcons.television),
       if (state.hasExtras)
         (extrasKey, 'Special features', FPhosphorBoldIcons.cookie),
       if (state.collections.isNotEmpty)
-        (collectionsKey, 'Collections', FPhosphorBoldIcons.package),
+        (collectionKey, 'Collections', FPhosphorBoldIcons.package),
       (peopleKey, 'Cast & Crew', FPhosphorBoldIcons.user),
       (similarKey, 'More', FPhosphorBoldIcons.starFour),
     ];

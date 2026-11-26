@@ -5,7 +5,7 @@ import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pudding/screens/home/models/home_data_model.dart';
 import 'package:pudding/screens/home/providers/showcase_provider.dart';
-import 'package:pudding/screens/library_detail/user_views_provider.dart';
+import 'package:pudding/screens/library/user_views_provider.dart';
 
 import 'package:pudding/services/di.dart';
 

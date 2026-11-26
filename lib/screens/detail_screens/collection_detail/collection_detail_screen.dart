@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:forui_phosphor/forui_phosphor.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:pudding/screens/collection_detail/provider/collection_state_provider.dart';
+import 'package:pudding/screens/detail_screens/collection_detail/provider/collection_state_provider.dart';
 import 'package:pudding/utils/jellyfin_item_extensions.dart';
 import 'package:pudding/widgets/detail_scaffold.dart';
 import 'package:pudding/widgets/detail_slivers/sliver_error.dart';

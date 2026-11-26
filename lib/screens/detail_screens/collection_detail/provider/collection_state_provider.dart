@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pudding/screens/collection_detail/model/collection_screen_state.dart';
+import 'package:pudding/screens/detail_screens/collection_detail/model/collection_screen_state.dart';
 import 'package:pudding/services/di.dart';
 
 //"AirTime" "CanDelete" "CanDownload" "ChannelInfo" "Chapters" "Trickplay" "ChildCount" "CumulativeRunTimeTicks" "CustomRating" "DateCreated" "DateLastMediaAdded" "DisplayPreferencesId" "Etag" "ExternalUrls" "Genres" "ItemCounts" "MediaSourceCount" "MediaSources" "OriginalTitle" "Overview" "ParentId" "Path" "People" "PlayAccess" "ProductionLocations" "ProviderIds" "PrimaryImageAspectRatio" "RecursiveItemCount" "Settings" "SeriesStudio" "SortName" "SpecialEpisodeNumbers" "Studios" "Taglines" "Tags" "RemoteTrailers" "MediaStreams" "SeasonUserData" "DateLastRefreshed" "DateLastSaved" "RefreshState" "ChannelImage" "EnableMediaSourceDisplay" "Width" "Height" "ExtraIds" "LocalTrailerCount" "IsHD" "SpecialFeatureCount"

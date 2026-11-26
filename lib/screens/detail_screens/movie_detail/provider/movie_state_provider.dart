@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:dart_jellyfin/dart_jellyfin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pudding/screens/movie_detail/model/movie_screen_state.dart';
+import 'package:pudding/screens/detail_screens/movie_detail/model/movie_screen_state.dart';
 import 'package:pudding/services/di.dart';
 import 'package:pudding/utils/jellyfin_item_copywith_extension.dart';
 
